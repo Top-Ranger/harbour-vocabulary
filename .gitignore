@@ -1,0 +1,7 @@
+*.qm
+*.user
+*.user.*
+
+# Icon path - create with 'create_icons.sh'
+icons/*
+icons/*/*
