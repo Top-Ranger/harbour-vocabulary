@@ -38,9 +38,6 @@ Page {
 
         VerticalScrollDecorator {}
 
-        PullDownMenu {
-        }
-
         contentHeight: column.height
 
         Column {
