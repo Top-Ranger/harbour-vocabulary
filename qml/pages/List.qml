@@ -23,14 +23,9 @@ Page {
     Item {
         id: functions
 
-        function remove_word(word) {
+        function remove_word(word, item) {
             if(simple_interface.removeVocabulary(word)) {
-                for(var i = 0; i < listModel.count; ++i) {
-                    if(listModel.get(i).word === word) {
-                        listModel.remove(i)
-                        return
-                    }
-                }
+                item.animateRemoval()
             }
             else {
                 panel.show()
@@ -65,6 +60,7 @@ Page {
         }
 
         delegate: ListItem {
+            id: listitem
             width: parent.width
 
             Row {
@@ -98,7 +94,7 @@ Page {
                 MenuItem {
                     text: qsTr("Remove vocabulary")
                     onClicked: {
-                        functions.remove_word(word)
+                        listitem.remorseAction(qsTr("Remove vocabulary"), function() { functions.remove_word(word, listitem) })
                     }
                 }
             }
