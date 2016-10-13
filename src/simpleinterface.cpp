@@ -62,8 +62,8 @@ bool SimpleInterface::addVocabulary(QString word, QString translation)
     QSqlQuery q(database);
 
     q.prepare(s);
-    q.addBindValue(word);
-    q.addBindValue(translation);
+    q.addBindValue(word.simplified());
+    q.addBindValue(translation.simplified());
 
     if(!q.exec())
     {
@@ -82,7 +82,7 @@ bool SimpleInterface::removeVocabulary(QString word)
     QSqlQuery q(database);
 
     q.prepare(s);
-    q.addBindValue(word);
+    q.addBindValue(word.simplified());
 
     if(!q.exec())
     {
@@ -130,7 +130,7 @@ QString SimpleInterface::getTranslationOfWord(QString word)
     QSqlQuery q(database);
 
     q.prepare(s);
-    q.addBindValue(word);
+    q.addBindValue(word.simplified());
 
     if(!q.exec())
     {
