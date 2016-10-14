@@ -16,6 +16,8 @@
 
 #include "simpleinterface.h"
 
+#include <QtCore/QtMath>
+
 SimpleInterface::SimpleInterface(QObject *parent) :
     QObject(parent),
     _count(0)
@@ -30,30 +32,30 @@ int SimpleInterface::count()
 
 void SimpleInterface::recount()
 {
-   _count = 0;
-   QString s = "SELECT count(*) FROM vocabulary";
-   QSqlQuery q(database);
+    _count = 0;
+    QString s = "SELECT count(*) FROM vocabulary";
+    QSqlQuery q(database);
 
-   if(!q.exec(s))
-   {
-       QString error = s.append(": ").append(q.lastError().text());
-       WARNING(error);
-       return;
-   }
-   if(!q.isSelect())
-   {
-       QString error = s.append(": No select");
-       WARNING(error);
-       return;
-   }
-   if(!q.next())
-   {
-       QString error = s.append(": ").append(q.lastError().text());
-       WARNING(error);
-       return;
-   }
-   _count = q.value(0).toInt();
-   emit countChanged(_count);
+    if(!q.exec(s))
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return;
+    }
+    if(!q.isSelect())
+    {
+        QString error = s.append(": No select");
+        WARNING(error);
+        return;
+    }
+    if(!q.next())
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return;
+    }
+    _count = q.value(0).toInt();
+    emit countChanged(_count);
 }
 
 bool SimpleInterface::addVocabulary(QString word, QString translation)
@@ -93,6 +95,63 @@ bool SimpleInterface::removeVocabulary(QString word)
     _count -= 1;
     emit countChanged(_count);
     return true;
+}
+
+bool SimpleInterface::editVocabulary(QString origin_word, QString new_word, QString translation, int priority)
+{
+    priority = qBound(1, priority, 100);
+    origin_word = origin_word.simplified();
+    new_word = new_word.simplified();
+    translation = translation.simplified();
+
+    if(origin_word == new_word)
+    {
+        // Update entry
+        QSqlQuery q(database);
+        QString s = "UPDATE vocabulary SET translation=?, priority=? WHERE word=?";
+        q.prepare(s);
+        q.addBindValue(translation);
+        q.addBindValue(priority);
+        q.addBindValue(origin_word);
+
+        if(!q.exec())
+        {
+            QString error = s.append(": ").append(q.lastError().text());
+            WARNING(error);
+            return false;
+        }
+        return true;
+    }
+    else
+    {
+        // Add new entry...
+        QSqlQuery q(database);
+        QString s = "INSERT INTO vocabulary (word, translation, priority) VALUES (?,?,?)";
+        q.prepare(s);
+        q.addBindValue(new_word);
+        q.addBindValue(translation);
+        q.addBindValue(priority);
+
+        if(!q.exec())
+        {
+            QString error = s.append(": ").append(q.lastError().text());
+            WARNING(error);
+            return false;
+        }
+
+        // ... and delete old one
+
+        if(!removeVocabulary(origin_word))
+        {
+            // Failure! Try delete new entry
+            if(!removeVocabulary(new_word))
+            {
+                CRITICAL("Can not remove new entry" << new_word);
+            }
+            return false;
+        }
+        return true;
+    }
 }
 
 QStringList SimpleInterface::getAllWords()
@@ -151,5 +210,34 @@ QString SimpleInterface::getTranslationOfWord(QString word)
         return "";
     }
     return q.value(0).toString();
+}
+
+int SimpleInterface::getPriorityOfWord(QString word)
+{
+    QString s = "SELECT priority FROM vocabulary WHERE word=?";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.addBindValue(word.simplified());
+
+    if(!q.exec())
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return 100;
+    }
+    if(!q.isSelect())
+    {
+        QString error = s.append(": No select");
+        WARNING(error);
+        return 100;
+    }
+    if(!q.next())
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return 100;
+    }
+    return q.value(0).toInt();
 }
 

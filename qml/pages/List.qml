@@ -20,6 +20,12 @@ import Sailfish.Silica 1.0
 Page {
     id: page
 
+    onStatusChanged: {
+        if(page.status === PageStatus.Activating) {
+            functions.load_list()
+        }
+    }
+
     Item {
         id: functions
 
@@ -31,17 +37,18 @@ Page {
                 panel.show()
             }
         }
-    }
 
-    ListModel {
-        id: listModel
-
-        Component.onCompleted: {
+        function load_list() {
+            listModel.clear()
             var wordlist = simple_interface.getAllWords()
             for(var i = 0; i < wordlist.length; ++i) {
                 listModel.append({"word": wordlist[i]})
             }
         }
+    }
+
+    ListModel {
+        id: listModel
     }
 
     UpperPanel {
@@ -91,6 +98,13 @@ Page {
             }
 
             menu: ContextMenu {
+                MenuItem {
+                    text: qsTr("Edit vocabulary")
+                    onClicked: {
+                        pageStack.push(Qt.resolvedUrl("Edit.qml"), { origin_word: word } )
+                    }
+                }
+
                 MenuItem {
                     text: qsTr("Remove vocabulary")
                     onClicked: {

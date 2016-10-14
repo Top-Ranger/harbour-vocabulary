@@ -59,7 +59,8 @@ DISTFILES += \
     harbour-vocabulary.desktop \
     qml/pages/Training.qml \
     Readme.md \
-    qml/pages/About.qml
+    qml/pages/About.qml \
+    qml/pages/Edit.qml
 
 HEADERS += \
     src/global.h \
