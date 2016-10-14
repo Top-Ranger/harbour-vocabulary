@@ -33,6 +33,13 @@ Page {
             property int status_reveal_answer: 1
             property int current_status: status_ask_question
             property int trainings_mode: trainer.modus
+
+            function new_question() {
+                translation.text = ""
+                word.text = ""
+                trainer.next()
+                master.current_status = master.status_ask_question
+            }
         }
 
         VerticalScrollDecorator {}
@@ -114,10 +121,7 @@ Page {
                     text: qsTr("Correct")
                     onClicked: {
                         trainer.correct()
-                        trainer.next()
-                        translation.text = ""
-                        word.text = ""
-                        master.current_status = master.status_ask_question
+                        master.new_question()
                     }
                 }
 
@@ -127,10 +131,7 @@ Page {
                     text: qsTr("False")
                     onClicked: {
                         trainer.wrong()
-                        trainer.next()
-                        translation.text = ""
-                        word.text = ""
-                        master.current_status = master.status_ask_question
+                        master.new_question()
                     }
                 }
             }
