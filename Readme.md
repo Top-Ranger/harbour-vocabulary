@@ -14,6 +14,7 @@ For every priority point the vocabulary gets an additional chance of getting dra
 
  * Add vocabularies to your vocabulary list
  * Edit added vocabulary
+ * View details of vocabulary
  * List all known vocabularies
  * Adaptive training mode
 

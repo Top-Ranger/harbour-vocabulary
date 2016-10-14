@@ -112,6 +112,10 @@ Page {
                     }
                 }
             }
+
+            onClicked: {
+                pageStack.push(Qt.resolvedUrl("Details.qml"), { word: word })
+            }
         }
 
         VerticalScrollDecorator {}

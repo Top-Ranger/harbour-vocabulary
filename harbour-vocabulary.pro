@@ -60,7 +60,8 @@ DISTFILES += \
     qml/pages/Training.qml \
     Readme.md \
     qml/pages/About.qml \
-    qml/pages/Edit.qml
+    qml/pages/Edit.qml \
+    qml/pages/Details.qml
 
 HEADERS += \
     src/global.h \
