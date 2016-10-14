@@ -23,6 +23,26 @@ Page {
 
     property string word: "ERROR"
 
+    property bool word_changed: false
+    property string origin_word: ""
+    property string new_word: ""
+
+    onStatusChanged: {
+        if(word_changed === true) {
+            page.word = new_word
+            word_text.text = new_word
+            translation_text.text = simple_interface.getTranslationOfWord(new_word)
+            priority.value = simple_interface.getPriorityOfWord(new_word)
+
+            var last_page = pageStack.previousPage(page)
+            last_page.word_changed = true
+            last_page.origin_word = page.origin_word
+            last_page.new_word = page.new_word
+
+            word_changed = false
+        }
+    }
+
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height
@@ -33,7 +53,7 @@ Page {
             MenuItem {
                 text: qsTr("Edit")
                 onClicked: {
-                    pageStack.replace(Qt.resolvedUrl("Edit.qml"), { origin_word: page.word })
+                    pageStack.push(Qt.resolvedUrl("Edit.qml"), { origin_word: page.word })
                 }
             }
         }
@@ -61,6 +81,7 @@ Page {
                 }
 
                 Text {
+                    id: word_text
                     width: column.width - word.width
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
@@ -76,6 +97,7 @@ Page {
                 }
 
                 Text {
+                    id: translation_text
                     width: column.width - translation.width
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap

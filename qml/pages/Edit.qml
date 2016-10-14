@@ -26,6 +26,10 @@ Page {
 
         function save_change() {
             if(simple_interface.editVocabulary(page.origin_word, word.text, translation.text, priority.value)) {
+                var last_page = pageStack.previousPage()
+                last_page.word_changed = true
+                last_page.origin_word = page.origin_word
+                last_page.new_word = word.text
                 pageStack.pop()
             }
             else {

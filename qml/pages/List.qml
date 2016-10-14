@@ -20,9 +20,20 @@ import Sailfish.Silica 1.0
 Page {
     id: page
 
+    property bool word_changed: false
+    property string origin_word: ""
+    property string new_word: ""
+
     onStatusChanged: {
-        if(page.status === PageStatus.Activating) {
-            functions.load_list()
+        if(word_changed === true) {
+            for(var i = 0; i < listModel.count; ++i) {
+                if(listModel.get(i).word === origin_word) {
+                    listModel.remove(i)
+                    listModel.insert(i, {"word": new_word})
+                    word_changed = false
+                    return
+                }
+            }
         }
     }
 
@@ -66,6 +77,10 @@ Page {
             title: qsTr("Vocabulary list")
         }
 
+        Component.onCompleted: {
+            functions.load_list()
+        }
+
         delegate: ListItem {
             id: listitem
             width: parent.width
@@ -89,6 +104,7 @@ Page {
                     color: Theme.primaryColor
                 }
                 Label {
+                    id: translation_label
                     text: simple_interface.getTranslationOfWord(word)
                     width: page.width / 3 * 2
                     color: Theme.secondaryColor
