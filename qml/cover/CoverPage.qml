@@ -45,7 +45,7 @@ CoverBackground {
 
     CoverActionList {
         CoverAction {
-            iconSource: "image://theme/icon-cover-play"
+            iconSource: "image://theme/icon-cover-next"
             onTriggered: random_vocabulary.newRandom()
         }
     }
