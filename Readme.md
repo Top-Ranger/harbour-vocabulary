@@ -4,10 +4,10 @@ Vocabulary is a vocabulary trainer for SailfishOS designed to be used independen
 
 # Adaptive training mode
 
-The training mode is designed in a way that prefers new / unknown vocabulary over known vocabulary.
+The adaptive training mode is designed in a way that prefers new / unknown vocabulary over known vocabulary.
 
 Each vocabulary gets a *priority* between 1 and 100 which starts at 100.
-Every time a vocabulary is remembered correctly the priority gets reduced by 1, for every mistake the priority is increased by 10.
+Every time a vocabulary is remembered correctly the priority gets reduced (default: by 1), for every mistake the priority is increased (default: by 10).
 For every priority point the vocabulary gets an additional chance of getting drawn from the vocabulary pool.
 
 # Current features
@@ -17,6 +17,7 @@ For every priority point the vocabulary gets an additional chance of getting dra
  * View details of vocabulary
  * List all known vocabularies
  * Adaptive training mode
+ * Adjust training mode
 
 # Planned features
 

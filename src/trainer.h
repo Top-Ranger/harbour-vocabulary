@@ -19,6 +19,8 @@
 
 #include "global.h"
 
+#include "settingsproxy.h"
+
 #include <random>
 #include <QObject>
 #include <QVector>
@@ -63,6 +65,7 @@ private:
     QVector<vocabulary> _vocabulary;
     int _sum;
     std::random_device _rnd;
+    SettingsProxy _settings;
 
 };
 

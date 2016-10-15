@@ -29,6 +29,11 @@ Page {
                 text: qsTr("About")
                 onClicked: pageStack.push(Qt.resolvedUrl("About.qml"))
             }
+
+            MenuItem {
+                text: qsTr("Adjust adaptive training")
+                onClicked: pageStack.push(Qt.resolvedUrl("SettingsTraining.qml"))
+            }
         }
 
         contentHeight: column.height

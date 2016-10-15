@@ -23,7 +23,8 @@ Trainer::Trainer(QObject *parent) : QObject(parent),
     _index(0),
     _vocabulary(),
     _sum(0),
-    _rnd()
+    _rnd(),
+    _settings()
 {
     // Init vocabulary list
     QString s = "SELECT word,translation,priority FROM vocabulary";
@@ -75,18 +76,29 @@ Trainer::trainings_modus Trainer::modus()
 
 void Trainer::next()
 {
-    std::uniform_int_distribution<int> distribution(1, _sum);
-    int selected_priority = distribution(_rnd);
-    int sum = 0;
-
-    for(int i = 0; i < _vocabulary.size(); ++i)
+    std::uniform_int_distribution<int> distribution;
+    if(_settings.adaptiveTrainingEnabled())
     {
-        sum += _vocabulary[i].priority;
-        if(sum >= selected_priority)
+        // Use adaptive mode
+        distribution = std::uniform_int_distribution<int>(1, _sum);
+        int selected_priority = distribution(_rnd);
+        int sum = 0;
+
+        for(int i = 0; i < _vocabulary.size(); ++i)
         {
-            _index = i;
-            break;
+            sum += _vocabulary[i].priority;
+            if(sum >= selected_priority)
+            {
+                _index = i;
+                break;
+            }
         }
+    }
+    else
+    {
+        // Select random (no adaptive mode)
+        distribution = std::uniform_int_distribution<int>(0, _vocabulary.size()-1);
+        _index = distribution(_rnd);
     }
 
     distribution = std::uniform_int_distribution<int>(0,1);
@@ -106,39 +118,45 @@ void Trainer::next()
 
 void Trainer::correct()
 {
-    _sum -= _vocabulary[_index].priority;
-    _vocabulary[_index].priority = qMax(1, _vocabulary[_index].priority-1);
-    _sum += _vocabulary[_index].priority;
-
-    QString s = "UPDATE vocabulary SET priority=? WHERE word=?";
-    QSqlQuery q(database);
-    q.prepare(s);
-    q.addBindValue(_vocabulary[_index].priority);
-    q.addBindValue(_vocabulary[_index].word);
-
-    if(!q.exec())
+    if(_settings.adaptiveTrainingEnabled())
     {
-        QString error = s.append(": ").append(q.lastError().text());
-        WARNING(error);
+        _sum -= _vocabulary[_index].priority;
+        _vocabulary[_index].priority = qMax(1, _vocabulary[_index].priority-_settings.adaptiveTrainingCorrectPoints());
+        _sum += _vocabulary[_index].priority;
+
+        QString s = "UPDATE vocabulary SET priority=? WHERE word=?";
+        QSqlQuery q(database);
+        q.prepare(s);
+        q.addBindValue(_vocabulary[_index].priority);
+        q.addBindValue(_vocabulary[_index].word);
+
+        if(!q.exec())
+        {
+            QString error = s.append(": ").append(q.lastError().text());
+            WARNING(error);
+        }
     }
 }
 
 void Trainer::wrong()
 {
-    _sum -= _vocabulary[_index].priority;
-    _vocabulary[_index].priority = qMin(100, _vocabulary[_index].priority+10);
-    _sum += _vocabulary[_index].priority;
-
-    QString s = "UPDATE vocabulary SET priority=? WHERE word=?";
-    QSqlQuery q(database);
-    q.prepare(s);
-    q.addBindValue(_vocabulary[_index].priority);
-    q.addBindValue(_vocabulary[_index].word);
-
-    if(!q.exec())
+    if(_settings.adaptiveTrainingEnabled())
     {
-        QString error = s.append(": ").append(q.lastError().text());
-        WARNING(error);
+        _sum -= _vocabulary[_index].priority;
+        _vocabulary[_index].priority = qMin(100, _vocabulary[_index].priority+_settings.adaptiveTrainingWrongPoints());
+        _sum += _vocabulary[_index].priority;
+
+        QString s = "UPDATE vocabulary SET priority=? WHERE word=?";
+        QSqlQuery q(database);
+        q.prepare(s);
+        q.addBindValue(_vocabulary[_index].priority);
+        q.addBindValue(_vocabulary[_index].word);
+
+        if(!q.exec())
+        {
+            QString error = s.append(": ").append(q.lastError().text());
+            WARNING(error);
+        }
     }
 }
 

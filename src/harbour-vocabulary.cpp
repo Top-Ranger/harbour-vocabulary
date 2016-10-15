@@ -19,6 +19,7 @@
 #include "randomvocabulary.h"
 #include "simpleinterface.h"
 #include "trainer.h"
+#include "settingsproxy.h"
 
 #include <QtQuick>
 #include <sailfishapp.h>
@@ -28,8 +29,13 @@ bool test_and_update_db();
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication::setOrganizationName("harbour-vocabulary");
+    QCoreApplication::setApplicationName("harbour-vocabulary");
+
     // Register QML types
     qmlRegisterType<Trainer>("harbour.vocabulary.Trainer", 1, 0, "Trainer");
+    qmlRegisterType<SettingsProxy>("harbour.vocabulary.SettingsProxy", 1, 0, "SettingsProxy");
+
     // Connect to DB
     QString path = QString(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation));
     path.append("/harbour-vocabulary");
