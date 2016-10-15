@@ -38,7 +38,7 @@ signals:
     void translationChanged(QString translation);
 
 public slots:
-    Q_INVOKABLE void newRandom();
+    void newRandom();
 
 private:
     QString _word;

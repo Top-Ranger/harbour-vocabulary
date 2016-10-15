@@ -34,13 +34,13 @@ signals:
     void countChanged(int);
 
 public slots:
-    Q_INVOKABLE bool addVocabulary(QString word, QString translation);
-    Q_INVOKABLE bool removeVocabulary(QString word);
-    Q_INVOKABLE bool editVocabulary(QString origin_word, QString new_word, QString translation, int priority);
-    Q_INVOKABLE QStringList getAllWords();
-    Q_INVOKABLE QString getTranslationOfWord(QString word);
-    Q_INVOKABLE int getPriorityOfWord(QString word);
-    Q_INVOKABLE void recount();
+    bool addVocabulary(QString word, QString translation);
+    bool removeVocabulary(QString word);
+    bool editVocabulary(QString origin_word, QString new_word, QString translation, int priority);
+    QStringList getAllWords();
+    QString getTranslationOfWord(QString word);
+    int getPriorityOfWord(QString word);
+    void recount();
 
 private:
     int _count;

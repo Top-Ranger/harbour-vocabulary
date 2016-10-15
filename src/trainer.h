@@ -48,9 +48,9 @@ signals:
     void modusChanged(trainings_modus modus);
 
 public slots:
-    Q_INVOKABLE void next();
-    Q_INVOKABLE void correct();
-    Q_INVOKABLE void wrong();
+    void next();
+    void correct();
+    void wrong();
 
 private:
     struct vocabulary {
