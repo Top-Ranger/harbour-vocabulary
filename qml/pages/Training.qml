@@ -49,7 +49,7 @@ Page {
         Column {
             id: column
             width: page.width
-            spacing: Theme.paddingMedium
+            spacing: Theme.paddingLarge
 
             PageHeader {
                 title: qsTr("Training")
