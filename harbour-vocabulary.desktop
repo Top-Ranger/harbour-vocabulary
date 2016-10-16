@@ -4,3 +4,4 @@ X-Nemo-Application-Type=silica-qt5
 Icon=harbour-vocabulary
 Exec=harbour-vocabulary
 Name=Vocabulary
+Categories=Education;Utility;
