@@ -37,14 +37,13 @@ int main(int argc, char *argv[])
     qmlRegisterType<SettingsProxy>("harbour.vocabulary.SettingsProxy", 1, 0, "SettingsProxy");
 
     // Connect to DB
-    QString path = QString(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation));
-    path.append("/harbour-vocabulary");
+    QString path = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
     QDir dir(path);
 
     if(!dir.exists())
     {
         DEBUG("Creating directory" << path);
-        dir.mkdir(path);
+        dir.mkpath(path);
     }
 
     path.append("/database.sqlite3");
@@ -55,7 +54,7 @@ int main(int argc, char *argv[])
     if(!database.open())
     {
         DEBUG(database.lastError().text());
-        FATAL("Can't open settings.sqlite3");
+        FATAL("Can not open database.sqlite3");
     }
 
     if(!exists)
