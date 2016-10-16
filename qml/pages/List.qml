@@ -19,6 +19,7 @@ import Sailfish.Silica 1.0
 
 Page {
     id: page
+    allowedOrientations: Orientation.All
 
     property bool word_changed: false
     property string origin_word: ""

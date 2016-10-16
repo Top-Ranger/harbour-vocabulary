@@ -20,6 +20,7 @@ import harbour.vocabulary.SettingsProxy 1.0
 
 Dialog {
     id: page
+    allowedOrientations: Orientation.All
 
     onAccepted: {
         settings.adaptiveTrainingCorrectPoints = correct.value

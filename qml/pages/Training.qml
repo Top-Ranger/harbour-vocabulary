@@ -20,6 +20,8 @@ import harbour.vocabulary.Trainer 1.0
 
 Page {
     id: page
+    allowedOrientations: Orientation.All
+
     SilicaFlickable {
         anchors.fill: parent
 
