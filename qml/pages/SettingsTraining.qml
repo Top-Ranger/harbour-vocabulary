@@ -57,6 +57,8 @@ Dialog {
             DialogHeader {
                 title: qsTr("Adjust adaptive training")
                 width: page.width
+                acceptText: qsTr("Save")
+                cancelText: qsTr("Abort")
             }
 
             Text {
