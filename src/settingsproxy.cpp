@@ -8,7 +8,7 @@ SettingsProxy::SettingsProxy(QObject *parent) :
 
 int SettingsProxy::adaptiveTrainingCorrectPoints()
 {
-    return _settings.value("adaptive_training/correct", 1).toInt();
+    return _settings.value("adaptive_training/correct", 3).toInt();
 }
 
 int SettingsProxy::adaptiveTrainingWrongPoints()
