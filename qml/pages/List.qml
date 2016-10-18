@@ -27,12 +27,23 @@ Page {
 
     onStatusChanged: {
         if(word_changed === true) {
+            var translation = simple_interface.getTranslationOfWord(new_word)
+
             for(var i = 0; i < listModel.count; ++i) {
                 if(listModel.get(i).word === origin_word) {
                     listModel.remove(i)
-                    listModel.insert(i, {"word": new_word})
+                    listModel.insert(i, {"word": new_word, "translation": translation})
                     word_changed = false
-                    return
+                    break
+                }
+            }
+
+            for(i = 0; i < originModel.count; ++i) {
+                if(originModel.get(i).word === origin_word) {
+                    originModel.remove(i)
+                    originModel.insert(i, {"word": new_word, "translation": translation})
+                    word_changed = false
+                    break
                 }
             }
         }
@@ -44,6 +55,13 @@ Page {
         function remove_word(word, item) {
             if(simple_interface.removeVocabulary(word)) {
                 item.animateRemoval()
+
+                for(var i = 0; i < originModel.count; ++i) {
+                    if(originModel.get(i).word === word) {
+                        originModel.remove(i)
+                        break
+                    }
+                }
             }
             else {
                 panel.show()
@@ -54,13 +72,30 @@ Page {
             listModel.clear()
             var wordlist = simple_interface.getAllWords()
             for(var i = 0; i < wordlist.length; ++i) {
-                listModel.append({"word": wordlist[i]})
+                var translation = simple_interface.getTranslationOfWord(wordlist[i])
+                originModel.append({"word": wordlist[i], "translation": translation})
+                listModel.append({"word": wordlist[i], "translation": translation})
+            }
+        }
+
+        function filter_list(filter) {
+            listModel.clear()
+            filter = filter.toLowerCase()
+            for(var i = 0; i < originModel.count; ++i) {
+                var item = originModel.get(i)
+                if(item.word.toLowerCase().indexOf(filter) !== -1 || item.translation.toLowerCase().indexOf(filter) !== -1) {
+                    listModel.append(item)
+                }
             }
         }
     }
 
     ListModel {
         id: listModel
+    }
+
+    ListModel {
+        id: originModel
     }
 
     UpperPanel {
@@ -74,8 +109,22 @@ Page {
         anchors.fill: parent
         currentIndex: -1
 
-        header: PageHeader {
-            title: qsTr("Vocabulary list")
+        header: Column {
+            width: page.width
+            spacing: Theme.paddingMedium
+
+            PageHeader {
+                width: parent.width
+                title: qsTr("Vocabulary list")
+            }
+
+            SearchField {
+                width: parent.width
+                placeholderText: qsTr("Search vocabulary")
+                onTextChanged: {
+                    functions.filter_list(text)
+                }
+            }
         }
 
         Component.onCompleted: {
@@ -106,7 +155,7 @@ Page {
                 }
                 Label {
                     id: translation_label
-                    text: simple_interface.getTranslationOfWord(word)
+                    text: translation
                     width: page.width / 3 * 2
                     color: Theme.secondaryColor
                     horizontalAlignment: Text.AlignLeft
@@ -138,4 +187,3 @@ Page {
         VerticalScrollDecorator {}
     }
 }
-
