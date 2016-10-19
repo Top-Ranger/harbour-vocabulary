@@ -46,7 +46,8 @@ SOURCES += src/harbour-vocabulary.cpp \
     src/randomvocabulary.cpp \
     src/global.cpp \
     src/trainer.cpp \
-    src/settingsproxy.cpp
+    src/settingsproxy.cpp \
+    src/fileutils.cpp
 
 OTHER_FILES += qml/harbour-vocabulary.qml \
     qml/cover/CoverPage.qml \
@@ -70,5 +71,6 @@ HEADERS += \
     src/simpleinterface.h \
     src/randomvocabulary.h \
     src/trainer.h \
-    src/settingsproxy.h
+    src/settingsproxy.h \
+    src/fileutils.h
 

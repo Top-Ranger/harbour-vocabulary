@@ -20,6 +20,7 @@
 #include "simpleinterface.h"
 #include "trainer.h"
 #include "settingsproxy.h"
+#include "fileutils.h"
 
 #include <QtQuick>
 #include <sailfishapp.h>
@@ -82,9 +83,11 @@ int main(int argc, char *argv[])
 
     RandomVocabulary random_vocabulary;
     SimpleInterface simple_interface;
+    FileUtils file_utils;
 
     view->rootContext()->setContextProperty("random_vocabulary", &random_vocabulary);
     view->rootContext()->setContextProperty("simple_interface", &simple_interface);
+    view->rootContext()->setContextProperty("file_utils", &file_utils);
 
     // Start application
     view->setSource(SailfishApp::pathTo("qml/harbour-vocabulary.qml"));
