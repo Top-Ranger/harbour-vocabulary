@@ -19,12 +19,12 @@ For every priority point the vocabulary gets an additional chance of getting dra
  * Search for vocabulary
  * Adaptive training mode
  * Adjust training mode
+ * Import / export of vocabulary list. Supported file formats:
+   - CSV
 
 # Planned features
 
- * Import / export of vocabulary list
  * Detailed statistics about all vocabulary
- * Customisation settings
 
 # License
 

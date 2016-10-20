@@ -36,6 +36,11 @@ Page {
                 text: qsTr("Adjust adaptive training")
                 onClicked: pageStack.push(Qt.resolvedUrl("SettingsTraining.qml"))
             }
+
+            MenuItem {
+                text: qsTr("Import / Export")
+                onClicked: pageStack.push(Qt.resolvedUrl("ImExport.qml"))
+            }
         }
 
         contentHeight: column.height

@@ -26,3 +26,8 @@ bool FileUtils::checkFileExists(QString path)
     return QFile::exists(path);
 }
 
+QString FileUtils::getFilePath(QString ending)
+{
+    return QStandardPaths::writableLocation(QStandardPaths::HomeLocation).append("/vocabulary").append(ending);
+}
+

@@ -15,25 +15,36 @@
  */
 
 
-#ifndef FILEUTILS_H
-#define FILEUTILS_H
+#ifndef CSVHANDLE_H
+#define CSVHANDLE_H
 
 #include "global.h"
 
 #include <QObject>
 
-class FileUtils : public QObject
+class CSVHandle : public QObject
 {
     Q_OBJECT
 public:
-    explicit FileUtils(QObject *parent = 0);
+    enum seperator {
+        TAB,
+        SPACE,
+        COMMA,
+        SEMICOLON
+    };
+    Q_ENUMS(seperator)
 
-    Q_INVOKABLE bool checkFileExists(QString path);
-    Q_INVOKABLE QString getFilePath(QString ending);
+    explicit CSVHandle(QObject *parent = 0);
+
+    Q_INVOKABLE QStringList loadCSV(QString path, seperator sep, bool has_header, int column_word, int column_translation, int column_priority, bool import_priority);
+    Q_INVOKABLE QStringList saveCSV(QString path, seperator sep, bool has_header);
 
 signals:
 
 public slots:
+
+private:
+    QChar getSeperator(seperator sep);
 };
 
-#endif // FILEUTILS_H
+#endif // CSVHANDLE_H

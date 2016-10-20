@@ -21,6 +21,7 @@
 #include "trainer.h"
 #include "settingsproxy.h"
 #include "fileutils.h"
+#include "csvhandle.h"
 
 #include <QtQuick>
 #include <sailfishapp.h>
@@ -36,6 +37,7 @@ int main(int argc, char *argv[])
     // Register QML types
     qmlRegisterType<Trainer>("harbour.vocabulary.Trainer", 1, 0, "Trainer");
     qmlRegisterType<SettingsProxy>("harbour.vocabulary.SettingsProxy", 1, 0, "SettingsProxy");
+    qmlRegisterType<CSVHandle>("harbour.vocabulary.CSVHandle", 1, 0, "CSVHandle");
 
     // Connect to DB
     QString path = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
