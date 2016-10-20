@@ -172,8 +172,8 @@ Page {
                             results_text += "\n"
                         }
                         errors.text = results_text
-                        simple_interface.recount()
                     }
+                    simple_interface.recount()
                 }
             }
 
