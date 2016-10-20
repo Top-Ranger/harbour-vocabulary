@@ -58,15 +58,23 @@ Page {
             }
 
             Row {
-                width: parent.width
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
                 Label {
+                    id: word_label
                     text: qsTr("Word: ")
                     color: Theme.primaryColor
                 }
 
                 Label {
+                    width: parent.width - word_label.width
                     text: (master.trainings_mode === Trainer.GUESS_TRANSLATION || master.current_status === master.status_reveal_answer) ? trainer.word : ""
                     color: Theme.secondaryColor
+                    wrapMode: Text.Wrap
                 }
             }
 
@@ -82,15 +90,23 @@ Page {
             }
 
             Row {
-                width: parent.width
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
                 Label {
+                    id: translation_label
                     text: qsTr("Translation: ")
                     color: Theme.primaryColor
                 }
 
                 Label {
+                    width: parent.width - translation_label.width
                     text: (master.trainings_mode === Trainer.GUESS_WORD || master.current_status === master.status_reveal_answer) ? trainer.translation : ""
                     color: Theme.secondaryColor
+                    wrapMode: Text.Wrap
                 }
             }
 
@@ -106,6 +122,12 @@ Page {
             }
 
             Button {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
                 width: parent.width
                 text: qsTr("Reveal answer")
                 enabled: master.current_status === master.status_ask_question
@@ -115,10 +137,15 @@ Page {
             }
 
             Row {
-                width: parent.width
+                spacing: Theme.paddingSmall
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
 
                 Button {
-                    width: parent.width/2
+                    width: parent.width/2 - Theme.paddingSmall/2
                     enabled: master.current_status === master.status_reveal_answer
                     text: qsTr("Correct")
                     onClicked: {
@@ -128,7 +155,7 @@ Page {
                 }
 
                 Button {
-                    width: parent.width/2
+                    width: parent.width/2 - Theme.paddingSmall/2
                     enabled: master.current_status === master.status_reveal_answer
                     text: qsTr("False")
                     onClicked: {

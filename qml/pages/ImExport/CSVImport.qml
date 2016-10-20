@@ -45,7 +45,14 @@ Page {
             }
 
             Label {
-                text: qsTr("Settings:")
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                text: qsTr("Import settings:")
+                font.bold: true
             }
 
             ComboBox {
@@ -138,7 +145,12 @@ Page {
             }
 
             Button {
-                width: parent.width
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
                 enabled: !page.started
                 text: qsTr("Import")
                 onClicked: {
@@ -178,13 +190,13 @@ Page {
             }
 
             Text {
-                id: errors
                 anchors {
                     left: parent.left
                     right: parent.right
-                    margins: Theme.paddingSmall
+                    margins: Theme.horizontalPageMargin
                 }
 
+                id: errors
                 focus: true
                 color: Theme.primaryColor
                 width: page.width

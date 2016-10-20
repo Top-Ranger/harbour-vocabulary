@@ -73,21 +73,29 @@ Page {
             }
 
             Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
                 text: qsTr("WARNING: Overwriting file")
                 font.pixelSize: Theme.fontSizeLarge
+                font.italic: true
                 visible: !page.is_import && page.path_exists
             }
 
-            BackgroundItem {
-                id: start
-                width: parent.width
-                enabled: (page.is_import && page.path_exists) || !page.is_import
-
-                Label {
-                    text: qsTr("Start import / export")
-                    anchors.centerIn: parent
-                    color: start.enabled ? Theme.primaryColor : Theme.secondaryColor
+            Button {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
                 }
+
+                id: start
+                enabled: (page.is_import && page.path_exists) || !page.is_import
+                text: qsTr("Start import / export")
+
 
                 onClicked: {
                     var target = "ImExport/CSVExport.qml"

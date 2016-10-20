@@ -69,6 +69,12 @@ Page {
             }
 
             Button {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
                 width: parent.width
                 text: qsTr("Save vocabulary")
                 onClicked: functions.save_word()
