@@ -78,6 +78,7 @@ Page {
                 IconButton {
                     id: word_icon
                     height: word.height
+                    width: height
                     icon.source: "image://theme/icon-s-clipboard"
                     onClicked: Clipboard.text = page.word
                 }
@@ -101,6 +102,7 @@ Page {
                 IconButton {
                     id: translation_icon
                     height: translation.height
+                    width: height
                     icon.source: "image://theme/icon-s-clipboard"
                     onClicked: Clipboard.text = translation_text.text
                 }
