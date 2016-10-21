@@ -51,21 +51,6 @@ Page {
         VerticalScrollDecorator {}
 
         PullDownMenu {
-
-            MenuItem {
-                text: qsTr("Copy translation to clipboard")
-                onClicked: {
-                    Clipboard.text = translation_text.text
-                }
-            }
-
-            MenuItem {
-                text: qsTr("Copy word to clipboard")
-                onClicked: {
-                    Clipboard.text = page.word
-                }
-            }
-
             MenuItem {
                 text: qsTr("Edit")
                 onClicked: {
@@ -90,6 +75,13 @@ Page {
             }
 
             Row {
+                IconButton {
+                    id: word_icon
+                    height: word.height
+                    icon.source: "image://theme/icon-s-clipboard"
+                    onClicked: Clipboard.text = page.word
+                }
+
                 Label {
                     id: word
                     text: qsTr("Word: ")
@@ -98,7 +90,7 @@ Page {
 
                 Text {
                     id: word_text
-                    width: column.width - word.width
+                    width: column.width - word.width - word_icon.width
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
                     text: page.word
@@ -106,6 +98,13 @@ Page {
             }
 
             Row {
+                IconButton {
+                    id: translation_icon
+                    height: translation.height
+                    icon.source: "image://theme/icon-s-clipboard"
+                    onClicked: Clipboard.text = translation_text.text
+                }
+
                 Label {
                     id: translation
                     text: qsTr("Translation: ")
@@ -114,7 +113,7 @@ Page {
 
                 Text {
                     id: translation_text
-                    width: column.width - translation.width
+                    width: column.width - translation.width - translation_icon.width
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
                     text: simple_interface.getTranslationOfWord(page.word)
