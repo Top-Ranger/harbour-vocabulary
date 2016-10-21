@@ -24,6 +24,8 @@ CoverBackground {
             margins: Theme.horizontalPageMargin
         }
 
+        spacing: Theme.paddingMedium
+
         Label {
             color: Theme.primaryColor
             width: parent.width
