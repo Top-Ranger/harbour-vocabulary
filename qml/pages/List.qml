@@ -146,6 +146,7 @@ Page {
                 }
 
                 Label {
+                    id: word_label
                     text: word
                     color: Theme.primaryColor
                 }
@@ -154,9 +155,8 @@ Page {
                     color: Theme.primaryColor
                 }
                 Label {
-                    id: translation_label
+                    width: parent.width - word_label.width
                     text: translation
-                    width: page.width / 3 * 2
                     color: Theme.secondaryColor
                     horizontalAlignment: Text.AlignLeft
                     truncationMode: TruncationMode.Elide
@@ -175,6 +175,20 @@ Page {
                     text: qsTr("Remove vocabulary")
                     onClicked: {
                         listitem.remorseAction(qsTr("Remove vocabulary"), function() { functions.remove_word(word, listitem) })
+                    }
+                }
+
+                MenuItem {
+                    text: qsTr("Copy word to clipboard")
+                    onClicked: {
+                        Clipboard.text = word
+                    }
+                }
+
+                MenuItem {
+                    text: qsTr("Copy translation to clipboard")
+                    onClicked: {
+                        Clipboard.text = translation
                     }
                 }
             }

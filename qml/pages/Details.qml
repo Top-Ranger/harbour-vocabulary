@@ -51,6 +51,21 @@ Page {
         VerticalScrollDecorator {}
 
         PullDownMenu {
+
+            MenuItem {
+                text: qsTr("Copy translation to clipboard")
+                onClicked: {
+                    Clipboard.text = translation_text.text
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Copy word to clipboard")
+                onClicked: {
+                    Clipboard.text = page.word
+                }
+            }
+
             MenuItem {
                 text: qsTr("Edit")
                 onClicked: {
