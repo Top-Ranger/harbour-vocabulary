@@ -19,27 +19,23 @@ import Sailfish.Silica 1.0
 
 CoverBackground {
     Column {
-        anchors.fill: parent
-        BackgroundItem {
-            width: parent.width
-            Label {
-                color: Theme.primaryColor
-                width: parent.width - 2*Theme.paddingLarge
-                wrapMode: Text.Wrap
-                text: random_vocabulary.word
-                anchors.centerIn: parent
-            }
+        anchors {
+            fill: parent
+            margins: Theme.horizontalPageMargin
         }
 
-        BackgroundItem {
+        Label {
+            color: Theme.primaryColor
             width: parent.width
-            Label {
-                color: Theme.secondaryColor
-                width: parent.width - 2*Theme.paddingLarge
-                wrapMode: Text.Wrap
-                text: random_vocabulary.translation
-                anchors.centerIn: parent
-            }
+            wrapMode: Text.Wrap
+            text: random_vocabulary.word
+        }
+
+        Label {
+            color: Theme.secondaryColor
+            width: parent.width
+            wrapMode: Text.Wrap
+            text: random_vocabulary.translation
         }
     }
 
