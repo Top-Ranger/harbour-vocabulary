@@ -19,6 +19,7 @@
 
 #include <QTextStream>
 #include <QtCore/QtMath>
+#include <QTextCodec>
 
 CSVHandle::CSVHandle(QObject *parent) : QObject(parent)
 {
@@ -45,6 +46,7 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
     }
 
     QTextStream stream(&file);
+    stream.setCodec(QTextCodec::codecForName("UTF-8"));
 
     database.transaction();
     QSqlQuery q(database);
@@ -123,6 +125,7 @@ QStringList CSVHandle::saveCSV(QString path, CSVHandle::seperator sep, bool writ
     }
 
     QTextStream stream(&file);
+    stream.setCodec(QTextCodec::codecForName("UTF-8"));
 
     QSqlQuery q(database);
     QString s = "SELECT word,translation,priority FROM vocabulary";
