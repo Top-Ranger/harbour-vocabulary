@@ -165,28 +165,32 @@ Page {
 
             menu: ContextMenu {
                 MenuItem {
-                    text: qsTr("Edit vocabulary")
+                    text: "<img src=\"image://theme/icon-s-edit\" align=\"middle\" /> " + qsTr("Edit vocabulary")
+                    textFormat: Text.StyledText
                     onClicked: {
                         pageStack.push(Qt.resolvedUrl("Edit.qml"), { origin_word: word } )
                     }
                 }
 
                 MenuItem {
-                    text: qsTr("Remove vocabulary")
+                    text: "<img src=\"image://theme/icon-m-delete\" width=\"" + Theme.iconSizeSmall + "\" height=\"" + Theme.iconSizeSmall + "\" align=\"middle\" >" + qsTr("Remove vocabulary")
+                    textFormat: Text.StyledText
                     onClicked: {
                         listitem.remorseAction(qsTr("Remove vocabulary"), function() { functions.remove_word(word, listitem) })
                     }
                 }
 
                 MenuItem {
-                    text: qsTr("Copy word to clipboard")
+                    text: "<img src=\"image://theme/icon-s-clipboard\" align=\"middle\" /> "+ qsTr("Copy word to clipboard")
+                    textFormat: Text.StyledText
                     onClicked: {
                         Clipboard.text = word
                     }
                 }
 
                 MenuItem {
-                    text: qsTr("Copy translation to clipboard")
+                    text: "<img src=\"image://theme/icon-s-clipboard\" align=\"middle\" /> " + qsTr("Copy translation to clipboard")
+                    textFormat: Text.StyledText
                     onClicked: {
                         Clipboard.text = translation
                     }
