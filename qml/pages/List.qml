@@ -134,6 +134,8 @@ Page {
             SearchField {
                 width: parent.width
                 placeholderText: qsTr("Search vocabulary")
+                EnterKey.onClicked: parent.focus = true
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 onTextChanged: {
                     functions.filter_list(text)
                 }

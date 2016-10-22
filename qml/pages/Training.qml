@@ -84,7 +84,8 @@ Page {
                 readOnly: master.current_status !== 0
                 width: parent.width
                 height: implicitHeight
-                focus: true
+                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input answer")
                 label: qsTr("Answer")
             }
@@ -116,7 +117,8 @@ Page {
                 readOnly: master.current_status !== 0
                 width: parent.width
                 height: implicitHeight
-                focus: true
+                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input answer")
                 label: qsTr("Answer")
             }

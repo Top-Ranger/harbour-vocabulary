@@ -54,7 +54,8 @@ Page {
                 id: word
                 width: parent.width
                 height: implicitHeight
-                focus: true
+                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input word or phrase here")
                 label: qsTr("Word / phrase")
             }
@@ -63,7 +64,8 @@ Page {
                 id: translation
                 width: parent.width
                 height: implicitHeight
-                focus: true
+                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input translation here")
                 label: qsTr("Translation")
             }
