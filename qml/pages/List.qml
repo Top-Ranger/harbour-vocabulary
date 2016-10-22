@@ -66,6 +66,13 @@ Page {
                         break
                     }
                 }
+
+                for(i = 0; i < listModel.count; ++i) {
+                    if(listModel.get(i).word === word) {
+                        listModel.remove(i)
+                        break
+                    }
+                }
             }
             else {
                 panel.show()
@@ -128,7 +135,7 @@ Page {
 
             PageHeader {
                 width: parent.width
-                title: qsTr("Vocabulary list")
+                title: qsTr("Vocabulary list") + " (" + listModel.count + ")"
             }
 
             SearchField {
