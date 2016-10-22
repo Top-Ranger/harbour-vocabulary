@@ -30,6 +30,23 @@ int SimpleInterface::count()
     return _count;
 }
 
+bool SimpleInterface::clearAllVocabulary()
+{
+    QString s = "DELETE FROM vocabulary";
+    QSqlQuery q(database);
+
+    if(!q.exec(s))
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return false;
+    }
+
+    _count = 0;
+    emit countChanged(_count);
+    return true;
+}
+
 void SimpleInterface::recount()
 {
     _count = 0;

@@ -49,6 +49,10 @@ Page {
         }
     }
 
+    RemorsePopup {
+        id: remorse_popup
+    }
+
     Item {
         id: functions
 
@@ -112,6 +116,15 @@ Page {
         header: Column {
             width: page.width
             spacing: Theme.paddingMedium
+
+            PullDownMenu {
+                MenuItem {
+                    text: qsTr("Remove all vocabulary")
+                    onClicked: {
+                        remorse_popup.execute(qsTr("Remove all vocabulary"), function() {if(!simple_interface.clearAllVocabulary()) { panel.show() } else { listModel.clear(); originModel.clear() } }, 10000)
+                    }
+                }
+            }
 
             PageHeader {
                 width: parent.width

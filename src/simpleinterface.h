@@ -29,6 +29,7 @@ class SimpleInterface : public QObject
 public:
     explicit SimpleInterface(QObject *parent = 0);
     int count();
+    Q_INVOKABLE bool clearAllVocabulary();
 
 signals:
     void countChanged(int);
