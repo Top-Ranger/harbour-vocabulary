@@ -51,12 +51,10 @@ Page {
                 anchors {
                     left: parent.left
                     right: parent.right
-                    margins: Theme.paddingSmall
                 }
 
                 focus: true
                 color: Theme.primaryColor
-                width: page.width
                 font.pixelSize: Theme.fontSizeExtraSmall
                 wrapMode: Text.Wrap
 
