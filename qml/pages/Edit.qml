@@ -91,6 +91,12 @@ Page {
             }
 
             Button {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
                 width: parent.width
                 text: qsTr("Save change")
                 onClicked: functions.save_change()
