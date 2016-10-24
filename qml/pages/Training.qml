@@ -84,6 +84,7 @@ Page {
                 readOnly: master.current_status !== 0
                 width: parent.width
                 height: implicitHeight
+                inputMethodHints: Qt.ImhNoPredictiveText
                 EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input answer")
@@ -117,6 +118,7 @@ Page {
                 readOnly: master.current_status !== 0
                 width: parent.width
                 height: implicitHeight
+                inputMethodHints: Qt.ImhNoPredictiveText
                 EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input answer")
