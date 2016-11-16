@@ -215,7 +215,7 @@ bool test_and_update_db()
     }
 
     case 2:
-        DEBUG("Database version: 1");
+        DEBUG("Database version: 2");
         return true;
         break;
 
