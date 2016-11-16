@@ -83,8 +83,8 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
             continue;
         }
         q.prepare(s);
-        q.addBindValue(columns[column_word]);
-        q.addBindValue(columns[column_translation]);
+        q.addBindValue(columns[column_word].simplified());
+        q.addBindValue(columns[column_translation].simplified());
         if(import_priority)
         {
             bool ok = true;
