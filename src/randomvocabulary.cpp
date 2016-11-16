@@ -55,7 +55,19 @@ void RandomVocabulary::newRandom()
     }
     _word = q.value(0).toString();
     _translation = q.value(1).toString();
-    emit textChanged(_word);
+    emit wordChanged(_word);
     emit translationChanged(_translation);
+}
+
+void RandomVocabulary::setWord(QString word)
+{
+    _word = word;
+    emit wordChanged(word);
+}
+
+void RandomVocabulary::setTranslation(QString translation)
+{
+    _translation = translation;
+    emit translationChanged(translation);
 }
 

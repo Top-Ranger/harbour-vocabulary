@@ -57,6 +57,14 @@ Page {
                     pageStack.push(Qt.resolvedUrl("Edit.qml"), { origin_word: page.word })
                 }
             }
+
+            MenuItem {
+                text: qsTr("Show on cover")
+                onClicked: {
+                    random_vocabulary.word = page.word
+                    random_vocabulary.translation = translation_text.text
+                }
+            }
         }
 
         Column {

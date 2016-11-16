@@ -25,8 +25,8 @@ class RandomVocabulary : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString word READ word NOTIFY textChanged)
-    Q_PROPERTY(QString translation READ translation NOTIFY translationChanged)
+    Q_PROPERTY(QString word READ word WRITE setWord NOTIFY wordChanged)
+    Q_PROPERTY(QString translation READ translation WRITE setTranslation NOTIFY translationChanged)
 
 public:
     explicit RandomVocabulary(QObject *parent = 0);
@@ -34,11 +34,13 @@ public:
     QString translation();
 
 signals:
-    void textChanged(QString text);
+    void wordChanged(QString text);
     void translationChanged(QString translation);
 
 public slots:
     void newRandom();
+    void setWord(QString word);
+    void setTranslation(QString translation);
 
 private:
     QString _word;
