@@ -70,6 +70,10 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
     while(!stream.atEnd())
     {
         QString line = stream.readLine();
+        if(line.isEmpty())
+        {
+            continue;
+        }
         QStringList columns = line.split(sep_char, QString::KeepEmptyParts);
         if(columns.size() < need_num_columns+1)
         {
