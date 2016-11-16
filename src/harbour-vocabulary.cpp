@@ -109,7 +109,7 @@ bool create_new_db()
     QStringList operations;
     operations.append("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT)");
     operations.append("CREATE TABLE vocabulary (word TEXT PRIMARY KEY, translation TEXT, priority INT)");
-    operations.append("INSERT INTO meta VALUES ('version', '1')");
+    operations.append("INSERT INTO meta VALUES ('version', '2')");
 
     foreach(QString s, operations)
     {
@@ -152,6 +152,69 @@ bool test_and_update_db()
     {
     // Upgrade settings
     case 1:
+        DEBUG("Database upgrade: 1 -> 2");
+        /*
+         * This database update simplifies all words contained in the database.
+         * It is needed because the old CSV import did not simplify.
+         */
+    {
+        QStringList to_update;
+
+        s = "SELECT word FROM vocabulary";
+
+        query.clear();
+        query.prepare(s);
+
+        if(!query.exec())
+        {
+            QString error = s.append(": ").append(query.lastError().text());
+            WARNING(error);
+            return false;
+        }
+        if(!query.isSelect())
+        {
+            QString error = s.append(": No select");
+            WARNING(error);
+            return false;
+        }
+
+        while(query.next())
+        {
+            QString word = query.value(0).toString();
+            if(word.simplified() != word)
+            {
+                to_update << word;
+            }
+        }
+
+        for(QStringList::iterator i = to_update.begin(); i != to_update.end(); ++i)
+        {
+            s = "UPDATE OR IGNORE vocabulary SET word=? WHERE word=?";
+
+            query.clear();
+            query.prepare(s);
+            query.addBindValue((*i).simplified());
+            query.addBindValue(*i);
+
+            if(!query.exec())
+            {
+                QString error = s.append(": ").append(query.lastError().text());
+                WARNING(error);
+            }
+        }
+
+        query.clear();
+        s = "UPDATE meta SET value=2 WHERE key='version'";
+
+        if(!query.exec(s))
+        {
+            QString error = s.append(": ").append(query.lastError().text());
+            CRITICAL(error);
+            return false;
+        }
+    }
+
+    case 2:
         DEBUG("Database version: 1");
         return true;
         break;
