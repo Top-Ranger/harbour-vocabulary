@@ -106,7 +106,7 @@ Page {
     Timer {
         id: search_timer
         repeat: false
-        interval: 1000
+        interval: 750
         onTriggered: {
             functions.filter_list(page.search_text)
         }

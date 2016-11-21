@@ -43,7 +43,7 @@ Page {
             }
 
             Label {
-                text: "Vocabulary 1.0"
+                text: "Vocabulary 1.1"
             }
 
             Text {
