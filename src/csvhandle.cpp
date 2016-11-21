@@ -101,7 +101,8 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
 
         if(!q.exec())
         {
-            QString error = s.append(": ").append(q.lastError().text());
+            QString error = s;
+            error.append(": ").append(q.lastError().text());
             WARNING(error);
             errors << error;
         }
