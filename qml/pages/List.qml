@@ -25,6 +25,8 @@ Page {
     property string origin_word: ""
     property string new_word: ""
 
+    property string search_text: ""
+
     onStatusChanged: {
         if(word_changed === true) {
             var translation = simple_interface.getTranslationOfWord(new_word)
@@ -101,6 +103,15 @@ Page {
         }
     }
 
+    Timer {
+        id: search_timer
+        repeat: false
+        interval: 1000
+        onTriggered: {
+            functions.filter_list(page.search_text)
+        }
+    }
+
     ListModel {
         id: listModel
     }
@@ -144,7 +155,8 @@ Page {
                 EnterKey.onClicked: parent.focus = true
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 onTextChanged: {
-                    functions.filter_list(text)
+                    page.search_text = text
+                    search_timer.restart()
                 }
             }
         }
