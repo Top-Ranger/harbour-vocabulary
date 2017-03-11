@@ -62,6 +62,18 @@ Page {
                 title: qsTr("Edit vocabulary") + " " + page.origin_word
             }
 
+            Button {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                width: parent.width
+                text: qsTr("Save change")
+                onClicked: functions.save_change()
+            }
+
             TextArea {
                 id: word
                 width: parent.width
@@ -90,18 +102,6 @@ Page {
                 maximumValue: 100
                 label: qsTr("Priority")
                 valueText: "" + value
-            }
-
-            Button {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    margins: Theme.horizontalPageMargin
-                }
-
-                width: parent.width
-                text: qsTr("Save change")
-                onClicked: functions.save_change()
             }
         }
     }

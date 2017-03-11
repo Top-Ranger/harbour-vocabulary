@@ -91,6 +91,18 @@ Page {
             PageHeader {
                 title: qsTr("Add vocabulary")
             }
+
+            Button {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                width: parent.width
+                text: qsTr("Save vocabulary")
+                onClicked: functions.save_word()
+            }
             
             Row {
                 anchors {
@@ -151,18 +163,6 @@ Page {
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input translation here")
                 label: qsTr("Translation")
-            }
-
-            Button {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    margins: Theme.horizontalPageMargin
-                }
-
-                width: parent.width
-                text: qsTr("Save vocabulary")
-                onClicked: functions.save_word()
             }
         }
     }
