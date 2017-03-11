@@ -36,7 +36,7 @@ public:
 
     explicit CSVHandle(QObject *parent = 0);
 
-    Q_INVOKABLE QStringList loadCSV(QString path, seperator sep, bool has_header, int column_word, int column_translation, int column_priority, bool import_priority);
+    Q_INVOKABLE QStringList loadCSV(QString path, seperator sep, bool has_header, int column_word, int column_translation, int column_priority, bool import_priority, bool overwrite_existing);
     Q_INVOKABLE QStringList saveCSV(QString path, seperator sep, bool has_header);
 
 signals:

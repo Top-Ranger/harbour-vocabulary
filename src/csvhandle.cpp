@@ -25,7 +25,7 @@ CSVHandle::CSVHandle(QObject *parent) : QObject(parent)
 {
 }
 
-QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_header, int column_word, int column_translation, int column_priority, bool import_priority)
+QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_header, int column_word, int column_translation, int column_priority, bool import_priority, bool overwrite_existing)
 {
     QStringList errors;
 
@@ -50,7 +50,15 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
 
     database.transaction();
     QSqlQuery q(database);
-    QString s = "INSERT OR ABORT INTO vocabulary VALUES (?,?,100)";
+    QString s;
+    if(overwrite_existing)
+    {
+        s = "INSERT OR REPLACE INTO vocabulary VALUES (?,?,100)";
+    }
+    else
+    {
+        s = "INSERT OR ABORT INTO vocabulary VALUES (?,?,100)";
+    }
 
     int need_num_columns = qMax(column_word, column_translation);
     QChar sep_char = getSeperator(sep);
@@ -58,7 +66,14 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
     if(import_priority)
     {
         need_num_columns = qMax(need_num_columns, column_priority);
-        s = "INSERT OR ABORT INTO vocabulary VALUES (?,?,?)";
+        if(overwrite_existing)
+        {
+            s = "INSERT OR REPLACE INTO vocabulary VALUES (?,?,?)";
+        }
+        else
+        {
+            s = "INSERT OR ABORT INTO vocabulary VALUES (?,?,?)";
+        }
     }
 
     if(has_header)
@@ -75,7 +90,7 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
             continue;
         }
         QStringList columns = line.split(sep_char, QString::KeepEmptyParts);
-        if(columns.size() < need_num_columns+1)
+        if(columns.size() < need_num_columns + 1)
         {
             QString error = QString(tr("Error at \"%1\": Column to small")).arg(line);
             WARNING(error);
@@ -194,4 +209,5 @@ QChar CSVHandle::getSeperator(CSVHandle::seperator sep)
     }
     Q_UNREACHABLE();
 }
+
 
