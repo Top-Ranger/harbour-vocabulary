@@ -99,6 +99,7 @@ Page {
                     margins: Theme.horizontalPageMargin
                 }
 
+                enabled: word.text.trim() != "" && translation.text.trim() != "" && word.text.trim() != best_match_result_label.text.trim()
                 width: parent.width
                 text: qsTr("Save vocabulary")
                 onClicked: functions.save_word()
