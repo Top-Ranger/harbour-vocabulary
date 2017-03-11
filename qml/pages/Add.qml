@@ -20,6 +20,10 @@ import Sailfish.Silica 1.0
 Page {
     id: page
     allowedOrientations: Orientation.All
+    
+    Component.onCompleted: {
+        functions.load_list()
+    }
 
     Item {
         id: functions
@@ -31,6 +35,44 @@ Page {
             else {
                 panel.show()
             }
+        }
+
+        function load_list() {
+            listModel.clear()
+            var wordlist = simple_interface.getAllWords()
+            for(var i = 0; i < wordlist.length; ++i) {
+                var translation = simple_interface.getTranslationOfWord(wordlist[i])
+                originModel.append({"word": wordlist[i], "translation": translation})
+                listModel.append({"word": wordlist[i], "translation": translation})
+            }
+        }
+
+        function filter_list(filter) {
+            listModel.clear()
+            filter = filter.toLowerCase()
+            for(var i = 0; i < originModel.count; ++i) {
+                var item = originModel.get(i)
+                if(item.word.toLowerCase().indexOf(filter) !== -1 || item.translation.toLowerCase().indexOf(filter) !== -1) {
+                    listModel.append(item)
+                }
+            }
+        }
+    }
+    
+    ListModel {
+        id: listModel
+    }
+
+    ListModel {
+        id: originModel
+    }
+
+    Timer {
+        id: search_timer
+        repeat: false
+        interval: 750
+        onTriggered: {
+            functions.filter_list(word.text)
         }
     }
 
@@ -49,6 +91,46 @@ Page {
             PageHeader {
                 title: qsTr("Add vocabulary")
             }
+            
+            Row {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+                Label {
+                    id: number_similar_label
+                    text: qsTr("Number similar: ")
+                    color: Theme.primaryColor
+                }
+                Label {
+                    width: parent.width - number_similar_label.width
+                    text: "" + listModel.count
+                    color: Theme.secondaryColor
+                    horizontalAlignment: Text.AlignLeft
+                    truncationMode: TruncationMode.Elide
+                }
+            }
+            
+            Row {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+                Label {
+                    id: best_match_label
+                    text: qsTr("Best match: ")
+                    color: Theme.primaryColor
+                }
+                Label {
+                    width: parent.width - best_match_label.width
+                    text: listModel.count===0 || listModel.count === originModel.count ? "" : listModel.get(0).word
+                    color: Theme.secondaryColor
+                    horizontalAlignment: Text.AlignLeft
+                    truncationMode: TruncationMode.Elide
+                }
+            }
 
             TextArea {
                 id: word
@@ -58,6 +140,7 @@ Page {
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input word or phrase here")
                 label: qsTr("Word / phrase")
+                onTextChanged: search_timer.restart()
             }
 
             TextArea {
