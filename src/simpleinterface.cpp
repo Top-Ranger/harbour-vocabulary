@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016,2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #include <QtCore/QtMath>
 
 SimpleInterface::SimpleInterface(QObject *parent) :
-    QObject(parent),
-    _count(0)
+        QObject(parent),
+        _count(0)
 {
     recount();
 }
@@ -171,6 +171,25 @@ bool SimpleInterface::editVocabulary(QString origin_word, QString new_word, QStr
     }
 }
 
+bool SimpleInterface::setPriority(QString word, int priority)
+{
+    QString s = "UPDATE vocabulary SET priority=? WHERE word=?";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.addBindValue(priority);
+    q.addBindValue(word);
+
+    if(!q.exec())
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return false;
+    }
+
+    return true;
+}
+
 QStringList SimpleInterface::getAllWords()
 {
     QString s = "SELECT word FROM vocabulary ORDER BY word ASC";
@@ -257,4 +276,3 @@ int SimpleInterface::getPriorityOfWord(QString word)
     }
     return q.value(0).toInt();
 }
-

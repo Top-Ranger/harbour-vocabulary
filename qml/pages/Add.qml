@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016,2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,11 +136,22 @@ Page {
                     color: Theme.primaryColor
                 }
                 Label {
-                    width: parent.width - best_match_label.width
+                    id: best_match_result_label
+                    width: parent.width - best_match_label.width - best_match_reset_icon.width
                     text: listModel.count===0 || listModel.count === originModel.count ? "" : listModel.get(0).word
                     color: Theme.secondaryColor
                     horizontalAlignment: Text.AlignLeft
                     truncationMode: TruncationMode.Elide
+                }
+                IconButton {
+                    id: best_match_reset_icon
+                    height: best_match_label.height
+                    icon.source: "image://theme/icon-m-refresh"
+                    visible: best_match_result_label.text != ""
+                    onClicked: {
+                        var word = best_match_result_label.text
+                        remorse.execute("Resetting priority of " + word, function(){ if(simple_interface.setPriority(word,100)){pageStack.pop()} else {panel_priority.show()}})
+                    }
                 }
             }
 
@@ -167,9 +178,18 @@ Page {
         }
     }
 
+    RemorsePopup {
+        id: remorse
+    }
+
     UpperPanel {
         id: panel
         text: qsTr("Can not save vocabulary")
+    }
+
+    UpperPanel {
+        id: panel_priority
+        text: qsTr("Can not set priority")
     }
 }
 

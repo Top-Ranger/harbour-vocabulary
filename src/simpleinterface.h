@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016,2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ public slots:
     bool addVocabulary(QString word, QString translation);
     bool removeVocabulary(QString word);
     bool editVocabulary(QString origin_word, QString new_word, QString translation, int priority);
+    bool setPriority(QString word, int priority);
     QStringList getAllWords();
     QString getTranslationOfWord(QString word);
     int getPriorityOfWord(QString word);
@@ -49,3 +50,4 @@ private:
 };
 
 #endif // SIMPLEINTERFACE_H
+
