@@ -118,8 +118,18 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
         {
             QString error = s;
             error.append(": ").append(q.lastError().text());
-            WARNING(error);
-            errors << error;
+            // This detection is not really reliable... but it is the best we can do
+            if(error.contains("UNIQUE", Qt::CaseSensitive))
+            {
+                errors << QString(tr("Vocabulary \"%1\" already in database - it will not be overwritten")).arg(columns[column_word].simplified());
+                error.append("(UNIQUE case)");
+                WARNING(error);
+            }
+            else
+            {
+                WARNING(error);
+                errors << error;
+            }
         }
     }
 
