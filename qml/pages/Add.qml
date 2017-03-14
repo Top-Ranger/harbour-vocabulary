@@ -132,13 +132,13 @@ Page {
                 }
                 Label {
                     id: best_match_label
-                    text: qsTr("Best match: ")
+                    text: qsTr("Possible match: ")
                     color: Theme.primaryColor
                 }
                 Label {
                     id: best_match_result_label
                     width: parent.width - best_match_label.width - best_match_reset_icon.width
-                    text: listModel.count===0 || listModel.count === originModel.count ? "" : listModel.get(0).word
+                    text: listModel.count===0 || listModel.count === originModel.count ? "" : listModel.get(Math.floor(Math.random()*listModel.count)).word
                     color: Theme.secondaryColor
                     horizontalAlignment: Text.AlignLeft
                     truncationMode: TruncationMode.Elide
