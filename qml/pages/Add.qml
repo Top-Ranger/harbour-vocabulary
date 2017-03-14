@@ -41,9 +41,8 @@ Page {
             listModel.clear()
             var wordlist = simple_interface.getAllWords()
             for(var i = 0; i < wordlist.length; ++i) {
-                var translation = simple_interface.getTranslationOfWord(wordlist[i])
-                originModel.append({"word": wordlist[i], "translation": translation})
-                listModel.append({"word": wordlist[i], "translation": translation})
+                originModel.append({"word": wordlist[i]})
+                listModel.append({"word": wordlist[i]})
             }
         }
 
@@ -52,7 +51,7 @@ Page {
             filter = filter.toLowerCase()
             for(var i = 0; i < originModel.count; ++i) {
                 var item = originModel.get(i)
-                if(item.word.toLowerCase().indexOf(filter) !== -1 || item.translation.toLowerCase().indexOf(filter) !== -1) {
+                if(item.word.toLowerCase().indexOf(filter) !== -1) {
                     listModel.append(item)
                 }
             }
