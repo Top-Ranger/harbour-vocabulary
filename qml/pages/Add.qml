@@ -74,8 +74,15 @@ Page {
         id: search_timer
         repeat: false
         interval: 750
+
+        property string lastWord: ""
+
         onTriggered: {
-            functions.filter_list(word.text)
+            var newWord = word.text.trim()
+            if(newWord !== lastWord) {
+                lastWord = newWord
+                functions.filter_list(newWord)
+            }
         }
     }
 
@@ -206,4 +213,3 @@ Page {
         text: qsTr("Can not set priority")
     }
 }
-
