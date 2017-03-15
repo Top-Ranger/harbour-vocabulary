@@ -48,6 +48,7 @@ Page {
 
         function filter_list(filter) {
             listModel.clear()
+            listModel.showItemNo = 0
             filter = filter.toLowerCase()
             for(var i = 0; i < originModel.count; ++i) {
                 var item = originModel.get(i)
@@ -55,11 +56,14 @@ Page {
                     listModel.append(item)
                 }
             }
+            listModel.showItemNo = Math.floor(Math.random()*listModel.count)
         }
     }
     
     ListModel {
         id: listModel
+
+        property int showItemNo: 0
     }
 
     ListModel {
@@ -81,6 +85,17 @@ Page {
         VerticalScrollDecorator {}
 
         contentHeight: column.height
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Reset priority of match")
+                enabled: best_match_result_label.text !== ""
+                onClicked: {
+                    var word = best_match_result_label.text
+                    remorse.execute(qsTr("Resetting priority of ") + word, function(){ if(!simple_interface.setPriority(word,100)){ panel_priority.show() }})
+                }
+            }
+        }
 
         Column {
             id: column
@@ -138,7 +153,7 @@ Page {
                 Label {
                     id: best_match_result_label
                     width: parent.width - best_match_label.width - best_match_reset_icon.width
-                    text: listModel.count===0 || listModel.count === originModel.count ? "" : listModel.get(Math.floor(Math.random()*listModel.count)).word
+                    text: listModel.count===0 || listModel.count === originModel.count ? "" : listModel.get(listModel.showItemNo).word
                     color: Theme.secondaryColor
                     horizontalAlignment: Text.AlignLeft
                     truncationMode: TruncationMode.Elide
@@ -146,11 +161,10 @@ Page {
                 IconButton {
                     id: best_match_reset_icon
                     height: best_match_label.height
-                    icon.source: "image://theme/icon-m-refresh"
+                    icon.source: "image://theme/icon-m-forward"
                     visible: best_match_result_label.text != ""
                     onClicked: {
-                        var word = best_match_result_label.text
-                        remorse.execute("Resetting priority of " + word, function(){ if(simple_interface.setPriority(word,100)){pageStack.pop()} else {panel_priority.show()}})
+                        listModel.showItemNo = (listModel.showItemNo + 1) % listModel.count
                     }
                 }
             }
