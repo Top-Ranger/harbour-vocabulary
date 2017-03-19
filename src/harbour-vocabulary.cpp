@@ -109,7 +109,11 @@ bool create_new_db()
     QStringList operations;
     operations.append("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT)");
     operations.append("CREATE TABLE vocabulary (word TEXT PRIMARY KEY, translation TEXT, priority INT)");
-    operations.append("INSERT INTO meta VALUES ('version', '2')");
+    operations.append("CREATE TABLE vocabulary-dates (word TEXT PRIMARY KEY, creation INT, modification INT)");
+    operations.append("CREATE TABLE groups (word TEXT, group TEXT, PRIMARY KEY(literal, list))");
+    operations.append("CREATE INDEX index_groups_group ON groups(group)");
+    operations.append("CREATE INDEX index_groups_word ON groups(word)");
+    operations.append("INSERT INTO meta VALUES ('version', '3')");
 
     foreach(QString s, operations)
     {
@@ -215,12 +219,17 @@ bool test_and_update_db()
     }
 
     case 2:
-        DEBUG("Database version: 2");
-        return true;
-        break;
+        /* Added dates and groups
+         */
+        DEBUG("Database upgrade: 2 -> 3");
+        operations.append("CREATE TABLE vocabulary-dates (word TEXT PRIMARY KEY, creation INT, modification INT)");
+        operations.append("CREATE TABLE groups (word TEXT, group TEXT, PRIMARY KEY(literal, list))");
+        operations.append("CREATE INDEX index_groups_group ON groups(group)");
+        operations.append("CREATE INDEX index_groups_word ON groups(word)");
+        operations.append("UPDATE meta SET value=3 WHERE key='version'");
 
         // For later usage
-        for(QStringList::const_iterator s = operations.cbegin(); s != operations.cend(); ++s)
+        for(QStringList::const_iterator s = operations.constBegin(); s != operations.constEnd(); ++s)
         {
             if(!query.exec(*s))
             {
@@ -232,7 +241,14 @@ bool test_and_update_db()
         }
         DEBUG("Upgrade complete");
 
+    case 3:
+        DEBUG("Database version: 3");
+        return true;
+        break;
+
     default:
+        /* Safeguard - if we reach this point something went REALLY wrong
+         */
         WARNING("Unknown database version");
         return false;
         break;
