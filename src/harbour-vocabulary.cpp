@@ -109,9 +109,9 @@ bool create_new_db()
     QStringList operations;
     operations.append("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT)");
     operations.append("CREATE TABLE vocabulary (word TEXT PRIMARY KEY, translation TEXT, priority INT)");
-    operations.append("CREATE TABLE vocabulary-dates (word TEXT PRIMARY KEY, creation INT, modification INT)");
-    operations.append("CREATE TABLE groups (word TEXT, group TEXT, PRIMARY KEY(literal, list))");
-    operations.append("CREATE INDEX index_groups_group ON groups(group)");
+    operations.append("CREATE TABLE vocabularydates (word TEXT PRIMARY KEY, creation INT, modification INT)");
+    operations.append("CREATE TABLE groups (word TEXT, g TEXT, PRIMARY KEY(word, g))");
+    operations.append("CREATE INDEX index_groups_group ON groups(g)");
     operations.append("CREATE INDEX index_groups_word ON groups(word)");
     operations.append("INSERT INTO meta VALUES ('version', '3')");
 
@@ -222,9 +222,9 @@ bool test_and_update_db()
         /* Added dates and groups
          */
         DEBUG("Database upgrade: 2 -> 3");
-        operations.append("CREATE TABLE vocabulary-dates (word TEXT PRIMARY KEY, creation INT, modification INT)");
-        operations.append("CREATE TABLE groups (word TEXT, group TEXT, PRIMARY KEY(literal, list))");
-        operations.append("CREATE INDEX index_groups_group ON groups(group)");
+        operations.append("CREATE TABLE vocabularydates (word TEXT PRIMARY KEY, creation INT, modification INT)");
+        operations.append("CREATE TABLE groups (word TEXT, g TEXT, PRIMARY KEY(word, g))");
+        operations.append("CREATE INDEX index_groups_group ON groups(g)");
         operations.append("CREATE INDEX index_groups_word ON groups(word)");
         operations.append("UPDATE meta SET value=3 WHERE key='version'");
 
