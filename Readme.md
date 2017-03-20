@@ -25,10 +25,6 @@ For every priority point the vocabulary gets an additional chance of getting dra
  * Import / export of vocabulary list. Supported file formats:
    - CSV
 
-# Planned features
-
- * Detailed statistics about all vocabulary
-
 # License
 
 Licensed under the Apache License, Version 2.0 (the "License");
