@@ -273,13 +273,16 @@ bool test_and_update_db()
             }
 
             database.transaction();
+            qint64 today = QDate::currentDate().toJulianDay();
             for(QStringList::iterator i = vocabulary_list.begin(); i != vocabulary_list.end(); ++i)
             {
-                s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?, 1, 1)";
+                s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?, ?, ?)";
 
                 query.clear();
                 query.prepare(s);
                 query.addBindValue(*i);
+                query.addBindValue(today);
+                query.addBindValue(today);
 
                 if(!query.exec())
                 {
