@@ -20,6 +20,7 @@
 #include "global.h"
 
 #include <QObject>
+#include <QDate>
 
 class SimpleInterface : public QObject
 {

@@ -19,8 +19,8 @@
 #include <QtCore/QtMath>
 
 SimpleInterface::SimpleInterface(QObject *parent) :
-        QObject(parent),
-        _count(0)
+    QObject(parent),
+    _count(0)
 {
     recount();
 }
@@ -32,6 +32,8 @@ int SimpleInterface::count()
 
 bool SimpleInterface::clearAllVocabulary()
 {
+    database.transaction();
+
     QString s = "DELETE FROM vocabulary";
     QSqlQuery q(database);
 
@@ -39,9 +41,31 @@ bool SimpleInterface::clearAllVocabulary()
     {
         QString error = s.append(": ").append(q.lastError().text());
         WARNING(error);
+        database.rollback();
         return false;
     }
 
+    s = "DELETE FROM vocabularydates";
+
+    if(!q.exec(s))
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        database.rollback();
+        return false;
+    }
+
+    s = "DELETE FROM groups";
+
+    if(!q.exec(s))
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        database.rollback();
+        return false;
+    }
+
+    database.commit();
     _count = 0;
     emit countChanged(_count);
     return true;
@@ -77,6 +101,7 @@ void SimpleInterface::recount()
 
 bool SimpleInterface::addVocabulary(QString word, QString translation)
 {
+    database.transaction();
     QString s = "INSERT INTO vocabulary (word, translation, priority) VALUES (?,?,100)";
     QSqlQuery q(database);
 
@@ -88,8 +113,26 @@ bool SimpleInterface::addVocabulary(QString word, QString translation)
     {
         QString error = s.append(": ").append(q.lastError().text());
         WARNING(error);
+        database.rollback();
         return false;
     }
+
+    s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?,?,?)";
+
+    q.prepare(s);
+    q.addBindValue(word.simplified());
+    q.addBindValue(QDate::currentDate().toJulianDay());
+    q.addBindValue(QDate::currentDate().toJulianDay());
+
+    if(!q.exec())
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        database.rollback();
+        return false;
+    }
+
+    database.commit();
     _count += 1;
     emit countChanged(_count);
     return true;
@@ -97,6 +140,8 @@ bool SimpleInterface::addVocabulary(QString word, QString translation)
 
 bool SimpleInterface::removeVocabulary(QString word)
 {
+    database.transaction();
+
     QString s = "DELETE FROM vocabulary WHERE word=?";
     QSqlQuery q(database);
 
@@ -107,8 +152,37 @@ bool SimpleInterface::removeVocabulary(QString word)
     {
         QString error = s.append(": ").append(q.lastError().text());
         WARNING(error);
+        database.rollback();
         return false;
     }
+
+    s = "DELETE FROM vocabularydates WHERE word=?";
+
+    q.prepare(s);
+    q.addBindValue(word.simplified());
+
+    if(!q.exec())
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        database.rollback();
+        return false;
+    }
+
+    s = "DELETE FROM groups WHERE word=?";
+
+    q.prepare(s);
+    q.addBindValue(word.simplified());
+
+    if(!q.exec())
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        database.rollback();
+        return false;
+    }
+
+    database.commit();
     _count -= 1;
     emit countChanged(_count);
     return true;
@@ -124,6 +198,8 @@ bool SimpleInterface::editVocabulary(QString origin_word, QString new_word, QStr
     if(origin_word == new_word)
     {
         // Update entry
+        database.transaction();
+
         QSqlQuery q(database);
         QString s = "UPDATE vocabulary SET translation=?, priority=? WHERE word=?";
         q.prepare(s);
@@ -135,8 +211,24 @@ bool SimpleInterface::editVocabulary(QString origin_word, QString new_word, QStr
         {
             QString error = s.append(": ").append(q.lastError().text());
             WARNING(error);
+            database.rollback();
             return false;
         }
+
+        s = "UPDATE vocabularydates SET modification=? WHERE word=?";
+        q.prepare(s);
+        q.addBindValue(QDate::currentDate().toJulianDay());
+        q.addBindValue(origin_word);
+
+        if(!q.exec())
+        {
+            QString error = s.append(": ").append(q.lastError().text());
+            WARNING(error);
+            database.rollback();
+            return false;
+        }
+
+        database.commit();
         return true;
     }
     else
@@ -155,6 +247,38 @@ bool SimpleInterface::editVocabulary(QString origin_word, QString new_word, QStr
             WARNING(error);
             return false;
         }
+
+        // creation/modification time
+        qint64 creation_time = 1;
+        s = "SELECT creation FROM vocabularydates WHERE word=?";
+        q.prepare(s);
+        q.addBindValue(origin_word);
+
+        if(q.exec() && q.isSelect() && q.next())
+        {
+            creation_time = q.value(0).toLongLong();
+        }
+        else
+        {
+            QString error = s.append(": Can not get creation time");
+            WARNING(error);
+            return "";
+        }
+
+        s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?,?,?)";
+
+        q.prepare(s);
+        q.addBindValue(new_word);
+        q.addBindValue(creation_time);
+        q.addBindValue(QDate::currentDate().toJulianDay());
+
+        if(!q.exec())
+        {
+            QString error = s.append(": ").append(q.lastError().text());
+            WARNING(error);
+        }
+        
+        // TODO: groups
 
         // ... and delete old one
 

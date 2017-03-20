@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     }
 
     // Add classes to QQuickView
-    QGuiApplication *app = SailfishApp::application(argc,argv);
+    QGuiApplication *app = SailfishApp::application(argc, argv);
     QQuickView *view = SailfishApp::createView();
 
     RandomVocabulary random_vocabulary;
@@ -161,65 +161,66 @@ bool test_and_update_db()
          * This database update simplifies all words contained in the database.
          * It is needed because the old CSV import did not simplify.
          */
-    {
-        QStringList to_update;
-
-        s = "SELECT word FROM vocabulary";
-
-        query.clear();
-        query.prepare(s);
-
-        if(!query.exec())
         {
-            QString error = s.append(": ").append(query.lastError().text());
-            WARNING(error);
-            return false;
-        }
-        if(!query.isSelect())
-        {
-            QString error = s.append(": No select");
-            WARNING(error);
-            return false;
-        }
+            QStringList to_update;
 
-        while(query.next())
-        {
-            QString word = query.value(0).toString();
-            if(word.simplified() != word)
-            {
-                to_update << word;
-            }
-        }
-
-        for(QStringList::iterator i = to_update.begin(); i != to_update.end(); ++i)
-        {
-            s = "UPDATE OR IGNORE vocabulary SET word=? WHERE word=?";
+            s = "SELECT word FROM vocabulary";
 
             query.clear();
             query.prepare(s);
-            query.addBindValue((*i).simplified());
-            query.addBindValue(*i);
 
             if(!query.exec())
             {
                 QString error = s.append(": ").append(query.lastError().text());
                 WARNING(error);
+                return false;
+            }
+            if(!query.isSelect())
+            {
+                QString error = s.append(": No select");
+                WARNING(error);
+                return false;
+            }
+
+            while(query.next())
+            {
+                QString word = query.value(0).toString();
+                if(word.simplified() != word)
+                {
+                    to_update << word;
+                }
+            }
+
+            for(QStringList::iterator i = to_update.begin(); i != to_update.end(); ++i)
+            {
+                s = "UPDATE OR IGNORE vocabulary SET word=? WHERE word=?";
+
+                query.clear();
+                query.prepare(s);
+                query.addBindValue((*i).simplified());
+                query.addBindValue(*i);
+
+                if(!query.exec())
+                {
+                    QString error = s.append(": ").append(query.lastError().text());
+                    WARNING(error);
+                }
+            }
+
+            query.clear();
+            s = "UPDATE meta SET value=2 WHERE key='version'";
+
+            if(!query.exec(s))
+            {
+                QString error = s.append(": ").append(query.lastError().text());
+                CRITICAL(error);
+                return false;
             }
         }
 
-        query.clear();
-        s = "UPDATE meta SET value=2 WHERE key='version'";
-
-        if(!query.exec(s))
-        {
-            QString error = s.append(": ").append(query.lastError().text());
-            CRITICAL(error);
-            return false;
-        }
-    }
-
     case 2:
-        /* Added dates and groups
+        /*
+         * Added dates and groups
          */
         DEBUG("Database upgrade: 2 -> 3");
         operations.append("CREATE TABLE vocabularydates (word TEXT PRIMARY KEY, creation INT, modification INT)");
@@ -228,7 +229,6 @@ bool test_and_update_db()
         operations.append("CREATE INDEX index_groups_word ON groups(word)");
         operations.append("UPDATE meta SET value=3 WHERE key='version'");
 
-        // For later usage
         for(QStringList::const_iterator s = operations.constBegin(); s != operations.constEnd(); ++s)
         {
             if(!query.exec(*s))
@@ -237,6 +237,56 @@ bool test_and_update_db()
                 error.append(": ").append(query.lastError().text());
                 CRITICAL(error);
                 return false;
+            }
+        }
+        operations.clear();
+
+        /*
+         * Add creation / modification time
+         * This might be more expensive here, but it will make the code better later by removing corner cases
+         */
+        {
+            QStringList vocabulary_list;
+            s = "SELECT word FROM vocabulary";
+
+            query.clear();
+            query.prepare(s);
+
+            if(!query.exec())
+            {
+                QString error = s.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+            if(!query.isSelect())
+            {
+                QString error = s.append(": No select");
+                WARNING(error);
+                return false;
+            }
+
+            while(query.next())
+            {
+                QString word = query.value(0).toString();
+                if(word.simplified() != word)
+                {
+                    vocabulary_list << word;
+                }
+            }
+
+            for(QStringList::iterator i = vocabulary_list.begin(); i != vocabulary_list.end(); ++i)
+            {
+                s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?, 1, 1)";
+
+                query.clear();
+                query.prepare(s);
+                query.addBindValue(*i);
+
+                if(!query.exec())
+                {
+                    QString error = s.append(": ").append(query.lastError().text());
+                    WARNING(error);
+                }
             }
         }
         DEBUG("Upgrade complete");
