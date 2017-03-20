@@ -63,9 +63,6 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
         s = "INSERT OR ABORT INTO vocabulary VALUES (?,?,100)";
         date_s = "INSERT OR ABORT INTO vocabularydates (word, creation, modification) VALUES (?, ?, ?)";
     }
-    
-    date_s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?, ?, ?)";
-
 
     int need_num_columns = qMax(column_word, column_translation);
     QChar sep_char = getSeperator(sep);
@@ -149,7 +146,8 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
 
             if(!q.exec())
             {
-                QString error = s.append(": ").append(q.lastError().text());
+                QString error = date_s;
+                error.append(": ").append(q.lastError().text());
                 WARNING(error);
             }
         }
@@ -184,7 +182,8 @@ QStringList CSVHandle::saveCSV(QString path, CSVHandle::seperator sep, bool writ
 
     if(!q.exec(s))
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         errors << error;
         file.close();
