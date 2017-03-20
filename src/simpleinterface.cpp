@@ -277,7 +277,7 @@ bool SimpleInterface::editVocabulary(QString origin_word, QString new_word, QStr
             QString error = s.append(": ").append(q.lastError().text());
             WARNING(error);
         }
-        
+
         // TODO: groups
 
         // ... and delete old one
@@ -399,4 +399,62 @@ int SimpleInterface::getPriorityOfWord(QString word)
         return 100;
     }
     return q.value(0).toInt();
+}
+
+QDate SimpleInterface::getCreationDate(QString word)
+{
+    QString s = "SELECT creation FROM vocabularydates WHERE word=?";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.addBindValue(word.simplified());
+
+    if(!q.exec())
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return QDate::fromJulianDay(1);
+    }
+    if(!q.isSelect())
+    {
+        QString error = s.append(": No select");
+        WARNING(error);
+        return QDate::fromJulianDay(1);
+    }
+    if(!q.next())
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return QDate::fromJulianDay(1);
+    }
+    return QDate::fromJulianDay(q.value(0).toLongLong());
+}
+
+QDate SimpleInterface::getModificationDate(QString word)
+{
+    QString s = "SELECT modification FROM vocabularydates WHERE word=?";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.addBindValue(word.simplified());
+
+    if(!q.exec())
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return QDate::fromJulianDay(1);
+    }
+    if(!q.isSelect())
+    {
+        QString error = s.append(": No select");
+        WARNING(error);
+        return QDate::fromJulianDay(1);
+    }
+    if(!q.next())
+    {
+        QString error = s.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return QDate::fromJulianDay(1);
+    }
+    return QDate::fromJulianDay(q.value(0).toLongLong());
 }

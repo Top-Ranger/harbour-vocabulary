@@ -34,6 +34,8 @@ Page {
             word_text.text = new_word
             translation_text.text = simple_interface.getTranslationOfWord(new_word)
             priority.value = simple_interface.getPriorityOfWord(new_word)
+            creation_text.text = simple_interface.getCreationDate(page.word).toLocaleDateString()
+            modification_text.text = simple_interface.getModificationDate(page.word).toLocaleDateString()
 
             var last_page = pageStack.previousPage(page)
             last_page.word_changed = true
@@ -140,6 +142,38 @@ Page {
                 label: qsTr("Priority")
                 valueText: "" + value
                 value: simple_interface.getPriorityOfWord(page.word)
+            }
+
+            Row {
+                Label {
+                    id: creation
+                    text: qsTr("Creation: ")
+                    color: Theme.highlightColor
+                }
+
+                Text {
+                    id: creation_text
+                    width: column.width - creation.width
+                    color: Theme.primaryColor
+                    wrapMode: Text.Wrap
+                    text: simple_interface.getCreationDate(page.word).toLocaleDateString()
+                }
+            }
+
+            Row {
+                Label {
+                    id: modification
+                    text: qsTr("Last modification: ")
+                    color: Theme.highlightColor
+                }
+
+                Text {
+                    id: modification_text
+                    width: column.width - modification.width
+                    color: Theme.primaryColor
+                    wrapMode: Text.Wrap
+                    text: simple_interface.getModificationDate(page.word).toLocaleDateString()
+                }
             }
         }
     }

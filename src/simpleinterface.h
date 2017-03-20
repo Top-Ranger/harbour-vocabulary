@@ -43,6 +43,8 @@ public slots:
     QStringList getAllWords();
     QString getTranslationOfWord(QString word);
     int getPriorityOfWord(QString word);
+    QDate getCreationDate(QString word);
+    QDate getModificationDate(QString word);
     void recount();
 
 private:

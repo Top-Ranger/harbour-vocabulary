@@ -269,12 +269,10 @@ bool test_and_update_db()
             while(query.next())
             {
                 QString word = query.value(0).toString();
-                if(word.simplified() != word)
-                {
-                    vocabulary_list << word;
-                }
+                vocabulary_list << word;
             }
 
+            database.transaction();
             for(QStringList::iterator i = vocabulary_list.begin(); i != vocabulary_list.end(); ++i)
             {
                 s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?, 1, 1)";
@@ -289,6 +287,7 @@ bool test_and_update_db()
                     WARNING(error);
                 }
             }
+            database.commit();
         }
         DEBUG("Upgrade complete");
 
