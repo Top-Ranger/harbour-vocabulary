@@ -20,6 +20,7 @@
 #include <QTextStream>
 #include <QtCore/QtMath>
 #include <QTextCodec>
+#include <QDate>
 
 CSVHandle::CSVHandle(QObject *parent) : QObject(parent)
 {
@@ -51,14 +52,20 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
     database.transaction();
     QSqlQuery q(database);
     QString s;
+    QString date_s;
     if(overwrite_existing)
     {
         s = "INSERT OR REPLACE INTO vocabulary VALUES (?,?,100)";
+        date_s = "INSERT OR REPLACE INTO vocabularydates (word, creation, modification) VALUES (?, ?, ?)";
     }
     else
     {
         s = "INSERT OR ABORT INTO vocabulary VALUES (?,?,100)";
+        date_s = "INSERT OR ABORT INTO vocabularydates (word, creation, modification) VALUES (?, ?, ?)";
     }
+    
+    date_s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?, ?, ?)";
+
 
     int need_num_columns = qMax(column_word, column_translation);
     QChar sep_char = getSeperator(sep);
@@ -81,6 +88,8 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
         // Ignore header
         stream.readLine();
     }
+
+    qint64 today = QDate::currentDate().toJulianDay();
 
     while(!stream.atEnd())
     {
@@ -129,6 +138,19 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
             {
                 WARNING(error);
                 errors << error;
+            }
+        }
+        else
+        {
+            q.prepare(date_s);
+            q.addBindValue(columns[column_word].simplified());
+            q.addBindValue(today);
+            q.addBindValue(today);
+
+            if(!q.exec())
+            {
+                QString error = s.append(": ").append(q.lastError().text());
+                WARNING(error);
             }
         }
     }
