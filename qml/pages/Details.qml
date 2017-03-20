@@ -163,7 +163,7 @@ Page {
             Row {
                 Label {
                     id: modification
-                    text: qsTr("Last modification: ")
+                    text: qsTr("Modification: ")
                     color: Theme.highlightColor
                 }
 
