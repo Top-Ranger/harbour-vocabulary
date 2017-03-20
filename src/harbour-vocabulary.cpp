@@ -217,6 +217,7 @@ bool test_and_update_db()
                 return false;
             }
         }
+        DEBUG("Upgrade complete");
 
     case 2:
         /*
