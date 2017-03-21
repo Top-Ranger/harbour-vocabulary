@@ -110,9 +110,6 @@ bool create_new_db()
     operations.append("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT)");
     operations.append("CREATE TABLE vocabulary (word TEXT PRIMARY KEY, translation TEXT, priority INT)");
     operations.append("CREATE TABLE vocabularydates (word TEXT PRIMARY KEY, creation INT, modification INT)");
-    operations.append("CREATE TABLE groups (word TEXT, g TEXT, PRIMARY KEY(word, g))");
-    operations.append("CREATE INDEX index_groups_group ON groups(g)");
-    operations.append("CREATE INDEX index_groups_word ON groups(word)");
     operations.append("INSERT INTO meta VALUES ('version', '3')");
 
     foreach(QString s, operations)
@@ -221,13 +218,10 @@ bool test_and_update_db()
 
     case 2:
         /*
-         * Added dates and groups
+         * Added dates
          */
         DEBUG("Database upgrade: 2 -> 3");
         operations.append("CREATE TABLE vocabularydates (word TEXT PRIMARY KEY, creation INT, modification INT)");
-        operations.append("CREATE TABLE groups (word TEXT, g TEXT, PRIMARY KEY(word, g))");
-        operations.append("CREATE INDEX index_groups_group ON groups(g)");
-        operations.append("CREATE INDEX index_groups_word ON groups(word)");
         operations.append("UPDATE meta SET value=3 WHERE key='version'");
 
         for(QStringList::const_iterator s = operations.constBegin(); s != operations.constEnd(); ++s)

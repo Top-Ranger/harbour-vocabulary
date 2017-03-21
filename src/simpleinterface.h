@@ -45,10 +45,6 @@ public slots:
     int getPriorityOfWord(QString word);
     QDate getCreationDate(QString word);
     QDate getModificationDate(QString word);
-    QStringList getGroupsOfWord(QString word);
-    bool addToGroup(QString word, QString g);
-    bool removeFromGroup(QString word, QString g);
-    bool setGroups(QString word, QVariantList g);
     void recount();
 
 private:

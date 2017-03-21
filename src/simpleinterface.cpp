@@ -55,16 +55,6 @@ bool SimpleInterface::clearAllVocabulary()
         return false;
     }
 
-    s = "DELETE FROM groups";
-
-    if(!q.exec(s))
-    {
-        QString error = s.append(": ").append(q.lastError().text());
-        WARNING(error);
-        database.rollback();
-        return false;
-    }
-
     database.commit();
     _count = 0;
     emit countChanged(_count);
@@ -157,19 +147,6 @@ bool SimpleInterface::removeVocabulary(QString word)
     }
 
     s = "DELETE FROM vocabularydates WHERE word=?";
-
-    q.prepare(s);
-    q.addBindValue(word.simplified());
-
-    if(!q.exec())
-    {
-        QString error = s.append(": ").append(q.lastError().text());
-        WARNING(error);
-        database.rollback();
-        return false;
-    }
-
-    s = "DELETE FROM groups WHERE word=?";
 
     q.prepare(s);
     q.addBindValue(word.simplified());
@@ -277,8 +254,6 @@ bool SimpleInterface::editVocabulary(QString origin_word, QString new_word, QStr
             QString error = s.append(": ").append(q.lastError().text());
             WARNING(error);
         }
-
-        // TODO: groups
 
         // ... and delete old one
 
@@ -457,120 +432,4 @@ QDate SimpleInterface::getModificationDate(QString word)
         return QDate::fromJulianDay(1);
     }
     return QDate::fromJulianDay(q.value(0).toLongLong());
-}
-
-QStringList SimpleInterface::getGroupsOfWord(QString word)
-{
-    QStringList result;
-    QString s = "SELECT g FROM groups WHERE word=?";
-    QSqlQuery q(database);
-
-    q.prepare(s);
-    q.addBindValue(word.simplified());
-
-    if(!q.exec())
-    {
-        QString error = s.append(": ").append(q.lastError().text());
-        WARNING(error);
-        return QStringList();
-    }
-    if(!q.isSelect())
-    {
-        QString error = s.append(": No select");
-        WARNING(error);
-        return QStringList();
-    }
-    while(q.next())
-    {
-        result << q.value(0).toString();
-    }
-    return result;
-}
-
-bool SimpleInterface::addToGroup(QString word, QString g)
-{
-    QString s = "INSERT INTO groups (word, g) VALUES (?,?)";
-    QSqlQuery q(database);
-
-    q.prepare(s);
-    q.addBindValue(word);
-    q.addBindValue(g);
-
-    if(!q.exec())
-    {
-        QString error = s;
-        error.append(": ").append(q.lastError().text());
-        WARNING(error);
-        return false;
-    }
-    return true;
-}
-
-bool SimpleInterface::removeFromGroup(QString word, QString g)
-{
-    QString s = "DELETE FROM groups WHERE word=? AND g=?";
-    QSqlQuery q(database);
-
-    q.prepare(s);
-    q.addBindValue(word);
-    q.addBindValue(g);
-
-    if(!q.exec())
-    {
-        QString error = s;
-        error.append(": ").append(q.lastError().text());
-        WARNING(error);
-        return false;
-    }
-    return true;
-}
-
-bool SimpleInterface::setGroups(QString word, QVariantList g)
-{
-    database.transaction();
-    // At first delete all prior groups
-    QString s = "DELETE FROM groups WHERE word=?";
-    QSqlQuery q(database);
-
-    q.prepare(s);
-    q.addBindValue(word);
-
-    if(!q.exec())
-    {
-        QString error = s;
-        error.append(": ").append(q.lastError().text());
-        WARNING(error);
-        database.rollback();
-        return false;
-    }
-
-    // Now set new groups
-    s = "INSERT INTO groups (word, g) VALUES (?,?)";
-
-    for(QVariantList::const_iterator i = g.constBegin(); i != g.constEnd(); ++i)
-    {
-        if(!(*i).canConvert<QString>())
-        {
-            WARNING(QString("Can not convert QVariant containing %1 to QString").arg((*i).typeName()));
-            database.rollback();
-            return false;
-        }
-        QString group = (*i).toString();
-
-        q.prepare(s);
-        q.addBindValue(word);
-        q.addBindValue(group);
-
-        if(!q.exec())
-        {
-            QString error = s;
-            error.append(": ").append(q.lastError().text());
-            WARNING(error);
-            database.rollback();
-            return false;
-        }
-    }
-
-    database.commit();
-    return true;
 }
