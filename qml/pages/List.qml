@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016,2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,32 +22,31 @@ Page {
     allowedOrientations: Orientation.All
 
     property bool word_changed: false
-    property string origin_word: ""
-    property string new_word: ""
+    property int word_id: 0
 
     property string search_text: ""
 
     onStatusChanged: {
         if(word_changed === true) {
-            var translation = simple_interface.getTranslationOfWord(new_word)
+            var word = simple_interface.getWord(page.word_id)
+            var translation = simple_interface.getTranslationOfWord(page.word_id)
 
             for(var i = 0; i < listModel.count; ++i) {
-                if(listModel.get(i).word === origin_word) {
+                if(listModel.get(i).id === page.word_id) {
                     listModel.remove(i)
-                    listModel.insert(i, {"word": new_word, "translation": translation})
-                    word_changed = false
+                    listModel.insert(i, {"id": page.word_id, "word": word, "translation": translation})
                     break
                 }
             }
 
             for(i = 0; i < originModel.count; ++i) {
-                if(originModel.get(i).word === origin_word) {
+                if(originModel.get(i).id === page.word_id) {
                     originModel.remove(i)
-                    originModel.insert(i, {"word": new_word, "translation": translation})
-                    word_changed = false
+                    originModel.insert(i, {"id": page.word_id, "word": word, "translation": translation})
                     break
                 }
             }
+            word_changed = false
         }
     }
 
@@ -58,19 +57,19 @@ Page {
     Item {
         id: functions
 
-        function remove_word(word, item) {
-            if(simple_interface.removeVocabulary(word)) {
+        function remove_word(word_id, item) {
+            if(simple_interface.removeVocabulary(word_id)) {
                 item.animateRemoval()
 
                 for(var i = 0; i < originModel.count; ++i) {
-                    if(originModel.get(i).word === word) {
+                    if(originModel.get(i).id === word_id) {
                         originModel.remove(i)
                         break
                     }
                 }
 
                 for(i = 0; i < listModel.count; ++i) {
-                    if(listModel.get(i).word === word) {
+                    if(listModel.get(i).id === word_id) {
                         listModel.remove(i)
                         break
                     }
@@ -85,9 +84,10 @@ Page {
             listModel.clear()
             var wordlist = simple_interface.getAllWords()
             for(var i = 0; i < wordlist.length; ++i) {
+                var word = simple_interface.getWord(wordlist[i])
                 var translation = simple_interface.getTranslationOfWord(wordlist[i])
-                originModel.append({"word": wordlist[i], "translation": translation})
-                listModel.append({"word": wordlist[i], "translation": translation})
+                originModel.append({"id": wordlist[i], "word": word, "translation": translation})
+                listModel.append({"id": wordlist[i], "word": word, "translation": translation})
             }
         }
 
@@ -202,7 +202,7 @@ Page {
                     text: "<img src=\"image://theme/icon-s-edit\" align=\"middle\" /> " + qsTr("Edit vocabulary")
                     textFormat: Text.StyledText
                     onClicked: {
-                        pageStack.push(Qt.resolvedUrl("Edit.qml"), { origin_word: word } )
+                        pageStack.push(Qt.resolvedUrl("Edit.qml"), { word_id: id } )
                     }
                 }
 
@@ -210,7 +210,7 @@ Page {
                     text: "<img src=\"image://theme/icon-m-delete\" width=\"" + Theme.iconSizeSmall + "\" height=\"" + Theme.iconSizeSmall + "\" align=\"middle\" >" + qsTr("Remove vocabulary")
                     textFormat: Text.StyledText
                     onClicked: {
-                        listitem.remorseAction(qsTr("Remove vocabulary"), function() { functions.remove_word(word, listitem) })
+                        listitem.remorseAction(qsTr("Remove vocabulary"), function() { functions.remove_word(id, listitem) })
                     }
                 }
 
@@ -232,7 +232,7 @@ Page {
             }
 
             onClicked: {
-                pageStack.push(Qt.resolvedUrl("Details.qml"), { word: word })
+                pageStack.push(Qt.resolvedUrl("Details.qml"), { word_id: id })
             }
         }
 

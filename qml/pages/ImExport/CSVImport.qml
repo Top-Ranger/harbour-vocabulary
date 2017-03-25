@@ -75,14 +75,6 @@ Page {
                 text: qsTr("CSV has header")
                 description: qsTr("If this is enabled, it is assumed that the CSV file has a header and the first line will be ignored.")
             }
-            
-            TextSwitch {
-                checked: true
-                id: overwrite
-                width: parent.width
-                text: qsTr("Overwrite existing vocabulary")
-                description: qsTr("If this option is enabled, existing vocabulary will be overwritten. Vocabularies are equal if they have the same 'word'.")
-            }
 
             ComboBox {
                 id: word_column
@@ -180,7 +172,7 @@ Page {
                         break
                     }
 
-                    var results = handle.loadCSV(page.path, seperator, header.checked, word_column.currentIndex, translation_column.currentIndex, priority_column.currentIndex, priority.checked, overwrite.checked)
+                    var results = handle.loadCSV(page.path, seperator, header.checked, word_column.currentIndex, translation_column.currentIndex, priority_column.currentIndex, priority.checked)
                     if(results.length === 0) {
                         errors.text = qsTr("Successfully imported")
                     }

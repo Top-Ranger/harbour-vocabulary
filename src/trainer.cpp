@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016,2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ Trainer::Trainer(QObject *parent) : QObject(parent),
     _settings()
 {
     // Init vocabulary list
-    QString s = "SELECT word,translation,priority FROM vocabulary";
+    QString s = "SELECT rowid,word,translation,priority FROM vocabulary";
     QSqlQuery q(database);
 
     if(!q.exec(s))
@@ -47,9 +47,10 @@ Trainer::Trainer(QObject *parent) : QObject(parent),
             while(q.next())
             {
                 vocabulary v;
-                v.word = q.value(0).toString();
-                v.translation = q.value(1).toString();
-                v.priority = q.value(2).toInt();
+                v.id = q.value(0).toInt();
+                v.word = q.value(1).toString();
+                v.translation = q.value(2).toString();
+                v.priority = q.value(3).toInt();
                 _sum += v.priority;
                 _vocabulary.append(v);
             }
@@ -97,11 +98,11 @@ void Trainer::next()
     else
     {
         // Select random (no adaptive mode)
-        distribution = std::uniform_int_distribution<int>(0, _vocabulary.size()-1);
+        distribution = std::uniform_int_distribution<int>(0, _vocabulary.size() - 1);
         _index = distribution(_rnd);
     }
 
-    distribution = std::uniform_int_distribution<int>(0,1);
+    distribution = std::uniform_int_distribution<int>(0, 1);
     if(distribution(_rnd) == 0)
     {
         _modus = GUESS_TRANSLATION;
@@ -121,14 +122,14 @@ void Trainer::correct()
     if(_settings.adaptiveTrainingEnabled())
     {
         _sum -= _vocabulary[_index].priority;
-        _vocabulary[_index].priority = qMax(1, _vocabulary[_index].priority-_settings.adaptiveTrainingCorrectPoints());
+        _vocabulary[_index].priority = qMax(1, _vocabulary[_index].priority - _settings.adaptiveTrainingCorrectPoints());
         _sum += _vocabulary[_index].priority;
 
-        QString s = "UPDATE vocabulary SET priority=? WHERE word=?";
+        QString s = "UPDATE vocabulary SET priority=:p WHERE rowid=:id";
         QSqlQuery q(database);
         q.prepare(s);
-        q.addBindValue(_vocabulary[_index].priority);
-        q.addBindValue(_vocabulary[_index].word);
+        q.bindValue(":p", _vocabulary[_index].priority);
+        q.bindValue(":id", _vocabulary[_index].id);
 
         if(!q.exec())
         {
@@ -143,14 +144,14 @@ void Trainer::wrong()
     if(_settings.adaptiveTrainingEnabled())
     {
         _sum -= _vocabulary[_index].priority;
-        _vocabulary[_index].priority = qMin(100, _vocabulary[_index].priority+_settings.adaptiveTrainingWrongPoints());
+        _vocabulary[_index].priority = qMin(100, _vocabulary[_index].priority + _settings.adaptiveTrainingWrongPoints());
         _sum += _vocabulary[_index].priority;
 
-        QString s = "UPDATE vocabulary SET priority=? WHERE word=?";
+        QString s = "UPDATE vocabulary SET priority=:p WHERE rowid=:id";
         QSqlQuery q(database);
         q.prepare(s);
-        q.addBindValue(_vocabulary[_index].priority);
-        q.addBindValue(_vocabulary[_index].word);
+        q.bindValue(":p", _vocabulary[_index].priority);
+        q.bindValue(":id", _vocabulary[_index].id);
 
         if(!q.exec())
         {

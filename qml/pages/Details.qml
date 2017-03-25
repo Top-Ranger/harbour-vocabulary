@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016,2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,20 @@ Page {
     id: page
     allowedOrientations: Orientation.All
 
-    property string word: "ERROR"
-
+    property int word_id: 0
     property bool word_changed: false
-    property string origin_word: ""
-    property string new_word: ""
 
     onStatusChanged: {
         if(word_changed === true) {
-            page.word = new_word
-            word_text.text = new_word
-            translation_text.text = simple_interface.getTranslationOfWord(new_word)
-            priority.value = simple_interface.getPriorityOfWord(new_word)
-            creation_text.text = simple_interface.getCreationDate(page.word).toLocaleDateString()
-            modification_text.text = simple_interface.getModificationDate(page.word).toLocaleDateString()
+            word_text.text = simple_interface.getWord(page.word_id)
+            translation_text.text = simple_interface.getTranslationOfWord(page.word_id)
+            priority.value = simple_interface.getPriorityOfWord(page.word_id)
+            creation_text.text = simple_interface.getCreationDate(page.word_id).toLocaleDateString()
+            modification_text.text = simple_interface.getModificationDate(page.word_id).toLocaleDateString()
 
             var last_page = pageStack.previousPage(page)
             last_page.word_changed = true
-            last_page.origin_word = page.origin_word
-            last_page.new_word = page.new_word
+            last_page.word_id = page.word_id
 
             word_changed = false
         }
@@ -56,14 +51,14 @@ Page {
             MenuItem {
                 text: qsTr("Edit")
                 onClicked: {
-                    pageStack.push(Qt.resolvedUrl("Edit.qml"), { origin_word: page.word })
+                    pageStack.push(Qt.resolvedUrl("Edit.qml"), { word_id: page.word_id })
                 }
             }
 
             MenuItem {
                 text: qsTr("Show on cover")
                 onClicked: {
-                    random_vocabulary.word = page.word
+                    random_vocabulary.word = word_text.text
                     random_vocabulary.translation = translation_text.text
                 }
             }
@@ -90,7 +85,7 @@ Page {
                     height: word.height
                     width: height
                     icon.source: "image://theme/icon-s-clipboard"
-                    onClicked: Clipboard.text = page.word
+                    onClicked: Clipboard.text = word_text.text
                 }
 
                 Label {
@@ -104,7 +99,7 @@ Page {
                     width: column.width - word.width - word_icon.width
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
-                    text: page.word
+                    text: simple_interface.getWord(page.word_id)
                 }
             }
 
@@ -128,7 +123,7 @@ Page {
                     width: column.width - translation.width - translation_icon.width
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
-                    text: simple_interface.getTranslationOfWord(page.word)
+                    text: simple_interface.getTranslationOfWord(page.word_id)
                 }
             }
 
@@ -141,7 +136,7 @@ Page {
                 maximumValue: 100
                 label: qsTr("Priority")
                 valueText: "" + value
-                value: simple_interface.getPriorityOfWord(page.word)
+                value: simple_interface.getPriorityOfWord(page.word_id)
             }
 
             Row {
@@ -156,7 +151,7 @@ Page {
                     width: column.width - creation.width
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
-                    text: simple_interface.getCreationDate(page.word).toLocaleDateString()
+                    text: simple_interface.getCreationDate(page.word_id).toLocaleDateString()
                 }
             }
 
@@ -172,7 +167,7 @@ Page {
                     width: column.width - modification.width
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
-                    text: simple_interface.getModificationDate(page.word).toLocaleDateString()
+                    text: simple_interface.getModificationDate(page.word_id).toLocaleDateString()
                 }
             }
         }

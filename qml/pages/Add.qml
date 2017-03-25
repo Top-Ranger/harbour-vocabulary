@@ -41,8 +41,9 @@ Page {
             listModel.clear()
             var wordlist = simple_interface.getAllWords()
             for(var i = 0; i < wordlist.length; ++i) {
-                originModel.append({"word": wordlist[i]})
-                listModel.append({"word": wordlist[i]})
+                var word = simple_interface.getWord(wordlist[i])
+                originModel.append({"id": wordlist[i], "word": word})
+                listModel.append({"id": wordlist[i], "word": word})
             }
         }
 
@@ -98,8 +99,9 @@ Page {
                 text: qsTr("Reset priority of match")
                 enabled: best_match_result_label.text !== ""
                 onClicked: {
-                    var word = best_match_result_label.text
-                    remorse.execute(qsTr("Resetting priority of ") + word, function(){ if(!simple_interface.setPriority(word,100)){ panel_priority.show() }})
+                    var word = listModel.get(listModel.showItemNo).word
+                    var id = listModel.get(listModel.showItemNo).id
+                    remorse.execute(qsTr("Resetting priority of ") + word, function(){ if(!simple_interface.setPriority(id,100)){ panel_priority.show() }})
                 }
             }
         }

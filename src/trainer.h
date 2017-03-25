@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016.2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,8 @@ class Trainer : public QObject
     Q_PROPERTY(trainings_modus modus READ modus NOTIFY modusChanged)
 
 public:
-    enum trainings_modus {
+    enum trainings_modus
+    {
         GUESS_WORD,
         GUESS_TRANSLATION
     };
@@ -55,7 +56,9 @@ public slots:
     void wrong();
 
 private:
-    struct vocabulary {
+    struct vocabulary
+    {
+        int id;
         QString word;
         QString translation;
         int priority;

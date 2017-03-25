@@ -21,17 +21,16 @@ Page {
     id: page
     allowedOrientations: Orientation.All
 
-    property string origin_word: "ERROR"
+    property int word_id: 0
 
     Item {
         id: functions
 
         function save_change() {
-            if(simple_interface.editVocabulary(page.origin_word, word.text, translation.text, priority.value)) {
+            if(simple_interface.editVocabulary(page.word_id, word.text, translation.text, priority.value)) {
                 var last_page = pageStack.previousPage()
                 last_page.word_changed = true
-                last_page.origin_word = page.origin_word
-                last_page.new_word = word.text
+                last_page.word_id = page.word_id
                 pageStack.pop()
             }
             else {
@@ -41,9 +40,9 @@ Page {
     }
 
     Component.onCompleted: {
-        word.text = page.origin_word
-        translation.text = simple_interface.getTranslationOfWord(page.origin_word)
-        priority.value = simple_interface.getPriorityOfWord(page.origin_word)
+        word.text = simple_interface.getWord(page.word_id)
+        translation.text = simple_interface.getTranslationOfWord(page.word_id)
+        priority.value = simple_interface.getPriorityOfWord(page.word_id)
     }
 
     SilicaFlickable {
@@ -59,7 +58,7 @@ Page {
             spacing: Theme.paddingMedium
 
             PageHeader {
-                title: qsTr("Edit vocabulary") + " " + page.origin_word
+                title: qsTr("Edit vocabulary") + " " + simple_interface.getWord(page.word_id)
             }
 
             Button {

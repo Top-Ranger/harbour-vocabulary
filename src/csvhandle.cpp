@@ -26,7 +26,7 @@ CSVHandle::CSVHandle(QObject *parent) : QObject(parent)
 {
 }
 
-QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_header, int column_word, int column_translation, int column_priority, bool import_priority, bool overwrite_existing)
+QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_header, int column_word, int column_translation, int column_priority, bool import_priority, int language)
 {
     QStringList errors;
 
@@ -52,17 +52,9 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
     database.transaction();
     QSqlQuery q(database);
     QString s;
-    QString date_s;
-    if(overwrite_existing)
-    {
-        s = "INSERT OR REPLACE INTO vocabulary VALUES (?,?,100)";
-        date_s = "INSERT OR REPLACE INTO vocabularydates (word, creation, modification) VALUES (?, ?, ?)";
-    }
-    else
-    {
-        s = "INSERT OR ABORT INTO vocabulary VALUES (?,?,100)";
-        date_s = "INSERT OR ABORT INTO vocabularydates (word, creation, modification) VALUES (?, ?, ?)";
-    }
+
+    s = "INSERT INTO vocabulary (word, translation, priority, creation, modification, language) VALUES (:word, :translation, 100, :creation, :modification, :language)";
+
 
     int need_num_columns = qMax(column_word, column_translation);
     QChar sep_char = getSeperator(sep);
@@ -70,14 +62,7 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
     if(import_priority)
     {
         need_num_columns = qMax(need_num_columns, column_priority);
-        if(overwrite_existing)
-        {
-            s = "INSERT OR REPLACE INTO vocabulary VALUES (?,?,?)";
-        }
-        else
-        {
-            s = "INSERT OR ABORT INTO vocabulary VALUES (?,?,?)";
-        }
+        s = "INSERT INTO vocabulary (word, translation, priority, creation, modification, language) VALUES (:word, :translation, :priority, :creation, :modification, :language)";
     }
 
     if(has_header)
@@ -104,8 +89,8 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
             continue;
         }
         q.prepare(s);
-        q.addBindValue(columns[column_word].simplified());
-        q.addBindValue(columns[column_translation].simplified());
+        q.bindValue(":word", columns[column_word].simplified());
+        q.bindValue(":translation", columns[column_translation].simplified());
         if(import_priority)
         {
             bool ok = true;
@@ -117,39 +102,18 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
                 WARNING(error);
                 errors << error;
             }
-            q.addBindValue(priority);
+            q.bindValue(":priority", priority);
         }
+        q.bindValue(":creation", today);
+        q.bindValue(":modification", today);
+        q.bindValue(":language", language);
 
         if(!q.exec())
         {
             QString error = s;
             error.append(": ").append(q.lastError().text());
-            // This detection is not really reliable... but it is the best we can do
-            if(error.contains("UNIQUE", Qt::CaseSensitive))
-            {
-                errors << QString(tr("Vocabulary \"%1\" already in database - it will not be overwritten")).arg(columns[column_word].simplified());
-                error.append("(UNIQUE case)");
-                WARNING(error);
-            }
-            else
-            {
-                WARNING(error);
-                errors << error;
-            }
-        }
-        else
-        {
-            q.prepare(date_s);
-            q.addBindValue(columns[column_word].simplified());
-            q.addBindValue(today);
-            q.addBindValue(today);
-
-            if(!q.exec())
-            {
-                QString error = date_s;
-                error.append(": ").append(q.lastError().text());
-                WARNING(error);
-            }
+            WARNING(error);
+            errors << error;
         }
     }
 
@@ -160,7 +124,7 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
     return errors;
 }
 
-QStringList CSVHandle::saveCSV(QString path, CSVHandle::seperator sep, bool write_header)
+QStringList CSVHandle::saveCSV(QString path, CSVHandle::seperator sep, bool write_header, int language)
 {
     QStringList errors;
 
@@ -178,9 +142,12 @@ QStringList CSVHandle::saveCSV(QString path, CSVHandle::seperator sep, bool writ
     stream.setCodec(QTextCodec::codecForName("UTF-8"));
 
     QSqlQuery q(database);
-    QString s = "SELECT word,translation,priority FROM vocabulary";
+    QString s = "SELECT word,translation,priority FROM vocabulary WHERE language=:l";
 
-    if(!q.exec(s))
+    q.prepare(s);
+    q.bindValue(":l", language);
+
+    if(!q.exec())
     {
         QString error = s;
         error.append(": ").append(q.lastError().text());

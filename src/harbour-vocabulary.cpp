@@ -25,6 +25,7 @@
 
 #include <QtQuick>
 #include <sailfishapp.h>
+#include <vector>
 
 bool create_new_db();
 bool test_and_update_db();
@@ -108,8 +109,9 @@ bool create_new_db()
 
     QStringList operations;
     operations.append("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT)");
-    operations.append("CREATE TABLE vocabulary (word TEXT PRIMARY KEY, translation TEXT, priority INT)");
-    operations.append("CREATE TABLE vocabularydates (word TEXT PRIMARY KEY, creation INT, modification INT)");
+    operations.append("CREATE TABLE language (language TEXT)");
+    operations.append("INSERT INTO language (rowid, language) VALUES (1, 'Default')");
+    operations.append("CREATE TABLE vocabulary (word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))");
     operations.append("INSERT INTO meta VALUES ('version', '3')");
 
     foreach(QString s, operations)
@@ -128,7 +130,6 @@ bool create_new_db()
 bool test_and_update_db()
 {
     QSqlQuery query(database);
-    QStringList operations;
     QString s = QString("SELECT value FROM meta WHERE key='version'");
 
     if(!query.exec(s))
@@ -190,12 +191,12 @@ bool test_and_update_db()
 
             for(QStringList::iterator i = to_update.begin(); i != to_update.end(); ++i)
             {
-                s = "UPDATE OR IGNORE vocabulary SET word=? WHERE word=?";
+                s = "UPDATE OR IGNORE vocabulary SET word=:new WHERE word=:old";
 
                 query.clear();
                 query.prepare(s);
-                query.addBindValue((*i).simplified());
-                query.addBindValue(*i);
+                query.bindValue(":new", (*i).simplified());
+                query.bindValue(":old", *i);
 
                 if(!query.exec())
                 {
@@ -218,70 +219,106 @@ bool test_and_update_db()
 
     case 2:
         /*
-         * Added dates
+         * Move to new database format
          */
         DEBUG("Database upgrade: 2 -> 3");
-        operations.append("CREATE TABLE vocabularydates (word TEXT PRIMARY KEY, creation INT, modification INT)");
-        operations.append("UPDATE meta SET value=3 WHERE key='version'");
-
-        for(QStringList::const_iterator s = operations.constBegin(); s != operations.constEnd(); ++s)
         {
-            if(!query.exec(*s))
-            {
-                QString error = *s;
-                error.append(": ").append(query.lastError().text());
-                CRITICAL(error);
-                return false;
-            }
-        }
-        operations.clear();
 
-        /*
-         * Add creation / modification time
-         * This might be more expensive here, but it will make the code better later by removing corner cases
-         */
-        {
-            QStringList vocabulary_list;
-            s = "SELECT word FROM vocabulary";
+            std::vector<QString> words;
+            std::vector<QString> translation;
+            std::vector<int> priority;
+
+            // At first fetch all vocabulary
 
             query.clear();
-            query.prepare(s);
+            s = "SELECT word, translation, priority FROM vocabulary";
 
-            if(!query.exec())
+            if(!query.exec(s))
             {
-                QString error = s.append(": ").append(query.lastError().text());
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
                 WARNING(error);
                 return false;
             }
             if(!query.isSelect())
             {
-                QString error = s.append(": No select");
+                QString error = s;
+                error.append(": No select");
                 WARNING(error);
                 return false;
             }
 
             while(query.next())
             {
-                QString word = query.value(0).toString();
-                vocabulary_list << word;
+                words.push_back(query.value(0).toString());
+                translation.push_back(query.value(1).toString());
+                priority.push_back(query.value(2).toInt());
             }
 
-            database.transaction();
-            qint64 today = QDate::currentDate().toJulianDay();
-            for(QStringList::iterator i = vocabulary_list.begin(); i != vocabulary_list.end(); ++i)
-            {
-                s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?, ?, ?)";
+            // Now update db schema
 
-                query.clear();
+            s = "DROP TABLE vocabulary";
+            if(!query.exec(s))
+            {
+                QString error = s.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            s = "CREATE TABLE language (language TEXT)";
+            if(!query.exec(s))
+            {
+                QString error = s.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            s = "INSERT INTO language (rowid, language) VALUES (1, 'Default')";
+            if(!query.exec(s))
+            {
+                QString error = s.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            s = "CREATE TABLE vocabulary (word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))";
+            if(!query.exec(s))
+            {
+                QString error = s.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            s = "UPDATE meta SET value='3' WHERE key='version'";
+            if(!query.exec(s))
+            {
+                QString error = s.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            // Insert vocabulary back to db
+            database.transaction();
+            qint64 date = QDate::currentDate().toJulianDay();
+            s = "INSERT INTO vocabulary (word, translation, priority, creation, modification, language) VALUES (:word, :translation, :priority, :creation, :modification, :language)";
+
+            for(size_t index = 0; index < words.size(); ++index)
+            {
                 query.prepare(s);
-                query.addBindValue(*i);
-                query.addBindValue(today);
-                query.addBindValue(today);
+                query.bindValue(":word", words[index]);
+                query.bindValue(":translation", translation[index]);
+                query.bindValue(":priority", priority[index]);
+                query.bindValue(":creation", date);
+                query.bindValue(":modification", date);
+                query.bindValue(":language", 1);
 
                 if(!query.exec())
                 {
-                    QString error = s.append(": ").append(query.lastError().text());
+                    QString error = s;
+                    error.append(": ").append(query.lastError().text());
                     WARNING(error);
+                    database.rollback();
+                    return false;
                 }
             }
             database.commit();
