@@ -1,3 +1,5 @@
+#include <QCoreApplication>
+#include <QCoreApplication>
 /*
  * Copyright 2016,2017 Marcus Soll
  *
@@ -25,7 +27,10 @@
 
 #include <QtQuick>
 #include <sailfishapp.h>
+#include <QtQml>
 #include <vector>
+#include <QCoreApplication>
+#include <QStandardPaths>
 
 bool create_new_db();
 bool test_and_update_db();
