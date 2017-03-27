@@ -38,21 +38,21 @@ void RandomVocabulary::newRandom()
     if(!q.exec(s))
     {
         QString error = s;
-        error(": ").append(q.lastError().text());
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return;
     }
     if(!q.isSelect())
     {
         QString error = s;
-        error(": No SELECT");
+        error.append(": No SELECT");
         WARNING(error);
         return;
     }
     if(!q.next())
     {
         QString error = s;
-        error(": ").append(q.lastError().text());
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return;
     }
