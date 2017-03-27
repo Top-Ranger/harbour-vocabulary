@@ -39,7 +39,8 @@ bool SimpleInterface::clearAllVocabulary()
 
     if(!q.exec(s))
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         database.rollback();
         return false;
@@ -59,19 +60,22 @@ void SimpleInterface::recount()
 
     if(!q.exec(s))
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return;
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return;
     }
     if(!q.next())
     {
-        QString error = s.append(" - No entry found: ").append(q.lastError().text());
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
         WARNING(error);
         return;
     }
@@ -95,7 +99,8 @@ bool SimpleInterface::addVocabulary(QString word, QString translation, int langu
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         database.rollback();
         return false;
@@ -119,7 +124,8 @@ bool SimpleInterface::removeVocabulary(int id)
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         database.rollback();
         return false;
@@ -152,7 +158,8 @@ bool SimpleInterface::editVocabulary(int id, QString new_word, QString translati
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         database.rollback();
         return false;
@@ -173,7 +180,8 @@ bool SimpleInterface::setPriority(int id, int priority)
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return false;
     }
@@ -190,13 +198,15 @@ QVariantList SimpleInterface::getAllWords()
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return QVariantList();
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return QVariantList();
     }
@@ -220,19 +230,22 @@ QString SimpleInterface::getWord(int id)
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return "";
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return "";
     }
     if(!q.next())
     {
-        QString error = s.append(" - No entry found: ").append(q.lastError().text());
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
         WARNING(error);
         return "";
     }
@@ -249,19 +262,22 @@ QString SimpleInterface::getTranslationOfWord(int id)
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return "";
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return "";
     }
     if(!q.next())
     {
-        QString error = s.append(" - No entry found: ").append(q.lastError().text());
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
         WARNING(error);
         return "";
     }
@@ -278,19 +294,22 @@ int SimpleInterface::getPriorityOfWord(int id)
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return 100;
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return 100;
     }
     if(!q.next())
     {
-        QString error = s.append(" - No entry found: ").append(q.lastError().text());
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
         WARNING(error);
         return 100;
     }
@@ -307,19 +326,22 @@ QDate SimpleInterface::getCreationDate(int id)
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return QDate::fromJulianDay(1);
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return QDate::fromJulianDay(1);
     }
     if(!q.next())
     {
-        QString error = s.append(" - No entry found: ").append(q.lastError().text());
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
         WARNING(error);
         return QDate::fromJulianDay(1);
     }
@@ -336,19 +358,22 @@ QDate SimpleInterface::getModificationDate(int id)
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return QDate::fromJulianDay(1);
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return QDate::fromJulianDay(1);
     }
     if(!q.next())
     {
-        QString error = s.append(" - No entry found: ").append(q.lastError().text());
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
         WARNING(error);
         return QDate::fromJulianDay(1);
     }

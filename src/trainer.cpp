@@ -32,14 +32,16 @@ Trainer::Trainer(QObject *parent) : QObject(parent),
 
     if(!q.exec(s))
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error(": ").append(q.lastError().text());
         WARNING(error);
     }
     else
     {
         if(!q.isSelect())
         {
-            QString error = s.append(": No select");
+            QString error = s;
+            error(": No select");
             WARNING(error);
         }
         else
@@ -133,7 +135,8 @@ void Trainer::correct()
 
         if(!q.exec())
         {
-            QString error = s.append(": ").append(q.lastError().text());
+            QString error = s;
+            error(": ").append(q.lastError().text());
             WARNING(error);
         }
     }
@@ -155,7 +158,8 @@ void Trainer::wrong()
 
         if(!q.exec())
         {
-            QString error = s.append(": ").append(q.lastError().text());
+            QString error = s;
+            error(": ").append(q.lastError().text());
             WARNING(error);
         }
     }

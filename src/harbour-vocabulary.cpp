@@ -123,7 +123,8 @@ bool create_new_db()
     {
         if(!query.exec(s))
         {
-            QString error = s.append(": ").append(query.lastError().text());
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
             CRITICAL(error);
             return false;
         }
@@ -139,13 +140,15 @@ bool test_and_update_db()
 
     if(!query.exec(s))
     {
-        QString error = s.append(": ").append(query.lastError().text());
+        QString error = s;
+        error.append(": ").append(query.lastError().text());
         CRITICAL(error);
         return false;
     }
     if(!query.isSelect())
     {
-        QString error = s.append(": No SELECT");
+        QString error = s;
+        error.append(": No SELECT");
         CRITICAL(error);
         return false;
     }
@@ -174,13 +177,15 @@ bool test_and_update_db()
 
             if(!query.exec())
             {
-                QString error = s.append(": ").append(query.lastError().text());
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
                 WARNING(error);
                 return false;
             }
             if(!query.isSelect())
             {
-                QString error = s.append(": No select");
+                QString error = s;
+                error.append(": No select");
                 WARNING(error);
                 return false;
             }
@@ -205,7 +210,8 @@ bool test_and_update_db()
 
                 if(!query.exec())
                 {
-                    QString error = s.append(": ").append(query.lastError().text());
+                    QString error = s;
+                    error.append(": ").append(query.lastError().text());
                     WARNING(error);
                 }
             }
@@ -215,7 +221,8 @@ bool test_and_update_db()
 
             if(!query.exec(s))
             {
-                QString error = s.append(": ").append(query.lastError().text());
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
                 CRITICAL(error);
                 return false;
             }
@@ -265,7 +272,8 @@ bool test_and_update_db()
             s = "DROP TABLE vocabulary";
             if(!query.exec(s))
             {
-                QString error = s.append(": ").append(query.lastError().text());
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
                 WARNING(error);
                 return false;
             }
@@ -273,7 +281,8 @@ bool test_and_update_db()
             s = "CREATE TABLE language (language TEXT)";
             if(!query.exec(s))
             {
-                QString error = s.append(": ").append(query.lastError().text());
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
                 WARNING(error);
                 return false;
             }
@@ -281,7 +290,8 @@ bool test_and_update_db()
             s = "INSERT INTO language (rowid, language) VALUES (1, 'Default')";
             if(!query.exec(s))
             {
-                QString error = s.append(": ").append(query.lastError().text());
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
                 WARNING(error);
                 return false;
             }
@@ -289,7 +299,8 @@ bool test_and_update_db()
             s = "CREATE TABLE vocabulary (word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))";
             if(!query.exec(s))
             {
-                QString error = s.append(": ").append(query.lastError().text());
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
                 WARNING(error);
                 return false;
             }
@@ -297,7 +308,8 @@ bool test_and_update_db()
             s = "UPDATE meta SET value='3' WHERE key='version'";
             if(!query.exec(s))
             {
-                QString error = s.append(": ").append(query.lastError().text());
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
                 WARNING(error);
                 return false;
             }

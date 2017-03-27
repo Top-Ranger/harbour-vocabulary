@@ -158,7 +158,8 @@ QStringList CSVHandle::saveCSV(QString path, CSVHandle::seperator sep, bool writ
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         errors << error;
         file.close();
