@@ -262,9 +262,9 @@ bool test_and_update_db()
 
             while(query.next())
             {
-                words.push_back(query.value(0).toString());
-                translation.push_back(query.value(1).toString());
-                priority.push_back(query.value(2).toInt());
+                words.emplace_back(query.value(0).toString());
+                translation.emplace_back(query.value(1).toString());
+                priority.emplace_back(query.value(2).toInt());
             }
 
             // Now update db schema
