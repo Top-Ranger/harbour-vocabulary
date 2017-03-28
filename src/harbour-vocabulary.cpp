@@ -1,5 +1,3 @@
-#include <QCoreApplication>
-#include <QCoreApplication>
 /*
  * Copyright 2016,2017 Marcus Soll
  *
