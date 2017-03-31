@@ -29,7 +29,7 @@ bool DatabaseTools::create_new_db()
     operations.append("CREATE TABLE language (rowid INTEGER PRIMARY KEY, language TEXT)");
     operations.append("INSERT INTO language (rowid, language) VALUES (1, 'Default')");
     operations.append("CREATE TABLE vocabulary (rowid INTEGER PRIMARY KEY, word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))");
-    operations.append("INSERT INTO meta (key TEXT PRIMARY KEY, value TEXT) VALUES ('version', '4')");
+    operations.append("INSERT INTO meta (key, value) VALUES ('version', '4')");
 
     foreach(QString s, operations)
     {
