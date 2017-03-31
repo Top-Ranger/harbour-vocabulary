@@ -10,10 +10,10 @@ bool DatabaseTools::create_new_db()
 
     QStringList operations;
     operations.append("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT)");
-    operations.append("CREATE TABLE language (language TEXT)");
+    operations.append("CREATE TABLE language (rowid INTEGER PRIMARY KEY, language TEXT)");
     operations.append("INSERT INTO language (rowid, language) VALUES (1, 'Default')");
-    operations.append("CREATE TABLE vocabulary (word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))");
-    operations.append("INSERT INTO meta VALUES ('version', '3')");
+    operations.append("CREATE TABLE vocabulary (rowid INTEGER PRIMARY KEY, word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))");
+    operations.append("INSERT INTO meta (key TEXT PRIMARY KEY, value TEXT) VALUES ('version', '4')");
 
     foreach(QString s, operations)
     {
@@ -239,7 +239,184 @@ bool DatabaseTools::test_and_update_db()
         DEBUG("Upgrade complete");
 
     case 3:
-        DEBUG("Database version: 3");
+        /*    operations.append("CREATE TABLE vocabulary (rowid INTEGER PRIMARY KEY, word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))");
+         *
+         * operations.append("CREATE TABLE language (rowid INTEGER PRIMARY KEY, language TEXT)");
+         *
+         * Use explicit rowid
+         * https://sqlite.org/foreignkeys.html
+         */
+        DEBUG("Database upgrade: 3 -> 4");
+        {
+            std::vector<QString> v_words;
+            std::vector<QString> v_translation;
+            std::vector<int> v_priority;
+            std::vector<qlonglong> v_creation;
+            std::vector<qlonglong> v_modification;
+            std::vector<int> v_language;
+
+            std::vector<int> l_rowid;
+            std::vector<QString> l_language;
+
+            // Fetch all vocabulary
+
+            query.clear();
+            s = "SELECT word,translation,priority,creation,modification,language FROM vocabulary";
+
+            if(!query.exec(s))
+            {
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+            if(!query.isSelect())
+            {
+                QString error = s;
+                error.append(": No select");
+                WARNING(error);
+                return false;
+            }
+
+            while(query.next())
+            {
+                v_words.emplace_back(query.value(0).toString());
+                v_translation.emplace_back(query.value(1).toString());
+                v_priority.emplace_back(query.value(2).toInt());
+                v_creation.emplace_back(query.value(3).toLongLong());
+                v_modification.emplace_back(query.value(4).toLongLong());
+                v_language.emplace_back(query.value(5).toInt());
+            }
+
+            // Fetch all languages
+
+            query.clear();
+            s = "SELECT rowid,language FROM language";
+
+            if(!query.exec(s))
+            {
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+            if(!query.isSelect())
+            {
+                QString error = s;
+                error.append(": No select");
+                WARNING(error);
+                return false;
+            }
+
+            while(query.next())
+            {
+                l_rowid.emplace_back(query.value(0).toInt());
+                l_language.emplace_back(query.value(1).toString());
+            }
+
+            // Now update db schema
+
+            s = "DROP TABLE vocabulary";
+            if(!query.exec(s))
+            {
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            s = "DROP TABLE language";
+            if(!query.exec(s))
+            {
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            s = "CREATE TABLE language (rowid INTEGER PRIMARY KEY, language TEXT)";
+            if(!query.exec(s))
+            {
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            s = "CREATE TABLE vocabulary (rowid INTEGER PRIMARY KEY, word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))";
+            if(!query.exec(s))
+            {
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            s = "UPDATE meta SET value='4' WHERE key='version'";
+            if(!query.exec(s))
+            {
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            database.transaction();
+            // Insert languages back into db
+            s = "INSERT INTO language (rowid, language) VALUES (:rowid, :language)";
+            for(size_t index = 0; index < l_rowid.size(); ++index)
+            {
+                query.prepare(s);
+                query.bindValue(":rowid", l_rowid[index]);
+                query.bindValue(":language", l_language[index]);
+                if(!query.exec())
+                {
+                    QString error = s;
+                    error.append(": ").append(query.lastError().text());
+                    WARNING(error);
+                    database.rollback();
+                    return false;
+                }
+            }
+
+            // Insert vocabulary back to db
+            s = "INSERT INTO vocabulary (word, translation, priority, creation, modification, language) VALUES (:word, :translation, :priority, :creation, :modification, :language)";
+
+            for(size_t index = 0; index < v_words.size(); ++index)
+            {
+                query.prepare(s);
+                query.bindValue(":word", v_words[index]);
+                query.bindValue(":translation", v_translation[index]);
+                query.bindValue(":priority", v_priority[index]);
+                query.bindValue(":creation", v_creation[index]);
+                query.bindValue(":modification", v_modification[index]);
+                query.bindValue(":language", v_language[index]);
+
+                if(!query.exec())
+                {
+                    QString error = s;
+                    error.append(": ").append(query.lastError().text());
+                    WARNING(error);
+                    database.rollback();
+                    return false;
+                }
+            }
+            database.commit();
+
+            // Clean database - no hard failure!
+            s = "VACUUM";
+            if(!query.exec())
+            {
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
+                WARNING(error);
+            }
+
+        }
+        DEBUG("Upgrade complete");
+
+    case 4:
+        DEBUG("Database version: 4");
         return true;
         break;
 
