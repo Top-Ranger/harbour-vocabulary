@@ -37,6 +37,22 @@ Page {
                 languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
             }
         }
+
+        function remove_language(lid, item) {
+            if(language_interface.removeLanguage(lid)) {
+                item.animateRemoval()
+
+                for(var i = 0; i < languageModel.count; ++i) {
+                    if(languageModel.get(i).lid === lid) {
+                        languageModel.remove(i)
+                        break
+                    }
+                }
+            }
+            else {
+                panel.show()
+            }
+        }
     }
 
     Timer {
@@ -108,9 +124,22 @@ Page {
             }
 
             menu: ContextMenu {
+                MenuItem {
+                    text: "<img src=\"image://theme/icon-m-delete\" width=\"" + Theme.iconSizeSmall + "\" height=\"" + Theme.iconSizeSmall + "\" align=\"middle\" >" + qsTr("Remove language")
+                    enabled: language_interface.countVocabularyWithLanguage(lid) === 0
+                    textFormat: Text.StyledText
+                    onClicked: {
+                        listitem.remorseAction(qsTr("Remove language"), function() { functions.remove_language(lid, listitem) })
+                    }
+                }
             }
         }
 
         VerticalScrollDecorator {}
+    }
+
+    UpperPanel {
+        id: panel
+        text: qsTr("Can not remove language")
     }
 }
