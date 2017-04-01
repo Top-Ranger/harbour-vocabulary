@@ -49,7 +49,8 @@ SOURCES += src/harbour-vocabulary.cpp \
     src/settingsproxy.cpp \
     src/fileutils.cpp \
     src/csvhandle.cpp \
-    src/databasetools.cpp
+    src/databasetools.cpp \
+    src/languageinterface.cpp
 
 OTHER_FILES += qml/harbour-vocabulary.qml \
     qml/cover/CoverPage.qml \
@@ -79,4 +80,5 @@ HEADERS += \
     src/settingsproxy.h \
     src/fileutils.h \
     src/csvhandle.h \
-    src/databasetools.h
+    src/databasetools.h \
+    src/languageinterface.h
