@@ -85,6 +85,16 @@ Page {
 
                 onClicked: pageStack.push(Qt.resolvedUrl("Add.qml"))
             }
+
+            BackgroundItem {
+                width: parent.width
+                Label {
+                    text: qsTr("Manage languages")
+                    anchors.centerIn: parent
+                }
+
+                onClicked: pageStack.push(Qt.resolvedUrl("Languages.qml"))
+            }
         }
     }
 }

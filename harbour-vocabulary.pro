@@ -70,7 +70,9 @@ DISTFILES += \
     qml/pages/SettingsTraining.qml \
     qml/pages/ImExport.qml \
     qml/pages/ImExport/CSVImport.qml \
-    qml/pages/ImExport/CSVExport.qml
+    qml/pages/ImExport/CSVExport.qml \
+    qml/pages/Languages.qml \
+    qml/pages/LanguageList.qml
 
 HEADERS += \
     src/global.h \
