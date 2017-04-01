@@ -175,7 +175,7 @@ Page {
             Row {
                 Label {
                     id: language
-                    text: qsTr("Modification: ")
+                    text: qsTr("Language: ")
                     color: Theme.highlightColor
                 }
 
