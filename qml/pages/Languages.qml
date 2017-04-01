@@ -22,7 +22,7 @@ Page {
     allowedOrientations: Orientation.All
 
     onStatusChanged: {
-        if(status = PageStatus.Activating) {
+        if(status === PageStatus.Activating) {
             functions.load_languages()
         }
     }
