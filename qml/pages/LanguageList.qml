@@ -128,7 +128,7 @@ Page {
 
             PageHeader {
                 width: parent.width
-                title: qsTr("Vocabulary list") + " (" + listModel.count + ")"
+                title: qsTr("Vocabulary list") + " - " + page.language_name + " (" + listModel.count + ")"
             }
 
             SearchField {
