@@ -21,15 +21,29 @@ Page {
     id: page
     allowedOrientations: Orientation.All
     
+    property int language_id: -1
+
     Component.onCompleted: {
         functions.load_list()
+        functions.load_languages()
     }
 
     Item {
         id: functions
 
         function save_word() {
-            if(simple_interface.addVocabulary(word.text, translation.text)) {
+            var new_id = -1
+            if(language_id === -1) {
+                new_id = language_interface.addLanguage(new_language_input.text)
+                if(new_id === -1) {
+                    panel.show()
+                    return
+                }
+            }
+
+            var id = page.language_id === -1 ? new_id : page.language_id
+
+            if(simple_interface.addVocabulary(word.text, translation.text, id)) {
                 pageStack.pop()
             }
             else {
@@ -59,6 +73,14 @@ Page {
             }
             listModel.showItemNo = Math.floor(Math.random()*listModel.count)
         }
+
+        function load_languages() {
+            languageModel.clear()
+            var languages = language_interface.getAllLanguages()
+            for(var i = 0; i < languages.length; ++i) {
+                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+            }
+        }
     }
     
     ListModel {
@@ -69,6 +91,10 @@ Page {
 
     ListModel {
         id: originModel
+    }
+
+    ListModel {
+        id: languageModel
     }
 
     Timer {
@@ -122,7 +148,7 @@ Page {
                     margins: Theme.horizontalPageMargin
                 }
 
-                enabled: word.text.trim() != "" && translation.text.trim() != "" && word.text.trim() != best_match_result_label.text.trim()
+                enabled: word.text.trim() != "" && translation.text.trim() != "" && (page.language_id !== -1 || new_language_input.text !== "")
                 width: parent.width
                 text: qsTr("Save vocabulary")
                 onClicked: functions.save_word()
@@ -197,6 +223,53 @@ Page {
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input translation here")
                 label: qsTr("Translation")
+            }
+
+            Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                text: qsTr("Languages:")
+            }
+
+            Repeater {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                model: languageModel
+
+                delegate: ListItem {
+                    width: parent.width
+                    Label {
+                        anchors.centerIn: parent
+                        width: parent.width - 2*Theme.horizontalPageMargin
+                        text: language
+                        color: page.language_id == lid ? Theme.primaryColor : Theme.secondaryColor
+                        horizontalAlignment: Text.AlignHCenter
+                        truncationMode: TruncationMode.Fade
+                    }
+
+                    onClicked: {
+                        new_language_input.text = ""
+                        page.language_id = lid
+                    }
+                }
+            }
+
+            TextArea {
+                id: new_language_input
+                width: parent.width
+                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                placeholderText: qsTr("Input new language")
+                label: qsTr("New language")
+                onTextChanged: page.language_id = -1
             }
         }
     }

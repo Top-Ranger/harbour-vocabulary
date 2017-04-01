@@ -22,12 +22,24 @@ Page {
     allowedOrientations: Orientation.All
 
     property int word_id: 0
+    property int language_id: -1
 
     Item {
         id: functions
 
         function save_change() {
-            if(simple_interface.editVocabulary(page.word_id, word.text, translation.text, priority.value)) {
+            var new_id = -1
+            if(language_id === -1) {
+                new_id = language_interface.addLanguage(new_language_input.text)
+                if(new_id === -1) {
+                    panel.show()
+                    return
+                }
+            }
+
+            var id = page.language_id === -1 ? new_id : page.language_id
+
+            if(simple_interface.editVocabulary(page.word_id, word.text, translation.text, priority.value, id)) {
                 var last_page = pageStack.previousPage()
                 last_page.word_changed = true
                 last_page.word_id = page.word_id
@@ -37,12 +49,26 @@ Page {
                 panel.show()
             }
         }
+
+        function load_languages() {
+            languageModel.clear()
+            var languages = language_interface.getAllLanguages()
+            for(var i = 0; i < languages.length; ++i) {
+                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+            }
+        }
     }
 
     Component.onCompleted: {
+        functions.load_languages()
         word.text = simple_interface.getWord(page.word_id)
         translation.text = simple_interface.getTranslationOfWord(page.word_id)
         priority.value = simple_interface.getPriorityOfWord(page.word_id)
+        page.language_id = simple_interface.getLanguageId(page.word_id)
+    }
+
+    ListModel {
+        id: languageModel
     }
 
     SilicaFlickable {
@@ -101,6 +127,53 @@ Page {
                 maximumValue: 100
                 label: qsTr("Priority")
                 valueText: "" + value
+            }
+
+            Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                text: qsTr("Languages:")
+            }
+
+            Repeater {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                model: languageModel
+
+                delegate: ListItem {
+                    width: parent.width
+                    Label {
+                        anchors.centerIn: parent
+                        width: parent.width - 2*Theme.horizontalPageMargin
+                        text: language
+                        color: page.language_id == lid ? Theme.primaryColor : Theme.secondaryColor
+                        horizontalAlignment: Text.AlignHCenter
+                        truncationMode: TruncationMode.Fade
+                    }
+
+                    onClicked: {
+                        new_language_input.text = ""
+                        page.language_id = lid
+                    }
+                }
+            }
+
+            TextArea {
+                id: new_language_input
+                width: parent.width
+                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                placeholderText: qsTr("Input new language")
+                label: qsTr("New language")
+                onTextChanged: page.language_id = -1
             }
         }
     }

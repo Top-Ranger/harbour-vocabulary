@@ -52,7 +52,7 @@ QVariantList LanguageInterface::getAllLanguages()
     return vl;
 }
 
-bool LanguageInterface::addLanguage(QString language)
+int LanguageInterface::addLanguage(QString language)
 {
     database.transaction();
     QString s = "INSERT INTO language (language) VALUES (:language)";
@@ -67,10 +67,34 @@ bool LanguageInterface::addLanguage(QString language)
         error.append(": ").append(q.lastError().text());
         WARNING(error);
         database.rollback();
-        return false;
+        return -1;
     }
     database.commit();
-    return true;
+
+    s = "SELECT last_insert_rowid()";
+
+    if(!q.exec(s))
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return -1;
+    }
+    if(!q.isSelect())
+    {
+        QString error = s;
+        error.append(": No select");
+        WARNING(error);
+        return -1;
+    }
+    if(!q.next())
+    {
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
+        WARNING(error);
+        return -1;
+    }
+    return q.value(0).toInt();
 }
 
 bool LanguageInterface::removeLanguage(int id)

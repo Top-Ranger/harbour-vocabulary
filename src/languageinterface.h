@@ -31,7 +31,7 @@ public:
 
 public slots:
     QVariantList getAllLanguages();
-    bool addLanguage(QString language);
+    int addLanguage(QString language);
     bool removeLanguage(int id);
     QString getLanguageName(int id);
     bool renameLanguage(int id, QString name);

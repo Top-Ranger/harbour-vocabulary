@@ -32,6 +32,7 @@ Page {
             priority.value = simple_interface.getPriorityOfWord(page.word_id)
             creation_text.text = simple_interface.getCreationDate(page.word_id).toLocaleDateString()
             modification_text.text = simple_interface.getModificationDate(page.word_id).toLocaleDateString()
+            language_text.text = language_interface.getLanguageName(simple_interface.getLanguageId(page.word_id))
 
             var last_page = pageStack.previousPage(page)
             last_page.word_changed = true
@@ -168,6 +169,22 @@ Page {
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
                     text: simple_interface.getModificationDate(page.word_id).toLocaleDateString()
+                }
+            }
+
+            Row {
+                Label {
+                    id: language
+                    text: qsTr("Modification: ")
+                    color: Theme.highlightColor
+                }
+
+                Text {
+                    id: language_text
+                    width: column.width - modification.width
+                    color: Theme.primaryColor
+                    wrapMode: Text.Wrap
+                    text: language_interface.getLanguageName(simple_interface.getLanguageId(page.word_id))
                 }
             }
         }
