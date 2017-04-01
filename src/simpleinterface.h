@@ -36,9 +36,9 @@ signals:
     void countChanged(int);
 
 public slots:
-    bool addVocabulary(QString word, QString translation, int language = 1);
+    bool addVocabulary(QString word, QString translation, int language);
     bool removeVocabulary(int id);
-    bool editVocabulary(int id, QString new_word, QString translation, int priority, int language = 1);
+    bool editVocabulary(int id, QString new_word, QString translation, int priority, int language);
     bool setPriority(int id, int priority);
     QVariantList getAllWords();
     QString getWord(int id);
