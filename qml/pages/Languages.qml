@@ -132,6 +132,14 @@ Page {
                         listitem.remorseAction(qsTr("Remove language"), function() { functions.remove_language(lid, listitem) })
                     }
                 }
+
+                MenuItem {
+                    text: "<img src=\"image://theme/icon-m-shortcut\" width=\"" + Theme.iconSizeSmall + "\" height=\"" + Theme.iconSizeSmall + "\" align=\"middle\" >" + qsTr("Move vocabulary to language")
+                    textFormat: Text.StyledText
+                    onClicked: {
+                        pageStack.push(Qt.resolvedUrl("LanguageMove.qml"), { language_id: lid } )
+                    }
+                }
             }
         }
 

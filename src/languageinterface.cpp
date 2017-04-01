@@ -17,6 +17,8 @@
 
 #include "languageinterface.h"
 
+#include<QDate>
+
 LanguageInterface::LanguageInterface(QObject *parent) :
     QObject(parent)
 {
@@ -245,4 +247,37 @@ int LanguageInterface::countVocabularyWithLanguage(int id)
         return -1;
     }
     return q.value(0).toInt();
+}
+
+bool LanguageInterface::moveToLanguage(int lid, QVariantList v_list)
+{
+    QString s = "UPDATE vocabulary SET language=:language, modification=:modification WHERE rowid=:id";
+    qint64 date = QDate::currentDate().toJulianDay();
+    QSqlQuery q(database);
+
+    database.transaction();
+
+    for(QVariantList::const_iterator i = v_list.constBegin(); i != v_list.constEnd(); ++i)
+    {
+        if(!(*i).canConvert<int>())
+        {
+            WARNING(QString("Can not convert %1 to int").arg((*i).typeName()));
+            continue;
+        }
+        q.prepare(s);
+        q.bindValue(":language", lid);
+        q.bindValue(":modification", date);
+        q.bindValue(":id", (*i).toInt());
+        if(!q.exec())
+        {
+            QString error = s;
+            error.append(": ").append(q.lastError().text());
+            WARNING(error);
+            database.rollback();
+            return false;
+        }
+    }
+
+    database.commit();
+    return true;
 }

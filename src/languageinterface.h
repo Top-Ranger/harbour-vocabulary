@@ -37,6 +37,7 @@ public slots:
     bool renameLanguage(int id, QString name);
     QVariantList getVocabularyByLanguage(int id);
     int countVocabularyWithLanguage(int id);
+    bool moveToLanguage(int lid, QVariantList v_list);
 
 private:
 };
