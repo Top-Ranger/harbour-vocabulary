@@ -143,11 +143,47 @@ Page {
             }
         }
 
+        footer: Row {
+            anchors {
+                left: parent.left
+                right: parent.right
+                margins: Theme.horizontalPageMargin
+            }
+            TextArea {
+                id: new_language_input
+                width: parent.width - new_language_button.width
+                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                placeholderText: qsTr("Input new language")
+                label: qsTr("New language")
+            }
+
+            IconButton {
+                id: new_language_button
+                icon.source: "image://theme/icon-m-add"
+                enabled: new_language_input !== ""
+                onClicked: {
+                    if(language_interface.addLanguage(new_language_input.text) === -1) {
+                        add_panel.show()
+                    }
+                    else {
+                        new_language_input.text = ""
+                        functions.load_languages()
+                    }
+                }
+            }
+        }
+
         VerticalScrollDecorator {}
     }
 
     UpperPanel {
         id: panel
         text: qsTr("Can not remove language")
+    }
+
+    UpperPanel {
+        id: add_panel
+        text: qsTr("Can not add language")
     }
 }
