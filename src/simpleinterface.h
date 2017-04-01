@@ -46,6 +46,7 @@ public slots:
     int getPriorityOfWord(int id);
     QDate getCreationDate(int id);
     QDate getModificationDate(int id);
+    int getLanguageId(int id);
     void recount();
 
 private:

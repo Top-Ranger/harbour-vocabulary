@@ -379,3 +379,35 @@ QDate SimpleInterface::getModificationDate(int id)
     }
     return QDate::fromJulianDay(q.value(0).toLongLong());
 }
+
+int SimpleInterface::getLanguageId(int id)
+{
+    QString s = "SELECT language FROM vocabulary WHERE rowid=:id";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.bindValue(":id", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return 1;
+    }
+    if(!q.isSelect())
+    {
+        QString error = s;
+        error.append(": No select");
+        WARNING(error);
+        return 1;
+    }
+    if(!q.next())
+    {
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
+        WARNING(error);
+        return 1;
+    }
+    return q.value(0).toInt();
+}
