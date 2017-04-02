@@ -1,5 +1,5 @@
 /*
- * Copyright 2016,2017 Marcus Soll
+ * Copyright 2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,20 @@ Page {
                 }
             }
         }
+
+        function remove_all_in_this_language() {
+            var array = []
+            for(var i = 0; i < originModel.count; ++i) {
+                array.push(originModel.get(i).id)
+            }
+            if(simple_interface.removeBatchVocabulary(array)) {
+                originModel.clear()
+                listModel.clear()
+            }
+            else {
+                panel.show()
+            }
+        }
     }
 
     Timer {
@@ -121,6 +135,15 @@ Page {
         model: listModel
         anchors.fill: parent
         currentIndex: -1
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Remove all vocabulary in language")
+                onClicked: {
+                    remorse_popup.execute(qsTr("Remove all vocabulary"), function() { functions.remove_all_in_this_language() }, 10000)
+                }
+            }
+        }
 
         header: Column {
             width: page.width

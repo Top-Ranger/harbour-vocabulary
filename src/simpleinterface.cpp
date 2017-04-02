@@ -411,3 +411,33 @@ int SimpleInterface::getLanguageId(int id)
     }
     return q.value(0).toInt();
 }
+
+bool SimpleInterface::removeBatchVocabulary(QVariantList ids)
+{
+    QString s = "DELETE FROM vocabulary WHERE rowid=:id";
+    QSqlQuery q(database);
+
+    database.transaction();
+
+    for(QVariantList::const_iterator i = ids.constBegin(); i != ids.constEnd(); ++i)
+    {
+        if(!(*i).canConvert<int>())
+        {
+            WARNING(QString("Can not convert %1 to int").arg((*i).typeName()));
+            continue;
+        }
+        q.prepare(s);
+        q.bindValue(":id", (*i).toInt());
+        if(!q.exec())
+        {
+            QString error = s;
+            error.append(": ").append(q.lastError().text());
+            WARNING(error);
+            database.rollback();
+            return false;
+        }
+    }
+
+    database.commit();
+    return true;
+}

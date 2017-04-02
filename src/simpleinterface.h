@@ -47,6 +47,7 @@ public slots:
     QDate getCreationDate(int id);
     QDate getModificationDate(int id);
     int getLanguageId(int id);
+    bool removeBatchVocabulary(QVariantList ids);
     void recount();
 
 private:
