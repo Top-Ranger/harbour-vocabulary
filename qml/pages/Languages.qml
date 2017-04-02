@@ -125,6 +125,14 @@ Page {
 
             menu: ContextMenu {
                 MenuItem {
+                    text: "<img src=\"image://theme/icon-s-edit\" width=\"" + Theme.iconSizeSmall + "\" height=\"" + Theme.iconSizeSmall + "\" align=\"middle\" >" + qsTr("Rename language")
+                    textFormat: Text.StyledText
+                    onClicked: {
+                        pageStack.push(Qt.resolvedUrl("LanguageEdit.qml"), { language_id: lid } )
+                    }
+                }
+
+                MenuItem {
                     text: "<img src=\"image://theme/icon-m-delete\" width=\"" + Theme.iconSizeSmall + "\" height=\"" + Theme.iconSizeSmall + "\" align=\"middle\" >" + qsTr("Remove language")
                     enabled: language_interface.countVocabularyWithLanguage(lid) === 0
                     textFormat: Text.StyledText

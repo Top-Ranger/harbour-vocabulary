@@ -73,7 +73,8 @@ DISTFILES += \
     qml/pages/ImExport/CSVExport.qml \
     qml/pages/Languages.qml \
     qml/pages/LanguageList.qml \
-    qml/pages/LanguageMove.qml
+    qml/pages/LanguageMove.qml \
+    qml/pages/LanguageEdit.qml
 
 HEADERS += \
     src/global.h \
