@@ -125,6 +125,27 @@ Page {
                 label: qsTr("Answer")
             }
 
+            Row {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                Label {
+                    id: language_label
+                    text: qsTr("Language: ")
+                    color: Theme.primaryColor
+                }
+
+                Label {
+                    width: parent.width - language_label.width
+                    text: language_interface.getLanguageName(trainer.language)
+                    color: Theme.secondaryColor
+                    wrapMode: Text.Wrap
+                }
+            }
+
             Button {
                 anchors {
                     left: parent.left

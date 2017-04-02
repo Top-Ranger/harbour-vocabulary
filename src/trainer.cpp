@@ -27,7 +27,7 @@ Trainer::Trainer(QObject *parent) : QObject(parent),
     _settings()
 {
     // Init vocabulary list
-    QString s = "SELECT rowid,word,translation,priority FROM vocabulary";
+    QString s = "SELECT rowid,word,translation,priority,language FROM vocabulary";
     QSqlQuery q(database);
 
     if(!q.exec(s))
@@ -53,6 +53,7 @@ Trainer::Trainer(QObject *parent) : QObject(parent),
                 v.word = q.value(1).toString();
                 v.translation = q.value(2).toString();
                 v.priority = q.value(3).toInt();
+                v.language = q.value(4).toInt();
                 _sum += v.priority;
                 _vocabulary.append(v);
             }
@@ -75,6 +76,11 @@ QString Trainer::translation()
 Trainer::trainings_modus Trainer::modus()
 {
     return _modus;
+}
+
+int Trainer::language()
+{
+    return _vocabulary[_index].language;
 }
 
 void Trainer::next()
@@ -117,6 +123,7 @@ void Trainer::next()
     emit wordChanged(_vocabulary[_index].word);
     emit translationChanged(_vocabulary[_index].translation);
     emit modusChanged(_modus);
+    emit languageChanged(_vocabulary[_index].language);
 }
 
 void Trainer::correct()
