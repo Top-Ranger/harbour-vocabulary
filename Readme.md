@@ -20,6 +20,7 @@ For every priority point the vocabulary gets an additional chance of getting dra
    - Modification date
  * List all known vocabularies
  * Search for vocabulary
+ * Support for multiple languages
  * Adaptive training mode
  * Adjust training mode
  * Import / export of vocabulary list. Supported file formats:
