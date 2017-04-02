@@ -20,7 +20,7 @@ import Sailfish.Silica 1.0
 Page {
     id: page
     allowedOrientations: Orientation.All
-    
+
     property int language_id: -1
 
     Component.onCompleted: {
@@ -82,7 +82,7 @@ Page {
             }
         }
     }
-    
+
     ListModel {
         id: listModel
 
@@ -153,7 +153,7 @@ Page {
                 text: qsTr("Save vocabulary")
                 onClicked: functions.save_word()
             }
-            
+
             Row {
                 anchors {
                     left: parent.left
@@ -173,7 +173,7 @@ Page {
                     truncationMode: TruncationMode.Elide
                 }
             }
-            
+
             Row {
                 anchors {
                     left: parent.left
@@ -208,7 +208,7 @@ Page {
                 id: word
                 width: parent.width
                 height: implicitHeight
-                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.onClicked: { text = text.replace("\n", ""); translation.focus = true }
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input word or phrase here")
                 label: qsTr("Word / phrase")
