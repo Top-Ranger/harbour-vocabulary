@@ -142,10 +142,21 @@ QStringList CSVHandle::saveCSV(QString path, CSVHandle::seperator sep, bool writ
     stream.setCodec(QTextCodec::codecForName("UTF-8"));
 
     QSqlQuery q(database);
-    QString s = "SELECT word,translation,priority FROM vocabulary WHERE language=:l";
+    QString s;
 
-    q.prepare(s);
-    q.bindValue(":l", language);
+    if(language == -1)
+    {
+        s = "SELECT word,translation,priority FROM vocabulary";
+
+        q.prepare(s);
+    }
+    else
+    {
+        s = "SELECT word,translation,priority FROM vocabulary WHERE language=:l";
+
+        q.prepare(s);
+        q.bindValue(":l", language);
+    }
 
     if(!q.exec())
     {

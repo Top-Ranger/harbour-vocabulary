@@ -23,6 +23,27 @@ Page {
     allowedOrientations: Orientation.All
     property string path: ""
     property bool started: false
+    property int language_id: -1
+
+    Component.onCompleted: {
+        functions.load_languages()
+    }
+
+    Item {
+        id: functions
+
+        function load_languages() {
+            languageModel.clear()
+            var languages = language_interface.getAllLanguages()
+            for(var i = 0; i < languages.length; ++i) {
+                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+            }
+        }
+    }
+
+    ListModel {
+        id: languageModel
+    }
 
     CSVHandle {
         id: handle
@@ -144,6 +165,36 @@ Page {
                 }
             }
 
+            Label {
+                text: qsTr("Import language:")
+            }
+
+            Repeater {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                model: languageModel
+
+                delegate: ListItem {
+                    width: parent.width
+                    Label {
+                        anchors.centerIn: parent
+                        width: parent.width - 2*Theme.horizontalPageMargin
+                        text: language
+                        color: page.language_id == lid ? Theme.primaryColor : Theme.secondaryColor
+                        horizontalAlignment: Text.AlignHCenter
+                        truncationMode: TruncationMode.Fade
+                    }
+
+                    onClicked: {
+                        page.language_id = lid
+                    }
+                }
+            }
+
             Button {
                 anchors {
                     left: parent.left
@@ -151,7 +202,7 @@ Page {
                     margins: Theme.horizontalPageMargin
                 }
 
-                enabled: !page.started
+                enabled: !page.started && page.language_id !== -1
                 text: qsTr("Import")
                 onClicked: {
                     page.started = true
@@ -172,7 +223,7 @@ Page {
                         break
                     }
 
-                    var results = handle.loadCSV(page.path, seperator, header.checked, word_column.currentIndex, translation_column.currentIndex, priority_column.currentIndex, priority.checked)
+                    var results = handle.loadCSV(page.path, seperator, header.checked, word_column.currentIndex, translation_column.currentIndex, priority_column.currentIndex, priority.checked, page.language_id)
                     if(results.length === 0) {
                         errors.text = qsTr("Successfully imported")
                     }
