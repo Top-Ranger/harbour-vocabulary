@@ -30,6 +30,8 @@ bool DatabaseTools::create_new_db()
     operations.append("INSERT INTO language (rowid, language) VALUES (1, 'Default')");
     operations.append("CREATE TABLE vocabulary (rowid INTEGER PRIMARY KEY, word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))");
     operations.append("CREATE INDEX index_vocabulary_language ON vocabulary(language)");
+    operations.append("CREATE INDEX index_vocabulary_creation ON vocabulary(creation)");
+    operations.append("CREATE INDEX index_vocabulary_modification ON vocabulary(modification)");
     operations.append("INSERT INTO meta (key, value) VALUES ('version', '4')");
 
     foreach(QString s, operations)
@@ -257,7 +259,7 @@ bool DatabaseTools::test_and_update_db()
 
     case 3:
         /*
-         * Added language index
+         * Added indices
          *
          * Use explicit rowid
          * https://sqlite.org/foreignkeys.html
@@ -369,6 +371,24 @@ bool DatabaseTools::test_and_update_db()
             }
 
             s = "CREATE INDEX index_vocabulary_language ON vocabulary(language)";
+            if(!query.exec(s))
+            {
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            s = "CREATE INDEX index_vocabulary_creation ON vocabulary(creation)";
+            if(!query.exec(s))
+            {
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            s = "CREATE INDEX index_vocabulary_modification ON vocabulary(modification)";
             if(!query.exec(s))
             {
                 QString error = s;
