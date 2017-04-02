@@ -29,6 +29,7 @@ bool DatabaseTools::create_new_db()
     operations.append("CREATE TABLE language (rowid INTEGER PRIMARY KEY, language TEXT)");
     operations.append("INSERT INTO language (rowid, language) VALUES (1, 'Default')");
     operations.append("CREATE TABLE vocabulary (rowid INTEGER PRIMARY KEY, word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))");
+    operations.append("CREATE INDEX index_vocabulary_language ON vocabulary(language)");
     operations.append("INSERT INTO meta (key, value) VALUES ('version', '4')");
 
     foreach(QString s, operations)
@@ -255,9 +256,8 @@ bool DatabaseTools::test_and_update_db()
         DEBUG("Upgrade complete");
 
     case 3:
-        /*    operations.append("CREATE TABLE vocabulary (rowid INTEGER PRIMARY KEY, word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))");
-         *
-         * operations.append("CREATE TABLE language (rowid INTEGER PRIMARY KEY, language TEXT)");
+        /*
+         * Added language index
          *
          * Use explicit rowid
          * https://sqlite.org/foreignkeys.html
@@ -360,6 +360,15 @@ bool DatabaseTools::test_and_update_db()
             }
 
             s = "CREATE TABLE vocabulary (rowid INTEGER PRIMARY KEY, word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))";
+            if(!query.exec(s))
+            {
+                QString error = s;
+                error.append(": ").append(query.lastError().text());
+                WARNING(error);
+                return false;
+            }
+
+            s = "CREATE INDEX index_vocabulary_language ON vocabulary(language)";
             if(!query.exec(s))
             {
                 QString error = s;
