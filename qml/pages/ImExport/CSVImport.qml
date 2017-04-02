@@ -166,6 +166,11 @@ Page {
             }
 
             Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
                 text: qsTr("Import language:")
             }
 
