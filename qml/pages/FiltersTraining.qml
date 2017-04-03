@@ -237,7 +237,7 @@ Page {
 
                 id: switch_creation_since
                 automaticCheck: false
-                text: qsTr("Created since")
+                text: qsTr("Vocabulary creation date after")
                 onClicked: {
                     pageStack.push(creation_since)
                 }
@@ -264,7 +264,7 @@ Page {
 
                 id: switch_creation_until
                 automaticCheck: false
-                text: qsTr("Created until")
+                text: qsTr("Vocabulary creation date before")
                 onClicked: {
                     pageStack.push(creation_until)
                 }
@@ -291,7 +291,7 @@ Page {
 
                 id: switch_modification_since
                 automaticCheck: false
-                text: qsTr("Modificated since")
+                text: qsTr("Vocabulary modification date after")
                 onClicked: {
                     pageStack.push(modification_since)
                 }
@@ -318,7 +318,7 @@ Page {
 
                 id: switch_modification_until
                 automaticCheck: false
-                text: qsTr("Modificated until")
+                text: qsTr("Vocabulary modification date before")
                 onClicked: {
                     pageStack.push(modification_until)
                 }
