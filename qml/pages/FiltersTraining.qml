@@ -28,6 +28,7 @@ Page {
 
     property var filter_type: []
     property var filter_argv: []
+    property int selected_modus: Trainer.TEST_BOTH
 
     DatePickerDialog {
         id: creation_since
@@ -267,7 +268,17 @@ Page {
                     settings_proxy.trainingFilterPriority = minimum_priority.value
 
 
-                    pageStack.replace(Qt.resolvedUrl("Training.qml"), { filter_type: page.filter_type, filter_argv: page.filter_argv } )
+                    pageStack.replace(Qt.resolvedUrl("Training.qml"), { filter_type: page.filter_type, filter_argv: page.filter_argv, selected_modus: page.selected_modus } )
+                }
+            }
+
+            ComboBox {
+                id: modus
+                label: qsTr("Training modus")
+                menu: ContextMenu {
+                    MenuItem { text: qsTr("Both ways"); onClicked: page.selected_modus = Trainer.TEST_BOTH }
+                    MenuItem { text: qsTr("Guess translation"); onClicked: page.selected_modus = Trainer.GUESS_TRANSLATION }
+                    MenuItem { text: qsTr("Guess word"); onClicked: page.selected_modus = Trainer.GUESS_WORD }
                 }
             }
 

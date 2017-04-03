@@ -37,9 +37,10 @@ public:
     enum trainings_modus
     {
         GUESS_WORD,
-        GUESS_TRANSLATION
+        GUESS_TRANSLATION,
+        TEST_BOTH // Only for input, not used in modus
     };
-    
+
     enum filters
     {
         LANGUAGE = 1,
@@ -66,7 +67,7 @@ signals:
     void languageChanged(int language);
 
 public slots:
-    bool load_vocabulary(QVariantList filter_type, QVariantList filter_argv);
+    bool load_vocabulary(QVariantList filter_type, QVariantList filter_argv, trainings_modus selected_modus);
     int count_vocabulary(QVariantList filter_type, QVariantList filter_argv);
     void next();
     void correct();
@@ -87,6 +88,7 @@ private:
     int _sum;
     std::random_device _rnd;
     SettingsProxy _settings;
+    trainings_modus _selected_modus;
 
 };
 

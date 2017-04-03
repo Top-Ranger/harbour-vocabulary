@@ -25,9 +25,10 @@ Page {
     property var filter_type: []
     property var filter_argv: []
     property bool loading_success: false
+    property int selected_modus: Trainer.TEST_BOTH
 
     Component.onCompleted: {
-        if(trainer.load_vocabulary(filter_type, filter_argv)) {
+        if(trainer.load_vocabulary(filter_type, filter_argv, selected_modus)) {
             loading_success = true
             master.new_question()
         }

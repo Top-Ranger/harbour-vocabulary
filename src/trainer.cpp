@@ -25,7 +25,8 @@ Trainer::Trainer(QObject *parent) : QObject(parent),
     _vocabulary(),
     _sum(0),
     _rnd(),
-    _settings()
+    _settings(),
+    _selected_modus(TEST_BOTH)
 {
 }
 
@@ -61,13 +62,15 @@ int Trainer::language()
     return _vocabulary[_index].language;
 }
 
-bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv)
+bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv, trainings_modus selected_modus)
 {
     if(filter_type.size() != filter_argv.size())
     {
         WARNING("filter_type and filter_argv must have same size!" << filter_type.size() << filter_argv.size());
         return false;
     }
+
+    _selected_modus = selected_modus;
 
     // Init vocabulary list
     bool first_where = true;
@@ -100,33 +103,33 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
 
         switch(static_cast<filters>(int_type))
         {
-            case LANGUAGE:
-                s.append("language=?");
-                break;
-            case MODIFICATION_SINCE:
-                s.append("modification >= ?");
-                break;
-            case MODIFICATION_UNTIL:
-                s.append("modification <= ?");
-                break;
-            case CREATION_SINCE:
-                s.append("creation >= ?");
-                break;
-            case CREATION_UNTIL:
-                s.append("creation <= ?");
-                break;
-            case MINIMUM_PRIORITY:
-                s.append("priority >= ?");
-                break;
-            case filters_after_enum:
-                WARNING("filters_after_enum received");
-                return false;
-                break;
-            default:
-                Q_UNREACHABLE();
-                WARNING("Impossible filter type");
-                return false;
-                break;
+        case LANGUAGE:
+            s.append("language=?");
+            break;
+        case MODIFICATION_SINCE:
+            s.append("modification >= ?");
+            break;
+        case MODIFICATION_UNTIL:
+            s.append("modification <= ?");
+            break;
+        case CREATION_SINCE:
+            s.append("creation >= ?");
+            break;
+        case CREATION_UNTIL:
+            s.append("creation <= ?");
+            break;
+        case MINIMUM_PRIORITY:
+            s.append("priority >= ?");
+            break;
+        case filters_after_enum:
+            WARNING("filters_after_enum received");
+            return false;
+            break;
+        default:
+            Q_UNREACHABLE();
+            WARNING("Impossible filter type");
+            return false;
+            break;
         }
     }
 
@@ -150,27 +153,27 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
 
         switch(static_cast<filters>(int_type))
         {
-            case LANGUAGE:
-                q.addBindValue(filter_argv[i].toInt());
-                break;
-            case MODIFICATION_SINCE:
-            case MODIFICATION_UNTIL:
-            case CREATION_SINCE:
-            case CREATION_UNTIL:
-                q.addBindValue(filter_argv[i].toDate().toJulianDay());
-                break;
-            case MINIMUM_PRIORITY:
-                q.addBindValue(filter_argv[i].toInt());
-                break;
-            case filters_after_enum:
-                WARNING("filters_after_enum received");
-                return false;
-                break;
-            default:
-                Q_UNREACHABLE();
-                WARNING("Impossible filter type");
-                return false;
-                break;
+        case LANGUAGE:
+            q.addBindValue(filter_argv[i].toInt());
+            break;
+        case MODIFICATION_SINCE:
+        case MODIFICATION_UNTIL:
+        case CREATION_SINCE:
+        case CREATION_UNTIL:
+            q.addBindValue(filter_argv[i].toDate().toJulianDay());
+            break;
+        case MINIMUM_PRIORITY:
+            q.addBindValue(filter_argv[i].toInt());
+            break;
+        case filters_after_enum:
+            WARNING("filters_after_enum received");
+            return false;
+            break;
+        default:
+            Q_UNREACHABLE();
+            WARNING("Impossible filter type");
+            return false;
+            break;
         }
     }
 
@@ -248,33 +251,33 @@ int Trainer::count_vocabulary(QVariantList filter_type, QVariantList filter_argv
 
         switch(static_cast<filters>(int_type))
         {
-            case LANGUAGE:
-                s.append("language=?");
-                break;
-            case MODIFICATION_SINCE:
-                s.append("modification >= ?");
-                break;
-            case MODIFICATION_UNTIL:
-                s.append("modification <= ?");
-                break;
-            case CREATION_SINCE:
-                s.append("creation >= ?");
-                break;
-            case CREATION_UNTIL:
-                s.append("creation <= ?");
-                break;
-            case MINIMUM_PRIORITY:
-                s.append("priority >= ?");
-                break;
-            case filters_after_enum:
-                WARNING("filters_after_enum received");
-                return 0;
-                break;
-            default:
-                Q_UNREACHABLE();
-                WARNING("Impossible filter type");
-                return 0;
-                break;
+        case LANGUAGE:
+            s.append("language=?");
+            break;
+        case MODIFICATION_SINCE:
+            s.append("modification >= ?");
+            break;
+        case MODIFICATION_UNTIL:
+            s.append("modification <= ?");
+            break;
+        case CREATION_SINCE:
+            s.append("creation >= ?");
+            break;
+        case CREATION_UNTIL:
+            s.append("creation <= ?");
+            break;
+        case MINIMUM_PRIORITY:
+            s.append("priority >= ?");
+            break;
+        case filters_after_enum:
+            WARNING("filters_after_enum received");
+            return 0;
+            break;
+        default:
+            Q_UNREACHABLE();
+            WARNING("Impossible filter type");
+            return 0;
+            break;
         }
     }
 
@@ -298,27 +301,27 @@ int Trainer::count_vocabulary(QVariantList filter_type, QVariantList filter_argv
 
         switch(static_cast<filters>(int_type))
         {
-            case LANGUAGE:
-                q.addBindValue(filter_argv[i].toInt());
-                break;
-            case MODIFICATION_SINCE:
-            case MODIFICATION_UNTIL:
-            case CREATION_SINCE:
-            case CREATION_UNTIL:
-                q.addBindValue(filter_argv[i].toDate().toJulianDay());
-                break;
-            case MINIMUM_PRIORITY:
-                q.addBindValue(filter_argv[i].toInt());
-                break;
-            case filters_after_enum:
-                WARNING("filters_after_enum received");
-                return 0;
-                break;
-            default:
-                Q_UNREACHABLE();
-                WARNING("Impossible filter type");
-                return 0;
-                break;
+        case LANGUAGE:
+            q.addBindValue(filter_argv[i].toInt());
+            break;
+        case MODIFICATION_SINCE:
+        case MODIFICATION_UNTIL:
+        case CREATION_SINCE:
+        case CREATION_UNTIL:
+            q.addBindValue(filter_argv[i].toDate().toJulianDay());
+            break;
+        case MINIMUM_PRIORITY:
+            q.addBindValue(filter_argv[i].toInt());
+            break;
+        case filters_after_enum:
+            WARNING("filters_after_enum received");
+            return 0;
+            break;
+        default:
+            Q_UNREACHABLE();
+            WARNING("Impossible filter type");
+            return 0;
+            break;
         }
     }
 
@@ -384,13 +387,27 @@ void Trainer::next()
     }
 
     distribution = std::uniform_int_distribution<int>(0, 1);
-    if(distribution(_rnd) == 0)
+    switch(_selected_modus)
     {
+    case GUESS_TRANSLATION:
         _modus = GUESS_TRANSLATION;
-    }
-    else
-    {
+        break;
+    case GUESS_WORD:
         _modus = GUESS_WORD;
+        break;
+    default:
+        WARNING("UNKNOWN test_modus, USING FALLBACK");
+        // Use TEST_BOTH as fallback
+    case TEST_BOTH:
+        if(distribution(_rnd) == 0)
+        {
+            _modus = GUESS_TRANSLATION;
+        }
+        else
+        {
+            _modus = GUESS_WORD;
+        }
+        break;
     }
 
     emit wordChanged(_vocabulary[_index].word);
