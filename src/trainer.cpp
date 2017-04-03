@@ -84,6 +84,7 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
         {
             s.append(" AND ");
         }
+        first_where = false;
 
         if(!filter_type[i].canConvert<int>())
         {
@@ -132,15 +133,6 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
 
     for(int i = 0; i < filter_type.size(); ++i)
     {
-        if(first_where)
-        {
-            s.append(" WHERE ");
-        }
-        else
-        {
-            s.append(" AND ");
-        }
-
         if(!filter_type[i].canConvert<int>())
         {
             WARNING(QString("Can not convert %1 to filter").arg(filter_type[i].typeName()));
@@ -234,6 +226,7 @@ int Trainer::count_vocabulary(QVariantList filter_type, QVariantList filter_argv
         {
             s.append(" AND ");
         }
+        first_where = false;
 
         if(!filter_type[i].canConvert<int>())
         {
@@ -282,15 +275,6 @@ int Trainer::count_vocabulary(QVariantList filter_type, QVariantList filter_argv
 
     for(int i = 0; i < filter_type.size(); ++i)
     {
-        if(first_where)
-        {
-            s.append(" WHERE ");
-        }
-        else
-        {
-            s.append(" AND ");
-        }
-
         if(!filter_type[i].canConvert<int>())
         {
             WARNING(QString("Can not convert %1 to filter").arg(filter_type[i].typeName()));
