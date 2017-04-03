@@ -22,6 +22,7 @@ For every priority point the vocabulary gets an additional chance of getting dra
  * Search for vocabulary
  * Support for multiple languages
  * Adaptive training mode
+   - Select vocabularies based on different attributes
  * Adjust training mode
  * Import / export of vocabulary list. Supported file formats:
    - CSV
