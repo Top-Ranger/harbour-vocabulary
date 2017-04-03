@@ -68,7 +68,7 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
         WARNING("filter_type and filter_argv must have same size!" << filter_type.size() << filter_argv.size());
         return false;
     }
-    
+
     // Init vocabulary list
     bool first_where = true;
     QString s = "SELECT rowid,word,translation,priority,language FROM vocabulary";
@@ -115,6 +115,9 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
             case CREATION_UNTIL:
                 s.append("creation <= ?");
                 break;
+            case MINIMUM_PRIORITY:
+                s.append("priority >= ?");
+                break;
             case filters_after_enum:
                 WARNING("filters_after_enum received");
                 return false;
@@ -155,6 +158,9 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
             case CREATION_SINCE:
             case CREATION_UNTIL:
                 q.addBindValue(filter_argv[i].toDate().toJulianDay());
+                break;
+            case MINIMUM_PRIORITY:
+                q.addBindValue(filter_argv[i].toInt());
                 break;
             case filters_after_enum:
                 WARNING("filters_after_enum received");
@@ -257,6 +263,9 @@ int Trainer::count_vocabulary(QVariantList filter_type, QVariantList filter_argv
             case CREATION_UNTIL:
                 s.append("creation <= ?");
                 break;
+            case MINIMUM_PRIORITY:
+                s.append("priority >= ?");
+                break;
             case filters_after_enum:
                 WARNING("filters_after_enum received");
                 return 0;
@@ -297,6 +306,9 @@ int Trainer::count_vocabulary(QVariantList filter_type, QVariantList filter_argv
             case CREATION_SINCE:
             case CREATION_UNTIL:
                 q.addBindValue(filter_argv[i].toDate().toJulianDay());
+                break;
+            case MINIMUM_PRIORITY:
+                q.addBindValue(filter_argv[i].toInt());
                 break;
             case filters_after_enum:
                 WARNING("filters_after_enum received");

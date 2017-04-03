@@ -47,7 +47,8 @@ public:
         MODIFICATION_UNTIL = 3,
         CREATION_SINCE = 4,
         CREATION_UNTIL = 5,
-        filters_after_enum = 6,
+        MINIMUM_PRIORITY = 6,
+        filters_after_enum = 7
     };
     Q_ENUMS(trainings_modus)
     Q_ENUMS(filters)

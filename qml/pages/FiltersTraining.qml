@@ -121,6 +121,13 @@ Page {
                 filter_argv.push(modification_until.date)
             }
 
+            // Minimum priority
+
+            if(minimum_priority.value !== 0) {
+                filter_type.push(Trainer.MINIMUM_PRIORITY)
+                filter_argv.push(minimum_priority.value)
+            }
+
             // Update
 
             page.number_vocabulary = trainer.count_vocabulary(filter_type, filter_argv)
@@ -334,6 +341,26 @@ Page {
                 text: modification_until.date.toLocaleDateString()
                 color: Theme.secondaryColor
                 visible: switch_modification_until.checked
+            }
+
+            Slider {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                id: minimum_priority
+                stepSize: 1
+                minimumValue: 0
+                maximumValue: 100
+                value: 0
+                label: qsTr("Minimum priority")
+                valueText: "" + value
+
+                onReleased: {
+                    functions.update_filters()
+                }
             }
         }
     }
