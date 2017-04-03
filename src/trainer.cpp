@@ -17,6 +17,7 @@
 #include "trainer.h"
 
 #include <QtCore/QtMath>
+#include <QDate>
 
 Trainer::Trainer(QObject *parent) : QObject(parent),
     _modus(GUESS_TRANSLATION),
@@ -26,15 +27,161 @@ Trainer::Trainer(QObject *parent) : QObject(parent),
     _rnd(),
     _settings()
 {
+}
+
+QString Trainer::word()
+{
+    if(_vocabulary.size() == 0)
+    {
+        return "";
+    }
+    return _vocabulary[_index].word;
+}
+
+QString Trainer::translation()
+{
+    if(_vocabulary.size() == 0)
+    {
+        return "";
+    }
+    return _vocabulary[_index].translation;
+}
+
+Trainer::trainings_modus Trainer::modus()
+{
+    return _modus;
+}
+
+int Trainer::language()
+{
+    if(_vocabulary.size() == 0)
+    {
+        return -1;
+    }
+    return _vocabulary[_index].language;
+}
+
+bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv)
+{
+    if(filter_type.size() != filter_argv.size())
+    {
+        WARNING("filter_type and filter_argv must have same size!" << filter_type.size() << filter_argv.size());
+        return false;
+    }
+    
     // Init vocabulary list
+    bool first_where = true;
     QString s = "SELECT rowid,word,translation,priority,language FROM vocabulary";
     QSqlQuery q(database);
 
-    if(!q.exec(s))
+    for(int i = 0; i < filter_type.size(); ++i)
+    {
+        if(first_where)
+        {
+            s.append(" WHERE ");
+        }
+        else
+        {
+            s.append(" AND ");
+        }
+
+        if(!filter_type[i].canConvert<int>())
+        {
+            WARNING(QString("Can not convert %1 to filter").arg(filter_type[i].typeName()));
+            return false;
+        }
+        int int_type = filter_type[i].toInt();
+        if(int_type <= 0 || int_type >= filters_after_enum)
+        {
+            WARNING("Filter type" << int_type << "out of range");
+            return false;
+        }
+
+        switch(static_cast<filters>(int_type))
+        {
+            case LANGUAGE:
+                s.append("language=?");
+                break;
+            case MODIFICATION_SINCE:
+                s.append("modification >= ?");
+                break;
+            case MODIFICATION_UNTIL:
+                s.append("modification <= ?");
+                break;
+            case CREATION_SINCE:
+                s.append("creation >= ?");
+                break;
+            case CREATION_UNTIL:
+                s.append("creation <= ?");
+                break;
+            case filters_after_enum:
+                WARNING("filters_after_enum received");
+                return false;
+                break;
+            default:
+                Q_UNREACHABLE();
+                WARNING("Impossible filter type");
+                return false;
+                break;
+        }
+    }
+
+    DEBUG(s);
+
+    q.prepare(s);
+
+    for(int i = 0; i < filter_type.size(); ++i)
+    {
+        if(first_where)
+        {
+            s.append(" WHERE ");
+        }
+        else
+        {
+            s.append(" AND ");
+        }
+
+        if(!filter_type[i].canConvert<int>())
+        {
+            WARNING(QString("Can not convert %1 to filter").arg(filter_type[i].typeName()));
+            return false;
+        }
+        int int_type = filter_type[i].toInt();
+        if(int_type <= 0 || int_type >= filters_after_enum)
+        {
+            WARNING("Filter type" << int_type << "out of range");
+            return false;
+        }
+
+        switch(static_cast<filters>(int_type))
+        {
+            case LANGUAGE:
+                q.addBindValue(filter_argv[i].toInt());
+                break;
+            case MODIFICATION_SINCE:
+            case MODIFICATION_UNTIL:
+            case CREATION_SINCE:
+            case CREATION_UNTIL:
+                q.addBindValue(filter_argv[i].toDate().toJulianDay());
+                break;
+            case filters_after_enum:
+                WARNING("filters_after_enum received");
+                return false;
+                break;
+            default:
+                Q_UNREACHABLE();
+                WARNING("Impossible filter type");
+                return false;
+                break;
+        }
+    }
+
+    if(!q.exec())
     {
         QString error = s;
         error.append(": ").append(q.lastError().text());
         WARNING(error);
+        return false;
     }
     else
     {
@@ -43,6 +190,7 @@ Trainer::Trainer(QObject *parent) : QObject(parent),
             QString error = s;
             error.append(": No select");
             WARNING(error);
+            return false;
         }
         else
         {
@@ -60,28 +208,157 @@ Trainer::Trainer(QObject *parent) : QObject(parent),
         }
     }
 
-    next();
+    return _vocabulary.size() != 0;
 }
 
-QString Trainer::word()
+int Trainer::count_vocabulary(QVariantList filter_type, QVariantList filter_argv)
 {
-    return _vocabulary[_index].word;
+    if(filter_type.size() != filter_argv.size())
+    {
+        WARNING("filter_type and filter_argv must have same size!" << filter_type.size() << filter_argv.size());
+        return 0;
+    }
+
+    // Init vocabulary list
+    bool first_where = true;
+    QString s = "SELECT count(*) FROM vocabulary";
+    QSqlQuery q(database);
+
+    for(int i = 0; i < filter_type.size(); ++i)
+    {
+        if(first_where)
+        {
+            s.append(" WHERE ");
+        }
+        else
+        {
+            s.append(" AND ");
+        }
+
+        if(!filter_type[i].canConvert<int>())
+        {
+            WARNING(QString("Can not convert %1 to filter").arg(filter_type[i].typeName()));
+            return 0;
+        }
+        int int_type = filter_type[i].toInt();
+        if(int_type <= 0 || int_type >= filters_after_enum)
+        {
+            WARNING("Filter type" << int_type << "out of range");
+            return 0;
+        }
+
+        switch(static_cast<filters>(int_type))
+        {
+            case LANGUAGE:
+                s.append("language=?");
+                break;
+            case MODIFICATION_SINCE:
+                s.append("modification >= ?");
+                break;
+            case MODIFICATION_UNTIL:
+                s.append("modification <= ?");
+                break;
+            case CREATION_SINCE:
+                s.append("creation >= ?");
+                break;
+            case CREATION_UNTIL:
+                s.append("creation <= ?");
+                break;
+            case filters_after_enum:
+                WARNING("filters_after_enum received");
+                return 0;
+                break;
+            default:
+                Q_UNREACHABLE();
+                WARNING("Impossible filter type");
+                return 0;
+                break;
+        }
+    }
+
+    DEBUG(s);
+
+    q.prepare(s);
+
+    for(int i = 0; i < filter_type.size(); ++i)
+    {
+        if(first_where)
+        {
+            s.append(" WHERE ");
+        }
+        else
+        {
+            s.append(" AND ");
+        }
+
+        if(!filter_type[i].canConvert<int>())
+        {
+            WARNING(QString("Can not convert %1 to filter").arg(filter_type[i].typeName()));
+            return 0;
+        }
+        int int_type = filter_type[i].toInt();
+        if(int_type <= 0 || int_type >= filters_after_enum)
+        {
+            WARNING("Filter type" << int_type << "out of range");
+            return 0;
+        }
+
+        switch(static_cast<filters>(int_type))
+        {
+            case LANGUAGE:
+                q.addBindValue(filter_argv[i].toInt());
+                break;
+            case MODIFICATION_SINCE:
+            case MODIFICATION_UNTIL:
+            case CREATION_SINCE:
+            case CREATION_UNTIL:
+                q.addBindValue(filter_argv[i].toDate().toJulianDay());
+                break;
+            case filters_after_enum:
+                WARNING("filters_after_enum received");
+                return 0;
+                break;
+            default:
+                Q_UNREACHABLE();
+                WARNING("Impossible filter type");
+                return 0;
+                break;
+        }
+    }
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return 0;
+    }
+    else
+    {
+        if(!q.isSelect())
+        {
+            QString error = s;
+            error.append(": No select");
+            WARNING(error);
+            return 0;
+        }
+        else
+        {
+            if(!q.next())
+            {
+                QString error = s;
+                error.append(" - no value: ").append(q.lastError().text());
+                WARNING(error);
+                return 0;
+
+            }
+            return q.value(0).toInt();
+        }
+    }
+
+    return 0;
 }
 
-QString Trainer::translation()
-{
-    return _vocabulary[_index].translation;
-}
-
-Trainer::trainings_modus Trainer::modus()
-{
-    return _modus;
-}
-
-int Trainer::language()
-{
-    return _vocabulary[_index].language;
-}
 
 void Trainer::next()
 {
@@ -171,5 +448,3 @@ void Trainer::wrong()
         }
     }
 }
-
-

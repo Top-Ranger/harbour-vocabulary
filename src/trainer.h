@@ -39,7 +39,18 @@ public:
         GUESS_WORD,
         GUESS_TRANSLATION
     };
+    
+    enum filters
+    {
+        LANGUAGE = 1,
+        MODIFICATION_SINCE = 2,
+        MODIFICATION_UNTIL = 3,
+        CREATION_SINCE = 4,
+        CREATION_UNTIL = 5,
+        filters_after_enum = 6,
+    };
     Q_ENUMS(trainings_modus)
+    Q_ENUMS(filters)
 
     explicit Trainer(QObject *parent = 0);
     QString word();
@@ -54,6 +65,8 @@ signals:
     void languageChanged(int language);
 
 public slots:
+    bool load_vocabulary(QVariantList filter_type, QVariantList filter_argv);
+    int count_vocabulary(QVariantList filter_type, QVariantList filter_argv);
     void next();
     void correct();
     void wrong();
