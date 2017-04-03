@@ -169,7 +169,7 @@ Page {
             IconButton {
                 id: new_language_button
                 icon.source: "image://theme/icon-m-add"
-                enabled: new_language_input !== ""
+                enabled: new_language_input.text !== ""
                 onClicked: {
                     if(language_interface.addLanguage(new_language_input.text) === -1) {
                         add_panel.show()
