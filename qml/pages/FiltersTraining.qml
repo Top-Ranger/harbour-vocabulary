@@ -17,6 +17,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.vocabulary.Trainer 1.0
+import harbour.vocabulary.SettingsProxy 1.0
 
 Page {
     id: page
@@ -30,6 +31,7 @@ Page {
 
     DatePickerDialog {
         id: creation_since
+        date: new Date()
         onAccepted: {
             switch_creation_since.checked = true
             functions.update_filters()
@@ -42,6 +44,7 @@ Page {
 
     DatePickerDialog {
         id: creation_until
+        date: new Date()
         onAccepted: {
             switch_creation_until.checked = true
             functions.update_filters()
@@ -54,6 +57,7 @@ Page {
 
     DatePickerDialog {
         id: modification_since
+        date: new Date()
         onAccepted: {
             switch_modification_since.checked = true
             functions.update_filters()
@@ -66,6 +70,7 @@ Page {
 
     DatePickerDialog {
         id: modification_until
+        date: new Date()
         onAccepted: {
             switch_modification_until.checked = true
             functions.update_filters()
@@ -82,9 +87,18 @@ Page {
         function load_languages() {
             languageModel.clear()
             var languages = language_interface.getAllLanguages()
+            var language_id_correct = false
             languageModel.append({"lid": -1, "language": qsTr("All languages")})
             for(var i = 0; i < languages.length; ++i) {
+                if(languages[i] === page.language_id) {
+                    language_id_correct = true
+                }
+
                 languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+            }
+
+            if(!language_id_correct) {
+                page.language_id = -1
             }
         }
 
@@ -140,7 +154,27 @@ Page {
         id: trainer
     }
 
+    SettingsProxy {
+        id: settings_proxy
+    }
+
     Component.onCompleted: {
+        // Load settings
+        page.language_id = settings_proxy.trainingFilterLanguage
+
+        switch_creation_since.checked = settings_proxy.trainingFilterCreationSinceEnabled
+        switch_creation_until.checked = settings_proxy.trainingFilterCreationUntilEnabled
+        switch_modification_since.checked = settings_proxy.trainingFilterModificationSinceEnabled
+        switch_modification_until.checked = settings_proxy.trainingFilterModificationUntilEnabled
+
+        creation_since.date = settings_proxy.trainingFilterCreationSinceDate
+        creation_until.date = settings_proxy.trainingFilterCreationUntilDate
+        modification_since.date = settings_proxy.trainingFilterModificationSinceDate
+        modification_until.date = settings_proxy.trainingFilterModificationUntilDate
+
+        minimum_priority.value = settings_proxy.trainingFilterPriority
+
+        // Call initialising functions
         functions.load_languages()
         functions.update_filters()
     }
@@ -155,6 +189,29 @@ Page {
         VerticalScrollDecorator {}
 
         contentHeight: column.height
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Reset to default")
+                onClicked: {
+                    page.language_id = -1
+
+                    switch_creation_since.checked = false
+                    switch_creation_until.checked = false
+                    switch_modification_since.checked = false
+                    switch_modification_until.checked = false
+
+                    creation_since.date = new Date()
+                    creation_until.date = new Date()
+                    modification_since.date = new Date()
+                    modification_until.date = new Date()
+
+                    minimum_priority.value = 0
+
+                    functions.update_filters()
+                }
+            }
+        }
 
         Column {
             id: column
@@ -194,7 +251,24 @@ Page {
                 width: parent.width
                 text: qsTr("Start training")
                 enabled: page.number_vocabulary !== 0
-                onClicked: pageStack.push(Qt.resolvedUrl("Training.qml"), { filter_type: page.filter_type, filter_argv: page.filter_argv, replace: true } )
+                onClicked: {
+                    settings_proxy.trainingFilterLanguage = page.language_id
+
+                    settings_proxy.trainingFilterCreationSinceEnabled = switch_creation_since.checked
+                    settings_proxy.trainingFilterCreationUntilEnabled = switch_creation_until.checked
+                    settings_proxy.trainingFilterModificationSinceEnabled = switch_modification_since.checked
+                    settings_proxy.trainingFilterModificationUntilEnabled = switch_modification_until.checked
+
+                    settings_proxy.trainingFilterCreationSinceDate = creation_since.date
+                    settings_proxy.trainingFilterCreationUntilDate = creation_until.date
+                    settings_proxy.trainingFilterModificationSinceDate = modification_since.date
+                    settings_proxy.trainingFilterModificationUntilDate = modification_until.date
+
+                    settings_proxy.trainingFilterPriority = minimum_priority.value
+
+
+                    pageStack.replace(Qt.resolvedUrl("Training.qml"), { filter_type: page.filter_type, filter_argv: page.filter_argv } )
+                }
             }
 
             Label {

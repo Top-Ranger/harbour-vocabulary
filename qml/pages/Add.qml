@@ -16,6 +16,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.vocabulary.SettingsProxy 1.0
 
 Page {
     id: page
@@ -24,8 +25,14 @@ Page {
     property int language_id: -1
 
     Component.onCompleted: {
+        page.language_id = settings_proxy.addVocabularyLanguage
+
         functions.load_list()
         functions.load_languages()
+    }
+
+    SettingsProxy {
+        id: settings_proxy
     }
 
     Item {
@@ -44,6 +51,7 @@ Page {
             var id = page.language_id === -1 ? new_id : page.language_id
 
             if(simple_interface.addVocabulary(word.text, translation.text, id)) {
+                settings_proxy.addVocabularyLanguage = id
                 pageStack.pop()
             }
             else {
@@ -76,9 +84,18 @@ Page {
 
         function load_languages() {
             languageModel.clear()
+            var language_id_correct = false
             var languages = language_interface.getAllLanguages()
             for(var i = 0; i < languages.length; ++i) {
+                if(languages[i] === page.language_id) {
+                    language_id_correct = true
+                }
+
                 languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+            }
+
+            if(!language_id_correct) {
+                page.language_id = -1
             }
         }
     }
