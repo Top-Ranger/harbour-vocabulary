@@ -34,7 +34,7 @@ Page {
 
         function load_languages() {
             languageModel.clear()
-            languageModel.append({"lid": -1, "language": "All languages"})
+            languageModel.append({"lid": -1, "language": qsTr("All languages")})
             var languages = language_interface.getAllLanguages()
             for(var i = 0; i < languages.length; ++i) {
                 languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})

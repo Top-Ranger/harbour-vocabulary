@@ -74,7 +74,8 @@ DISTFILES += \
     qml/pages/Languages.qml \
     qml/pages/LanguageList.qml \
     qml/pages/LanguageMove.qml \
-    qml/pages/LanguageEdit.qml
+    qml/pages/LanguageEdit.qml \
+    qml/pages/FiltersTraining.qml
 
 HEADERS += \
     src/global.h \

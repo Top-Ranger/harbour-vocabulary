@@ -63,7 +63,7 @@ Page {
                     color: simple_interface.count === 0 ? Theme.secondaryColor : Theme.primaryColor
                 }
 
-                onClicked: pageStack.push(Qt.resolvedUrl("Training.qml"))
+                onClicked: pageStack.push(Qt.resolvedUrl("FiltersTraining.qml"))
             }
 
             BackgroundItem {
