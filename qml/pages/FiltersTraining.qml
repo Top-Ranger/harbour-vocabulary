@@ -28,6 +28,54 @@ Page {
     property var filter_type: []
     property var filter_argv: []
 
+    DatePickerDialog {
+        id: creation_since
+        onAccepted: {
+            switch_creation_since.checked = true
+            functions.update_filters()
+        }
+        onRejected: {
+            switch_creation_since.checked = false
+            functions.update_filters()
+        }
+    }
+
+    DatePickerDialog {
+        id: creation_until
+        onAccepted: {
+            switch_creation_until.checked = true
+            functions.update_filters()
+        }
+        onRejected: {
+            switch_creation_until.checked = false
+            functions.update_filters()
+        }
+    }
+
+    DatePickerDialog {
+        id: modification_since
+        onAccepted: {
+            switch_modification_since.checked = true
+            functions.update_filters()
+        }
+        onRejected: {
+            switch_modification_since.checked = false
+            functions.update_filters()
+        }
+    }
+
+    DatePickerDialog {
+        id: modification_until
+        onAccepted: {
+            switch_modification_until.checked = true
+            functions.update_filters()
+        }
+        onRejected: {
+            switch_modification_until.checked = false
+            functions.update_filters()
+        }
+    }
+
     Item {
         id: functions
 
@@ -43,10 +91,38 @@ Page {
         function update_filters() {
             var filter_type = []
             var filter_argv = []
+
+            // Language
+
             if(language_id !== -1) {
                 filter_type.push(Trainer.LANGUAGE)
                 filter_argv.push(page.language_id)
             }
+
+            // Dates
+
+            if(switch_creation_since.checked) {
+                filter_type.push(Trainer.CREATION_SINCE)
+                filter_argv.push(creation_since.date)
+            }
+
+            if(switch_creation_until.checked) {
+                filter_type.push(Trainer.CREATION_UNTIL)
+                filter_argv.push(creation_until.date)
+            }
+
+            if(switch_modification_since.checked) {
+                filter_type.push(Trainer.MODIFICATION_SINCE)
+                filter_argv.push(modification_since.date)
+            }
+
+            if(switch_modification_until.checked) {
+                filter_type.push(Trainer.MODIFICATION_UNTIL)
+                filter_argv.push(modification_until.date)
+            }
+
+            // Update
+
             page.number_vocabulary = trainer.count_vocabulary(filter_type, filter_argv)
             page.filter_type = filter_type
             page.filter_argv = filter_argv
@@ -59,6 +135,7 @@ Page {
 
     Component.onCompleted: {
         functions.load_languages()
+        functions.update_filters()
     }
 
     ListModel {
@@ -149,6 +226,114 @@ Page {
                         functions.update_filters()
                     }
                 }
+            }
+
+            TextSwitch {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                id: switch_creation_since
+                automaticCheck: false
+                text: qsTr("Created since")
+                onClicked: {
+                    pageStack.push(creation_since)
+                }
+            }
+
+            Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                text: creation_since.date.toLocaleDateString()
+                color: Theme.secondaryColor
+                visible: switch_creation_since.checked
+            }
+
+            TextSwitch {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                id: switch_creation_until
+                automaticCheck: false
+                text: qsTr("Created until")
+                onClicked: {
+                    pageStack.push(creation_until)
+                }
+            }
+
+            Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                text: creation_until.date.toLocaleDateString()
+                color: Theme.secondaryColor
+                visible: switch_creation_until.checked
+            }
+
+            TextSwitch {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                id: switch_modification_since
+                automaticCheck: false
+                text: qsTr("Modificated since")
+                onClicked: {
+                    pageStack.push(modification_since)
+                }
+            }
+
+            Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                text: modification_since.date.toLocaleDateString()
+                color: Theme.secondaryColor
+                visible: switch_modification_since.checked
+            }
+
+            TextSwitch {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                id: switch_modification_until
+                automaticCheck: false
+                text: qsTr("Modificated until")
+                onClicked: {
+                    pageStack.push(modification_until)
+                }
+            }
+
+            Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                text: modification_until.date.toLocaleDateString()
+                color: Theme.secondaryColor
+                visible: switch_modification_until.checked
             }
         }
     }
