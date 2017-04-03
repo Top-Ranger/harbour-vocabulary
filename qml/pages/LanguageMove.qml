@@ -170,15 +170,18 @@ Page {
                     id: word_label
                     text: word
                     color: selected ? Theme.primaryColor : Theme.secondaryColor
+                    font.bold: selected
                 }
                 Label {
                     text: " "
                     color: selected ? Theme.primaryColor : Theme.secondaryColor
+                    font.bold: selected
                 }
                 Label {
                     width: parent.width - word_label.width
                     text: translation
                     color: selected ? Theme.primaryColor : Theme.secondaryColor
+                    font.bold: selected
                     horizontalAlignment: Text.AlignLeft
                     truncationMode: TruncationMode.Elide
                 }

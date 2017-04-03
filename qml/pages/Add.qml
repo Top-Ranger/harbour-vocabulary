@@ -250,7 +250,8 @@ Page {
                         anchors.centerIn: parent
                         width: parent.width - 2*Theme.horizontalPageMargin
                         text: language
-                        color: page.language_id == lid ? Theme.primaryColor : Theme.secondaryColor
+                        color: page.language_id === lid ? Theme.primaryColor : Theme.secondaryColor
+                        font.bold: page.language_id === lid
                         horizontalAlignment: Text.AlignHCenter
                         truncationMode: TruncationMode.Fade
                     }
