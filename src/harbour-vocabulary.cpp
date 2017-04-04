@@ -32,6 +32,7 @@
 #include <vector>
 #include <QCoreApplication>
 #include <QStandardPaths>
+#include <QDateTime>
 
 int main(int argc, char *argv[])
 {
@@ -78,8 +79,23 @@ int main(int argc, char *argv[])
         if(!DatabaseTools::test_and_update_db())
         {
             database.close();
-            file.remove();
-            FATAL("Can't read/update database.sqlite3");
+            path.append("-UPGRADE_FAILED-");
+            path.append(QDateTime::currentDateTime().toString(Qt::ISODate));
+            if(file.rename(path))
+            {
+                FATAL(QString("Can't read/update database.sqlite3, moving to %1").arg(path));
+            }
+            else
+            {
+                if(file.remove())
+                {
+                    FATAL("Can't read/update database.sqlite3, removing it");
+                }
+                else
+                {
+                    FATAL("Can't read/update database.sqlite3, can not remove it! Please check your system");
+                }
+            }
         }
     }
 
@@ -105,3 +121,4 @@ int main(int argc, char *argv[])
     database.close();
     return return_value;
 }
+
