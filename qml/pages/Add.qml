@@ -29,6 +29,7 @@ Page {
 
         functions.load_list()
         functions.load_languages()
+        functions.filter_list("")
     }
 
     SettingsProxy {
@@ -64,8 +65,8 @@ Page {
             var wordlist = simple_interface.getAllWords()
             for(var i = 0; i < wordlist.length; ++i) {
                 var word = simple_interface.getWord(wordlist[i])
-                originModel.append({"id": wordlist[i], "word": word})
-                listModel.append({"id": wordlist[i], "word": word})
+                var language = simple_interface.getLanguageId(wordlist[i])
+                originModel.append({"id": wordlist[i], "word": word, "language": language})
             }
         }
 
@@ -75,7 +76,7 @@ Page {
             filter = filter.toLowerCase()
             for(var i = 0; i < originModel.count; ++i) {
                 var item = originModel.get(i)
-                if(item.word.toLowerCase().indexOf(filter) !== -1) {
+                if((page.language_id === -1 || page.language_id === item.language) && item.word.toLowerCase().indexOf(filter) !== -1) {
                     listModel.append(item)
                 }
             }
@@ -120,11 +121,13 @@ Page {
         interval: 750
 
         property string lastWord: ""
+        property int last_lid: -1
 
         onTriggered: {
             var newWord = word.text.trim()
-            if(newWord !== lastWord) {
+            if(newWord !== lastWord || page.language_id !== last_lid) {
                 lastWord = newWord
+                last_lid = page.language_id
                 functions.filter_list(newWord)
             }
         }
@@ -205,7 +208,7 @@ Page {
                 Label {
                     id: best_match_result_label
                     width: parent.width - best_match_label.width - best_match_reset_icon.width
-                    text: listModel.count===0 || listModel.count === originModel.count ? "" : listModel.get(listModel.showItemNo).word
+                    text: listModel.count === 0 ? "" : listModel.get(listModel.showItemNo).word
                     color: Theme.secondaryColor
                     horizontalAlignment: Text.AlignLeft
                     truncationMode: TruncationMode.Elide
@@ -215,6 +218,7 @@ Page {
                     height: best_match_label.height
                     icon.source: "image://theme/icon-m-forward"
                     visible: best_match_result_label.text != ""
+                    enabled: listModel.count !== 1
                     onClicked: {
                         listModel.showItemNo = (listModel.showItemNo + 1) % listModel.count
                     }
@@ -276,6 +280,8 @@ Page {
                     onClicked: {
                         new_language_input.text = ""
                         page.language_id = lid
+                        search_timer.stop()
+                        functions.filter_list(word.text.trim())
                     }
                 }
             }
@@ -287,7 +293,11 @@ Page {
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input new language")
                 label: qsTr("New language")
-                onTextChanged: page.language_id = -1
+                onTextChanged: {
+                    page.language_id = -1
+                    search_timer.stop()
+                    functions.filter_list(word.text.trim())
+                }
             }
         }
     }
