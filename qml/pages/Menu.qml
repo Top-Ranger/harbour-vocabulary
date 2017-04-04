@@ -16,10 +16,15 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.vocabulary.SettingsProxy 1.0
 
 Page {
     id: page
     allowedOrientations: Orientation.All
+
+    SettingsProxy {
+        id: settings_proxy
+    }
 
     SilicaFlickable {
         anchors.fill: parent
@@ -63,7 +68,14 @@ Page {
                     color: simple_interface.count === 0 ? Theme.secondaryColor : Theme.primaryColor
                 }
 
-                onClicked: pageStack.push(Qt.resolvedUrl("FiltersTraining.qml"))
+                onClicked: {
+                    if(settings_proxy.trainingDirectStart) {
+                        pageStack.push(Qt.resolvedUrl("Training.qml"))
+                    }
+                    else {
+                        pageStack.push(Qt.resolvedUrl("FiltersTraining.qml"))
+                    }
+                }
             }
 
             BackgroundItem {

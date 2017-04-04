@@ -26,12 +26,14 @@ Dialog {
         settings.adaptiveTrainingCorrectPoints = correct.value
         settings.adaptiveTrainingWrongPoints = wrong.value
         settings.adaptiveTrainingEnabled = adaptive_enabled.checked
+        settings.trainingDirectStart = direct_enabled.checked
     }
 
     Component.onCompleted: {
         correct.value = settings.adaptiveTrainingCorrectPoints
         wrong.value = settings.adaptiveTrainingWrongPoints
         adaptive_enabled.checked = settings.adaptiveTrainingEnabled
+        direct_enabled.checked = settings.trainingDirectStart
     }
 
     SettingsProxy {
@@ -106,6 +108,13 @@ Each vocabulary gets a priority between 1 and 100 which starts at 100. Every tim
                 width: parent.width
                 text: qsTr("Enable adaptive training")
                 description: qsTr("If the adaptive training mode is disabled, all vocabulary have the same chance of appearing. While disabled, the priority of vocabulary is not changed.")
+            }
+
+            TextSwitch {
+                id: direct_enabled
+                width: parent.width
+                text: qsTr("Directly go to training")
+                description: qsTr("If this is enabled, training will start directly with all vocabulary instead of showing the trainings options.")
             }
         }
     }

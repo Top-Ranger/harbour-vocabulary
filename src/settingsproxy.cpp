@@ -76,6 +76,11 @@ int SettingsProxy::addVocabularyLanguage()
     return _settings.value("add_vocabulary/language", -1).toInt();
 }
 
+bool SettingsProxy::trainingDirectStart()
+{
+    return _settings.value("training/direct_start", false).toBool();
+}
+
 void SettingsProxy::setAdaptiveTrainingCorrectPoints(int points)
 {
     _settings.setValue("adaptive_training/correct", points);
@@ -158,4 +163,10 @@ void SettingsProxy::setAddVocabularyLanguage(int language)
 {
     _settings.setValue("add_vocabulary/language", language);
     emit addVocabularyLanguageChanged(language);
+}
+
+void SettingsProxy::setTrainingDirectStart(bool direct)
+{
+    _settings.setValue("training/direct_start", direct);
+    emit trainingDirectStartChanged(direct);
 }
