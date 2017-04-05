@@ -218,7 +218,7 @@ Page {
                     height: best_match_label.height
                     icon.source: "image://theme/icon-m-forward"
                     visible: best_match_result_label.text != ""
-                    enabled: listModel.count !== 1
+                    enabled: listModel.count !== 1 && listModel.count !== 0
                     onClicked: {
                         listModel.showItemNo = (listModel.showItemNo + 1) % listModel.count
                     }
