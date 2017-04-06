@@ -22,6 +22,18 @@ Page {
     id: page
     allowedOrientations: Orientation.All
 
+    property var filter_type: []
+    property var filter_argv: []
+    property bool loading_success: false
+    property int selected_modus: Trainer.TEST_BOTH
+
+    Component.onCompleted: {
+        if(trainer.load_vocabulary(filter_type, filter_argv, selected_modus)) {
+            loading_success = true
+            master.new_question()
+        }
+    }
+
     SilicaFlickable {
         anchors.fill: parent
 
@@ -55,6 +67,21 @@ Page {
 
             PageHeader {
                 title: qsTr("Training")
+            }
+
+            Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                visible: !page.loading_success
+                text: qsTr("Can not load vocabulary!")
+                font.bold: true
+                font.italic: true
+                font.pixelSize: Theme.fontSizeLarge
+                color: Theme.primaryColor
             }
 
             Row {
@@ -125,6 +152,27 @@ Page {
                 label: qsTr("Answer")
             }
 
+            Row {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                Label {
+                    id: language_label
+                    text: qsTr("Language: ")
+                    color: Theme.primaryColor
+                }
+
+                Label {
+                    width: parent.width - language_label.width
+                    text: trainer.language !== -1 ? language_interface.getLanguageName(trainer.language) : ""
+                    color: Theme.secondaryColor
+                    wrapMode: Text.Wrap
+                }
+            }
+
             Button {
                 anchors {
                     left: parent.left
@@ -134,7 +182,7 @@ Page {
 
                 width: parent.width
                 text: qsTr("Reveal answer")
-                enabled: master.current_status === master.status_ask_question
+                enabled: master.current_status === master.status_ask_question && page.loading_success
                 onClicked: {
                     master.current_status = master.status_reveal_answer
                 }
@@ -150,7 +198,7 @@ Page {
 
                 Button {
                     width: parent.width/2 - Theme.paddingSmall/2
-                    enabled: master.current_status === master.status_reveal_answer
+                    enabled: master.current_status === master.status_reveal_answer && page.loading_success
                     text: qsTr("Correct")
                     onClicked: {
                         trainer.correct()
@@ -160,7 +208,7 @@ Page {
 
                 Button {
                     width: parent.width/2 - Theme.paddingSmall/2
-                    enabled: master.current_status === master.status_reveal_answer
+                    enabled: master.current_status === master.status_reveal_answer && page.loading_success
                     text: qsTr("False")
                     onClicked: {
                         trainer.wrong()

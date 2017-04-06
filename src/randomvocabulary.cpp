@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016,2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,19 +37,22 @@ void RandomVocabulary::newRandom()
     QString s = "SELECT word, translation FROM vocabulary ORDER BY RANDOM() LIMIT 1";
     if(!q.exec(s))
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return;
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No SELECT");
+        QString error = s;
+        error.append(": No SELECT");
         WARNING(error);
         return;
     }
     if(!q.next())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return;
     }

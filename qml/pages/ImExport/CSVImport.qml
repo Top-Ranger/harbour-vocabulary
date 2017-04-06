@@ -23,6 +23,27 @@ Page {
     allowedOrientations: Orientation.All
     property string path: ""
     property bool started: false
+    property int language_id: -1
+
+    Component.onCompleted: {
+        functions.load_languages()
+    }
+
+    Item {
+        id: functions
+
+        function load_languages() {
+            languageModel.clear()
+            var languages = language_interface.getAllLanguages()
+            for(var i = 0; i < languages.length; ++i) {
+                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+            }
+        }
+    }
+
+    ListModel {
+        id: languageModel
+    }
 
     CSVHandle {
         id: handle
@@ -74,14 +95,6 @@ Page {
                 width: parent.width
                 text: qsTr("CSV has header")
                 description: qsTr("If this is enabled, it is assumed that the CSV file has a header and the first line will be ignored.")
-            }
-            
-            TextSwitch {
-                checked: true
-                id: overwrite
-                width: parent.width
-                text: qsTr("Overwrite existing vocabulary")
-                description: qsTr("If this option is enabled, existing vocabulary will be overwritten. Vocabularies are equal if they have the same 'word'.")
             }
 
             ComboBox {
@@ -152,6 +165,53 @@ Page {
                 }
             }
 
+            Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+                text: qsTr("Import language:")
+            }
+
+            Repeater {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                model: languageModel
+
+                delegate: ListItem {
+                    width: parent.width
+                    Label {
+                        anchors.centerIn: parent
+                        width: parent.width - 2*Theme.horizontalPageMargin
+                        text: language
+                        color: page.language_id === lid ? Theme.primaryColor : Theme.secondaryColor
+                        font.bold: page.language_id === lid
+                        horizontalAlignment: Text.AlignHCenter
+                        truncationMode: TruncationMode.Fade
+                    }
+
+                    onClicked: {
+                        new_language_input.text = ""
+                        page.language_id = lid
+                    }
+                }
+            }
+
+            TextArea {
+                id: new_language_input
+                width: parent.width
+                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                placeholderText: qsTr("Input new language")
+                label: qsTr("New language")
+                onTextChanged: page.language_id = -1
+            }
+
             Button {
                 anchors {
                     left: parent.left
@@ -159,7 +219,7 @@ Page {
                     margins: Theme.horizontalPageMargin
                 }
 
-                enabled: !page.started
+                enabled: !page.started && (page.language_id !== -1 || new_language_input.text !== "")
                 text: qsTr("Import")
                 onClicked: {
                     page.started = true
@@ -180,7 +240,17 @@ Page {
                         break
                     }
 
-                    var results = handle.loadCSV(page.path, seperator, header.checked, word_column.currentIndex, translation_column.currentIndex, priority_column.currentIndex, priority.checked, overwrite.checked)
+                    var id = page.language_id
+
+                    if(page.language_id === -1) {
+                        id = language_interface.addLanguage(new_language_input.text)
+                        if(id === -1) {
+                            errors.text = qsTr("Can not add new language")
+                            return
+                        }
+                    }
+
+                    var results = handle.loadCSV(page.path, seperator, header.checked, word_column.currentIndex, translation_column.currentIndex, priority_column.currentIndex, priority.checked, id)
                     if(results.length === 0) {
                         errors.text = qsTr("Successfully imported")
                     }

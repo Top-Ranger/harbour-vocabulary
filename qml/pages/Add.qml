@@ -16,20 +16,43 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.vocabulary.SettingsProxy 1.0
 
 Page {
     id: page
     allowedOrientations: Orientation.All
-    
+
+    property int language_id: -1
+
     Component.onCompleted: {
+        page.language_id = settings_proxy.addVocabularyLanguage
+
         functions.load_list()
+        functions.load_languages()
+        functions.filter_list("")
+    }
+
+    SettingsProxy {
+        id: settings_proxy
     }
 
     Item {
         id: functions
 
         function save_word() {
-            if(simple_interface.addVocabulary(word.text, translation.text)) {
+            var new_id = -1
+            if(language_id === -1) {
+                new_id = language_interface.addLanguage(new_language_input.text)
+                if(new_id === -1) {
+                    panel.show()
+                    return
+                }
+            }
+
+            var id = page.language_id === -1 ? new_id : page.language_id
+
+            if(simple_interface.addVocabulary(word.text, translation.text, id)) {
+                settings_proxy.addVocabularyLanguage = id
                 pageStack.pop()
             }
             else {
@@ -41,8 +64,9 @@ Page {
             listModel.clear()
             var wordlist = simple_interface.getAllWords()
             for(var i = 0; i < wordlist.length; ++i) {
-                originModel.append({"word": wordlist[i]})
-                listModel.append({"word": wordlist[i]})
+                var word = simple_interface.getWord(wordlist[i])
+                var language = simple_interface.getLanguageId(wordlist[i])
+                originModel.append({"id": wordlist[i], "word": word, "language": language})
             }
         }
 
@@ -52,14 +76,31 @@ Page {
             filter = filter.toLowerCase()
             for(var i = 0; i < originModel.count; ++i) {
                 var item = originModel.get(i)
-                if(item.word.toLowerCase().indexOf(filter) !== -1) {
+                if((page.language_id === -1 || page.language_id === item.language) && item.word.toLowerCase().indexOf(filter) !== -1) {
                     listModel.append(item)
                 }
             }
             listModel.showItemNo = Math.floor(Math.random()*listModel.count)
         }
+
+        function load_languages() {
+            languageModel.clear()
+            var language_id_correct = false
+            var languages = language_interface.getAllLanguages()
+            for(var i = 0; i < languages.length; ++i) {
+                if(languages[i] === page.language_id) {
+                    language_id_correct = true
+                }
+
+                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+            }
+
+            if(!language_id_correct) {
+                page.language_id = -1
+            }
+        }
     }
-    
+
     ListModel {
         id: listModel
 
@@ -70,17 +111,23 @@ Page {
         id: originModel
     }
 
+    ListModel {
+        id: languageModel
+    }
+
     Timer {
         id: search_timer
         repeat: false
         interval: 750
 
         property string lastWord: ""
+        property int last_lid: -1
 
         onTriggered: {
             var newWord = word.text.trim()
-            if(newWord !== lastWord) {
+            if(newWord !== lastWord || page.language_id !== last_lid) {
                 lastWord = newWord
+                last_lid = page.language_id
                 functions.filter_list(newWord)
             }
         }
@@ -98,8 +145,9 @@ Page {
                 text: qsTr("Reset priority of match")
                 enabled: best_match_result_label.text !== ""
                 onClicked: {
-                    var word = best_match_result_label.text
-                    remorse.execute(qsTr("Resetting priority of ") + word, function(){ if(!simple_interface.setPriority(word,100)){ panel_priority.show() }})
+                    var word = listModel.get(listModel.showItemNo).word
+                    var id = listModel.get(listModel.showItemNo).id
+                    remorse.execute(qsTr("Resetting priority of ") + word, function(){ if(!simple_interface.setPriority(id,100)){ panel_priority.show() }})
                 }
             }
         }
@@ -120,12 +168,12 @@ Page {
                     margins: Theme.horizontalPageMargin
                 }
 
-                enabled: word.text.trim() != "" && translation.text.trim() != "" && word.text.trim() != best_match_result_label.text.trim()
+                enabled: word.text.trim() != "" && translation.text.trim() != "" && (page.language_id !== -1 || new_language_input.text !== "")
                 width: parent.width
                 text: qsTr("Save vocabulary")
                 onClicked: functions.save_word()
             }
-            
+
             Row {
                 anchors {
                     left: parent.left
@@ -145,7 +193,7 @@ Page {
                     truncationMode: TruncationMode.Elide
                 }
             }
-            
+
             Row {
                 anchors {
                     left: parent.left
@@ -160,7 +208,7 @@ Page {
                 Label {
                     id: best_match_result_label
                     width: parent.width - best_match_label.width - best_match_reset_icon.width
-                    text: listModel.count===0 || listModel.count === originModel.count ? "" : listModel.get(listModel.showItemNo).word
+                    text: listModel.count === 0 ? "" : listModel.get(listModel.showItemNo).word
                     color: Theme.secondaryColor
                     horizontalAlignment: Text.AlignLeft
                     truncationMode: TruncationMode.Elide
@@ -170,6 +218,7 @@ Page {
                     height: best_match_label.height
                     icon.source: "image://theme/icon-m-forward"
                     visible: best_match_result_label.text != ""
+                    enabled: listModel.count !== 1 && listModel.count !== 0
                     onClicked: {
                         listModel.showItemNo = (listModel.showItemNo + 1) % listModel.count
                     }
@@ -180,7 +229,7 @@ Page {
                 id: word
                 width: parent.width
                 height: implicitHeight
-                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.onClicked: { text = text.replace("\n", ""); translation.focus = true }
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input word or phrase here")
                 label: qsTr("Word / phrase")
@@ -195,6 +244,60 @@ Page {
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input translation here")
                 label: qsTr("Translation")
+            }
+
+            Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                text: qsTr("Languages:")
+            }
+
+            Repeater {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                model: languageModel
+
+                delegate: ListItem {
+                    width: parent.width
+                    Label {
+                        anchors.centerIn: parent
+                        width: parent.width - 2*Theme.horizontalPageMargin
+                        text: language
+                        color: page.language_id === lid ? Theme.primaryColor : Theme.secondaryColor
+                        font.bold: page.language_id === lid
+                        horizontalAlignment: Text.AlignHCenter
+                        truncationMode: TruncationMode.Fade
+                    }
+
+                    onClicked: {
+                        new_language_input.text = ""
+                        page.language_id = lid
+                        search_timer.stop()
+                        functions.filter_list(word.text.trim())
+                    }
+                }
+            }
+
+            TextArea {
+                id: new_language_input
+                width: parent.width
+                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                placeholderText: qsTr("Input new language")
+                label: qsTr("New language")
+                onTextChanged: {
+                    page.language_id = -1
+                    search_timer.stop()
+                    functions.filter_list(word.text.trim())
+                }
             }
         }
     }

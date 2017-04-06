@@ -23,6 +23,28 @@ Page {
     allowedOrientations: Orientation.All
     property string path: ""
     property bool started: false
+    property int language_id: -1
+
+    Component.onCompleted: {
+        functions.load_languages()
+    }
+
+    Item {
+        id: functions
+
+        function load_languages() {
+            languageModel.clear()
+            languageModel.append({"lid": -1, "language": qsTr("All languages")})
+            var languages = language_interface.getAllLanguages()
+            for(var i = 0; i < languages.length; ++i) {
+                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+            }
+        }
+    }
+
+    ListModel {
+        id: languageModel
+    }
 
     CSVHandle {
         id: handle
@@ -75,6 +97,42 @@ Page {
                 text: qsTr("Add header")
             }
 
+            Label {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+                text: qsTr("Export language:")
+            }
+
+            Repeater {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                model: languageModel
+
+                delegate: ListItem {
+                    width: parent.width
+                    Label {
+                        anchors.centerIn: parent
+                        width: parent.width - 2*Theme.horizontalPageMargin
+                        text: language
+                        color: page.language_id === lid ? Theme.primaryColor : Theme.secondaryColor
+                        font.bold: page.language_id === lid
+                        horizontalAlignment: Text.AlignHCenter
+                        truncationMode: TruncationMode.Fade
+                    }
+
+                    onClicked: {
+                        page.language_id = lid
+                    }
+                }
+            }
+
             Button {
                 anchors {
                     left: parent.left
@@ -103,7 +161,7 @@ Page {
                         break
                     }
 
-                    var results = handle.saveCSV(page.path, seperator, header.checked)
+                    var results = handle.saveCSV(page.path, seperator, header.checked, page.language_id)
                     if(results.length === 0) {
                         errors.text = qsTr("Successfully exported")
                     }

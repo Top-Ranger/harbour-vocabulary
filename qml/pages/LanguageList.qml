@@ -1,5 +1,5 @@
 /*
- * Copyright 2016,2017 Marcus Soll
+ * Copyright 2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,32 +21,22 @@ Page {
     id: page
     allowedOrientations: Orientation.All
 
+    property int language_id: -1
+    property string language_name: "ERROR"
+
     property bool word_changed: false
     property int word_id: 0
 
     property string search_text: ""
 
+    Component.onCompleted: {
+        page.language_name = language_interface.getLanguageName(page.language_id)
+    }
+
     onStatusChanged: {
         if(word_changed === true) {
-            var word = simple_interface.getWord(page.word_id)
-            var translation = simple_interface.getTranslationOfWord(page.word_id)
-
-            for(var i = 0; i < listModel.count; ++i) {
-                if(listModel.get(i).id === page.word_id) {
-                    listModel.remove(i)
-                    listModel.insert(i, {"id": page.word_id, "word": word, "translation": translation})
-                    break
-                }
-            }
-
-            for(i = 0; i < originModel.count; ++i) {
-                if(originModel.get(i).id === page.word_id) {
-                    originModel.remove(i)
-                    originModel.insert(i, {"id": page.word_id, "word": word, "translation": translation})
-                    break
-                }
-            }
-            word_changed = false
+            functions.load_list()
+            page.word_changed = false
         }
     }
 
@@ -82,7 +72,8 @@ Page {
 
         function load_list() {
             listModel.clear()
-            var wordlist = simple_interface.getAllWords()
+            originModel.clear()
+            var wordlist = language_interface.getVocabularyByLanguage(page.language_id)
             for(var i = 0; i < wordlist.length; ++i) {
                 var word = simple_interface.getWord(wordlist[i])
                 var translation = simple_interface.getTranslationOfWord(wordlist[i])
@@ -99,6 +90,20 @@ Page {
                 if(item.word.toLowerCase().indexOf(filter) !== -1 || item.translation.toLowerCase().indexOf(filter) !== -1) {
                     listModel.append(item)
                 }
+            }
+        }
+
+        function remove_all_in_this_language() {
+            var array = []
+            for(var i = 0; i < originModel.count; ++i) {
+                array.push(originModel.get(i).id)
+            }
+            if(simple_interface.removeBatchVocabulary(array)) {
+                originModel.clear()
+                listModel.clear()
+            }
+            else {
+                panel.show()
             }
         }
     }
@@ -133,9 +138,9 @@ Page {
 
         PullDownMenu {
             MenuItem {
-                text: qsTr("Remove all vocabulary")
+                text: qsTr("Remove all vocabulary in language")
                 onClicked: {
-                    remorse_popup.execute(qsTr("Remove all vocabulary"), function() {if(!simple_interface.clearAllVocabulary()) { panel.show() } else { listModel.clear(); originModel.clear() } }, 10000)
+                    remorse_popup.execute(qsTr("Remove all vocabulary"), function() { functions.remove_all_in_this_language() }, 10000)
                 }
             }
         }
@@ -146,7 +151,7 @@ Page {
 
             PageHeader {
                 width: parent.width
-                title: qsTr("Vocabulary list") + " (" + listModel.count + ")"
+                title: qsTr("Vocabulary list") + " - " + page.language_name + " (" + listModel.count + ")"
             }
 
             SearchField {

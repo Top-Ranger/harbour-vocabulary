@@ -16,18 +16,23 @@
 
 #include "global.h"
 
+#include "databasetools.h"
+
 #include "randomvocabulary.h"
 #include "simpleinterface.h"
 #include "trainer.h"
 #include "settingsproxy.h"
 #include "fileutils.h"
 #include "csvhandle.h"
+#include "languageinterface.h"
 
 #include <QtQuick>
 #include <sailfishapp.h>
-
-bool create_new_db();
-bool test_and_update_db();
+#include <QtQml>
+#include <vector>
+#include <QCoreApplication>
+#include <QStandardPaths>
+#include <QDateTime>
 
 int main(int argc, char *argv[])
 {
@@ -62,7 +67,7 @@ int main(int argc, char *argv[])
 
     if(!exists)
     {
-        if(!create_new_db())
+        if(!DatabaseTools::create_new_db())
         {
             database.close();
             file.remove();
@@ -71,11 +76,26 @@ int main(int argc, char *argv[])
     }
     else
     {
-        if(!test_and_update_db())
+        if(!DatabaseTools::test_and_update_db())
         {
             database.close();
-            file.remove();
-            FATAL("Can't read/update database.sqlite3");
+            path.append("-UPGRADE_FAILED-");
+            path.append(QDateTime::currentDateTime().toString(Qt::ISODate));
+            if(file.rename(path))
+            {
+                FATAL(QString("Can't read/update database.sqlite3, moving to %1").arg(path));
+            }
+            else
+            {
+                if(file.remove())
+                {
+                    FATAL("Can't read/update database.sqlite3, removing it");
+                }
+                else
+                {
+                    FATAL("Can't read/update database.sqlite3, can not remove it! Please check your system");
+                }
+            }
         }
     }
 
@@ -86,10 +106,12 @@ int main(int argc, char *argv[])
     RandomVocabulary random_vocabulary;
     SimpleInterface simple_interface;
     FileUtils file_utils;
+    LanguageInterface language_interface;
 
     view->rootContext()->setContextProperty("random_vocabulary", &random_vocabulary);
     view->rootContext()->setContextProperty("simple_interface", &simple_interface);
     view->rootContext()->setContextProperty("file_utils", &file_utils);
+    view->rootContext()->setContextProperty("language_interface", &language_interface);
 
     // Start application
     view->setSource(SailfishApp::pathTo("qml/harbour-vocabulary.qml"));
@@ -100,204 +122,3 @@ int main(int argc, char *argv[])
     return return_value;
 }
 
-bool create_new_db()
-{
-    DEBUG("Creating database");
-
-    QSqlQuery query(database);
-
-    QStringList operations;
-    operations.append("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT)");
-    operations.append("CREATE TABLE vocabulary (word TEXT PRIMARY KEY, translation TEXT, priority INT)");
-    operations.append("CREATE TABLE vocabularydates (word TEXT PRIMARY KEY, creation INT, modification INT)");
-    operations.append("INSERT INTO meta VALUES ('version', '3')");
-
-    foreach(QString s, operations)
-    {
-        if(!query.exec(s))
-        {
-            QString error = s.append(": ").append(query.lastError().text());
-            CRITICAL(error);
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool test_and_update_db()
-{
-    QSqlQuery query(database);
-    QStringList operations;
-    QString s = QString("SELECT value FROM meta WHERE key='version'");
-
-    if(!query.exec(s))
-    {
-        QString error = s.append(": ").append(query.lastError().text());
-        CRITICAL(error);
-        return false;
-    }
-    if(!query.isSelect())
-    {
-        QString error = s.append(": No SELECT");
-        CRITICAL(error);
-        return false;
-    }
-    if(!query.next())
-    {
-        WARNING("No metadata 'version'");
-        return false;
-    }
-
-    switch(query.value(0).toInt())
-    {
-    // Upgrade settings
-    case 1:
-        DEBUG("Database upgrade: 1 -> 2");
-        /*
-         * This database update simplifies all words contained in the database.
-         * It is needed because the old CSV import did not simplify.
-         */
-        {
-            QStringList to_update;
-
-            s = "SELECT word FROM vocabulary";
-
-            query.clear();
-            query.prepare(s);
-
-            if(!query.exec())
-            {
-                QString error = s.append(": ").append(query.lastError().text());
-                WARNING(error);
-                return false;
-            }
-            if(!query.isSelect())
-            {
-                QString error = s.append(": No select");
-                WARNING(error);
-                return false;
-            }
-
-            while(query.next())
-            {
-                QString word = query.value(0).toString();
-                if(word.simplified() != word)
-                {
-                    to_update << word;
-                }
-            }
-
-            for(QStringList::iterator i = to_update.begin(); i != to_update.end(); ++i)
-            {
-                s = "UPDATE OR IGNORE vocabulary SET word=? WHERE word=?";
-
-                query.clear();
-                query.prepare(s);
-                query.addBindValue((*i).simplified());
-                query.addBindValue(*i);
-
-                if(!query.exec())
-                {
-                    QString error = s.append(": ").append(query.lastError().text());
-                    WARNING(error);
-                }
-            }
-
-            query.clear();
-            s = "UPDATE meta SET value=2 WHERE key='version'";
-
-            if(!query.exec(s))
-            {
-                QString error = s.append(": ").append(query.lastError().text());
-                CRITICAL(error);
-                return false;
-            }
-        }
-        DEBUG("Upgrade complete");
-
-    case 2:
-        /*
-         * Added dates
-         */
-        DEBUG("Database upgrade: 2 -> 3");
-        operations.append("CREATE TABLE vocabularydates (word TEXT PRIMARY KEY, creation INT, modification INT)");
-        operations.append("UPDATE meta SET value=3 WHERE key='version'");
-
-        for(QStringList::const_iterator s = operations.constBegin(); s != operations.constEnd(); ++s)
-        {
-            if(!query.exec(*s))
-            {
-                QString error = *s;
-                error.append(": ").append(query.lastError().text());
-                CRITICAL(error);
-                return false;
-            }
-        }
-        operations.clear();
-
-        /*
-         * Add creation / modification time
-         * This might be more expensive here, but it will make the code better later by removing corner cases
-         */
-        {
-            QStringList vocabulary_list;
-            s = "SELECT word FROM vocabulary";
-
-            query.clear();
-            query.prepare(s);
-
-            if(!query.exec())
-            {
-                QString error = s.append(": ").append(query.lastError().text());
-                WARNING(error);
-                return false;
-            }
-            if(!query.isSelect())
-            {
-                QString error = s.append(": No select");
-                WARNING(error);
-                return false;
-            }
-
-            while(query.next())
-            {
-                QString word = query.value(0).toString();
-                vocabulary_list << word;
-            }
-
-            database.transaction();
-            qint64 today = QDate::currentDate().toJulianDay();
-            for(QStringList::iterator i = vocabulary_list.begin(); i != vocabulary_list.end(); ++i)
-            {
-                s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?, ?, ?)";
-
-                query.clear();
-                query.prepare(s);
-                query.addBindValue(*i);
-                query.addBindValue(today);
-                query.addBindValue(today);
-
-                if(!query.exec())
-                {
-                    QString error = s.append(": ").append(query.lastError().text());
-                    WARNING(error);
-                }
-            }
-            database.commit();
-        }
-        DEBUG("Upgrade complete");
-
-    case 3:
-        DEBUG("Database version: 3");
-        return true;
-        break;
-
-    default:
-        /* Safeguard - if we reach this point something went REALLY wrong
-         */
-        WARNING("Unknown database version");
-        return false;
-        break;
-    }
-}

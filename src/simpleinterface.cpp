@@ -39,17 +39,8 @@ bool SimpleInterface::clearAllVocabulary()
 
     if(!q.exec(s))
     {
-        QString error = s.append(": ").append(q.lastError().text());
-        WARNING(error);
-        database.rollback();
-        return false;
-    }
-
-    s = "DELETE FROM vocabularydates";
-
-    if(!q.exec(s))
-    {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         database.rollback();
         return false;
@@ -69,19 +60,22 @@ void SimpleInterface::recount()
 
     if(!q.exec(s))
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return;
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return;
     }
     if(!q.next())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
         WARNING(error);
         return;
     }
@@ -89,34 +83,24 @@ void SimpleInterface::recount()
     emit countChanged(_count);
 }
 
-bool SimpleInterface::addVocabulary(QString word, QString translation)
+bool SimpleInterface::addVocabulary(QString word, QString translation, int language)
 {
     database.transaction();
-    QString s = "INSERT INTO vocabulary (word, translation, priority) VALUES (?,?,100)";
+    qint64 date = QDate::currentDate().toJulianDay();
+    QString s = "INSERT INTO vocabulary (word, translation, priority, creation, modification, language) VALUES (:word, :translation, 100, :creation, :modification, :language)";
     QSqlQuery q(database);
 
     q.prepare(s);
-    q.addBindValue(word.simplified());
-    q.addBindValue(translation.simplified());
+    q.bindValue(":word", word.simplified());
+    q.bindValue(":translation", translation.simplified());
+    q.bindValue(":creation", date);
+    q.bindValue(":modification", date);
+    q.bindValue(":language", language);
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
-        WARNING(error);
-        database.rollback();
-        return false;
-    }
-
-    s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?,?,?)";
-
-    q.prepare(s);
-    q.addBindValue(word.simplified());
-    q.addBindValue(QDate::currentDate().toJulianDay());
-    q.addBindValue(QDate::currentDate().toJulianDay());
-
-    if(!q.exec())
-    {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         database.rollback();
         return false;
@@ -128,32 +112,20 @@ bool SimpleInterface::addVocabulary(QString word, QString translation)
     return true;
 }
 
-bool SimpleInterface::removeVocabulary(QString word)
+bool SimpleInterface::removeVocabulary(int id)
 {
     database.transaction();
 
-    QString s = "DELETE FROM vocabulary WHERE word=?";
+    QString s = "DELETE FROM vocabulary WHERE rowid=:id";
     QSqlQuery q(database);
 
     q.prepare(s);
-    q.addBindValue(word.simplified());
+    q.bindValue(":id", id);
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
-        WARNING(error);
-        database.rollback();
-        return false;
-    }
-
-    s = "DELETE FROM vocabularydates WHERE word=?";
-
-    q.prepare(s);
-    q.addBindValue(word.simplified());
-
-    if(!q.exec())
-    {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         database.rollback();
         return false;
@@ -165,123 +137,51 @@ bool SimpleInterface::removeVocabulary(QString word)
     return true;
 }
 
-bool SimpleInterface::editVocabulary(QString origin_word, QString new_word, QString translation, int priority)
+bool SimpleInterface::editVocabulary(int id, QString new_word, QString translation, int priority, int language)
 {
     priority = qBound(1, priority, 100);
-    origin_word = origin_word.simplified();
     new_word = new_word.simplified();
     translation = translation.simplified();
 
-    if(origin_word == new_word)
-    {
-        // Update entry
-        database.transaction();
+    // Update entry
+    database.transaction();
 
-        QSqlQuery q(database);
-        QString s = "UPDATE vocabulary SET translation=?, priority=? WHERE word=?";
-        q.prepare(s);
-        q.addBindValue(translation);
-        q.addBindValue(priority);
-        q.addBindValue(origin_word);
-
-        if(!q.exec())
-        {
-            QString error = s.append(": ").append(q.lastError().text());
-            WARNING(error);
-            database.rollback();
-            return false;
-        }
-
-        s = "UPDATE vocabularydates SET modification=? WHERE word=?";
-        q.prepare(s);
-        q.addBindValue(QDate::currentDate().toJulianDay());
-        q.addBindValue(origin_word);
-
-        if(!q.exec())
-        {
-            QString error = s.append(": ").append(q.lastError().text());
-            WARNING(error);
-            database.rollback();
-            return false;
-        }
-
-        database.commit();
-        return true;
-    }
-    else
-    {
-        // Add new entry...
-        QSqlQuery q(database);
-        QString s = "INSERT INTO vocabulary (word, translation, priority) VALUES (?,?,?)";
-        q.prepare(s);
-        q.addBindValue(new_word);
-        q.addBindValue(translation);
-        q.addBindValue(priority);
-
-        if(!q.exec())
-        {
-            QString error = s.append(": ").append(q.lastError().text());
-            WARNING(error);
-            return false;
-        }
-
-        // creation/modification time
-        qint64 creation_time = 1;
-        s = "SELECT creation FROM vocabularydates WHERE word=?";
-        q.prepare(s);
-        q.addBindValue(origin_word);
-
-        if(q.exec() && q.isSelect() && q.next())
-        {
-            creation_time = q.value(0).toLongLong();
-        }
-        else
-        {
-            QString error = s.append(": Can not get creation time");
-            WARNING(error);
-            return "";
-        }
-
-        s = "INSERT INTO vocabularydates (word, creation, modification) VALUES (?,?,?)";
-
-        q.prepare(s);
-        q.addBindValue(new_word);
-        q.addBindValue(creation_time);
-        q.addBindValue(QDate::currentDate().toJulianDay());
-
-        if(!q.exec())
-        {
-            QString error = s.append(": ").append(q.lastError().text());
-            WARNING(error);
-        }
-
-        // ... and delete old one
-
-        if(!removeVocabulary(origin_word))
-        {
-            // Failure! Try delete new entry
-            if(!removeVocabulary(new_word))
-            {
-                CRITICAL("Can not remove new entry" << new_word);
-            }
-            return false;
-        }
-        return true;
-    }
-}
-
-bool SimpleInterface::setPriority(QString word, int priority)
-{
-    QString s = "UPDATE vocabulary SET priority=? WHERE word=?";
     QSqlQuery q(database);
-
+    QString s = "UPDATE vocabulary SET word=:w, translation=:t, priority=:p, modification=:m, language=:l WHERE rowid=:id";
     q.prepare(s);
-    q.addBindValue(priority);
-    q.addBindValue(word);
+    q.bindValue(":w", new_word);
+    q.bindValue(":t", translation);
+    q.bindValue(":p", priority);
+    q.bindValue(":m", QDate::currentDate().toJulianDay());
+    q.bindValue(":l", language);
+    q.bindValue(":id", id);
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        database.rollback();
+        return false;
+    }
+
+    database.commit();
+    return true;
+}
+
+bool SimpleInterface::setPriority(int id, int priority)
+{
+    QString s = "UPDATE vocabulary SET priority=:p WHERE rowid=:id";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.bindValue(":p", priority);
+    q.bindValue(":id", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return false;
     }
@@ -289,147 +189,255 @@ bool SimpleInterface::setPriority(QString word, int priority)
     return true;
 }
 
-QStringList SimpleInterface::getAllWords()
+QVariantList SimpleInterface::getAllWords()
 {
-    QString s = "SELECT word FROM vocabulary ORDER BY word ASC";
+    QString s = "SELECT rowid FROM vocabulary ORDER BY word ASC";
     QSqlQuery q(database);
 
     q.prepare(s);
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
-        return QStringList();
+        return QVariantList();
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
-        return QStringList();
+        return QVariantList();
     }
 
-    QStringList sl;
+    QVariantList vl;
     while(q.next())
     {
-        sl.append(q.value(0).toString());
+        vl.append(q.value(0).toInt());
     }
-    return sl;
+    return vl;
 
 }
 
-QString SimpleInterface::getTranslationOfWord(QString word)
+QString SimpleInterface::getWord(int id)
 {
-    QString s = "SELECT translation FROM vocabulary WHERE word=?";
+    QString s = "SELECT word FROM vocabulary WHERE rowid=:id";
     QSqlQuery q(database);
 
     q.prepare(s);
-    q.addBindValue(word.simplified());
+    q.bindValue(":id", id);
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return "";
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return "";
     }
     if(!q.next())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
         WARNING(error);
         return "";
     }
     return q.value(0).toString();
 }
 
-int SimpleInterface::getPriorityOfWord(QString word)
+QString SimpleInterface::getTranslationOfWord(int id)
 {
-    QString s = "SELECT priority FROM vocabulary WHERE word=?";
+    QString s = "SELECT translation FROM vocabulary WHERE rowid=:id";
     QSqlQuery q(database);
 
     q.prepare(s);
-    q.addBindValue(word.simplified());
+    q.bindValue(":id", id);
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return "";
+    }
+    if(!q.isSelect())
+    {
+        QString error = s;
+        error.append(": No select");
+        WARNING(error);
+        return "";
+    }
+    if(!q.next())
+    {
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
+        WARNING(error);
+        return "";
+    }
+    return q.value(0).toString();
+}
+
+int SimpleInterface::getPriorityOfWord(int id)
+{
+    QString s = "SELECT priority FROM vocabulary WHERE rowid=:id";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.bindValue(":id", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return 100;
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return 100;
     }
     if(!q.next())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
         WARNING(error);
         return 100;
     }
     return q.value(0).toInt();
 }
 
-QDate SimpleInterface::getCreationDate(QString word)
+QDate SimpleInterface::getCreationDate(int id)
 {
-    QString s = "SELECT creation FROM vocabularydates WHERE word=?";
+    QString s = "SELECT creation FROM vocabulary WHERE rowid=:id";
     QSqlQuery q(database);
 
     q.prepare(s);
-    q.addBindValue(word.simplified());
+    q.bindValue(":id", id);
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return QDate::fromJulianDay(1);
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return QDate::fromJulianDay(1);
     }
     if(!q.next())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
         WARNING(error);
         return QDate::fromJulianDay(1);
     }
     return QDate::fromJulianDay(q.value(0).toLongLong());
 }
 
-QDate SimpleInterface::getModificationDate(QString word)
+QDate SimpleInterface::getModificationDate(int id)
 {
-    QString s = "SELECT modification FROM vocabularydates WHERE word=?";
+    QString s = "SELECT modification FROM vocabulary WHERE rowid=:id";
     QSqlQuery q(database);
 
     q.prepare(s);
-    q.addBindValue(word.simplified());
+    q.bindValue(":id", id);
 
     if(!q.exec())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
         WARNING(error);
         return QDate::fromJulianDay(1);
     }
     if(!q.isSelect())
     {
-        QString error = s.append(": No select");
+        QString error = s;
+        error.append(": No select");
         WARNING(error);
         return QDate::fromJulianDay(1);
     }
     if(!q.next())
     {
-        QString error = s.append(": ").append(q.lastError().text());
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
         WARNING(error);
         return QDate::fromJulianDay(1);
     }
     return QDate::fromJulianDay(q.value(0).toLongLong());
+}
+
+int SimpleInterface::getLanguageId(int id)
+{
+    QString s = "SELECT language FROM vocabulary WHERE rowid=:id";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.bindValue(":id", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return 1;
+    }
+    if(!q.isSelect())
+    {
+        QString error = s;
+        error.append(": No select");
+        WARNING(error);
+        return 1;
+    }
+    if(!q.next())
+    {
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
+        WARNING(error);
+        return 1;
+    }
+    return q.value(0).toInt();
+}
+
+bool SimpleInterface::removeBatchVocabulary(QVariantList ids)
+{
+    QString s = "DELETE FROM vocabulary WHERE rowid=:id";
+    QSqlQuery q(database);
+
+    database.transaction();
+
+    for(QVariantList::const_iterator i = ids.constBegin(); i != ids.constEnd(); ++i)
+    {
+        if(!(*i).canConvert<int>())
+        {
+            WARNING(QString("Can not convert %1 to int").arg((*i).typeName()));
+            continue;
+        }
+        q.prepare(s);
+        q.bindValue(":id", (*i).toInt());
+        if(!q.exec())
+        {
+            QString error = s;
+            error.append(": ").append(q.lastError().text());
+            WARNING(error);
+            database.rollback();
+            return false;
+        }
+    }
+
+    database.commit();
+    return true;
 }

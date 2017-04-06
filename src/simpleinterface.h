@@ -36,15 +36,18 @@ signals:
     void countChanged(int);
 
 public slots:
-    bool addVocabulary(QString word, QString translation);
-    bool removeVocabulary(QString word);
-    bool editVocabulary(QString origin_word, QString new_word, QString translation, int priority);
-    bool setPriority(QString word, int priority);
-    QStringList getAllWords();
-    QString getTranslationOfWord(QString word);
-    int getPriorityOfWord(QString word);
-    QDate getCreationDate(QString word);
-    QDate getModificationDate(QString word);
+    bool addVocabulary(QString word, QString translation, int language);
+    bool removeVocabulary(int id);
+    bool editVocabulary(int id, QString new_word, QString translation, int priority, int language);
+    bool setPriority(int id, int priority);
+    QVariantList getAllWords();
+    QString getWord(int id);
+    QString getTranslationOfWord(int id);
+    int getPriorityOfWord(int id);
+    QDate getCreationDate(int id);
+    QDate getModificationDate(int id);
+    int getLanguageId(int id);
+    bool removeBatchVocabulary(QVariantList ids);
     void recount();
 
 private:

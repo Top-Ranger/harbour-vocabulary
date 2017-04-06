@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016.2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,34 +31,56 @@ class Trainer : public QObject
     Q_PROPERTY(QString word READ word NOTIFY wordChanged)
     Q_PROPERTY(QString translation READ translation NOTIFY translationChanged)
     Q_PROPERTY(trainings_modus modus READ modus NOTIFY modusChanged)
+    Q_PROPERTY(int language READ language NOTIFY languageChanged)
 
 public:
-    enum trainings_modus {
+    enum trainings_modus
+    {
         GUESS_WORD,
-        GUESS_TRANSLATION
+        GUESS_TRANSLATION,
+        TEST_BOTH // Only for input, not used in modus
+    };
+
+    enum filters
+    {
+        LANGUAGE = 1,
+        MODIFICATION_SINCE = 2,
+        MODIFICATION_UNTIL = 3,
+        CREATION_SINCE = 4,
+        CREATION_UNTIL = 5,
+        MINIMUM_PRIORITY = 6,
+        filters_after_enum = 7
     };
     Q_ENUMS(trainings_modus)
+    Q_ENUMS(filters)
 
     explicit Trainer(QObject *parent = 0);
     QString word();
     QString translation();
     trainings_modus modus();
+    int language();
 
 signals:
     void wordChanged(QString word);
     void translationChanged(QString translation);
     void modusChanged(trainings_modus modus);
+    void languageChanged(int language);
 
 public slots:
+    bool load_vocabulary(QVariantList filter_type, QVariantList filter_argv, trainings_modus selected_modus);
+    int count_vocabulary(QVariantList filter_type, QVariantList filter_argv);
     void next();
     void correct();
     void wrong();
 
 private:
-    struct vocabulary {
+    struct vocabulary
+    {
+        int id;
         QString word;
         QString translation;
         int priority;
+        int language;
     };
     trainings_modus _modus;
     int _index;
@@ -66,6 +88,7 @@ private:
     int _sum;
     std::random_device _rnd;
     SettingsProxy _settings;
+    trainings_modus _selected_modus;
 
 };
 

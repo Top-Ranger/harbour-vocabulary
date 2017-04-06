@@ -8,7 +8,7 @@ Name:       harbour-vocabulary
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Vocabulary trainer for SailfishOS
-Version:    1.2
+Version:    1.4
 Release:    1
 Group:      Qt/Qt
 License:    Apache-2.0
@@ -33,7 +33,7 @@ Vocabulary is a vocabulary trainer for SailfishOS designed to be used independen
 # >> build pre
 # << build pre
 
-%qtc_qmake5 
+%qtc_qmake5
 
 %qtc_make %{?_smp_mflags}
 
