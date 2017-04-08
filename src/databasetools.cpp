@@ -450,7 +450,7 @@ bool DatabaseTools::test_and_update_db()
 
             // Clean database - no hard failure!
             s = "VACUUM";
-            if(!query.exec())
+            if(!query.exec(s))
             {
                 QString error = s;
                 error.append(": ").append(query.lastError().text());
