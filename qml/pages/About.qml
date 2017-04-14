@@ -43,6 +43,7 @@ Page {
             }
 
             Label {
+                font.bold: true
                 text: "Vocabulary 1.5"
             }
 
@@ -58,11 +59,45 @@ Page {
                 font.pixelSize: Theme.fontSizeExtraSmall
                 wrapMode: Text.Wrap
 
-                text: "
-Vocabulary is a vocabulary trainer for SailfishOS designed to be used independent of the language you want to learn.
+                text: "Vocabulary is a vocabulary trainer for SailfishOS designed to be used independent of the language you want to learn."
+            }
 
 
-Copyright 2016,2017 Marcus Soll
+            PageHeader {
+                title: qsTr("Contributors")
+            }
+
+            Text {
+
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+
+                focus: true
+                color: Theme.primaryColor
+                font.pixelSize: Theme.fontSizeExtraSmall
+                wrapMode: Text.Wrap
+
+                text: "Ingvix"
+            }
+
+            PageHeader {
+                title: qsTr("License")
+            }
+
+            Text {
+
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+
+                focus: true
+                color: Theme.primaryColor
+                font.pixelSize: Theme.fontSizeExtraSmall
+                wrapMode: Text.Wrap
+                text: "Copyright 2016,2017 Marcus Soll
 
 Licensed under the Apache License, Version 2.0 (the \"License\"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

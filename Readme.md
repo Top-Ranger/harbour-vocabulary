@@ -27,6 +27,13 @@ For every priority point the vocabulary gets an additional chance of getting dra
  * Import / export of vocabulary list. Supported file formats:
    - CSV
 
+# Authors
+## Main authors
+ * Marcus Soll (Top-Ranger)
+
+## Contributors
+ * Ingvix
+
 # License
 
 Licensed under the Apache License, Version 2.0 (the "License");
