@@ -52,26 +52,48 @@ Page {
 
         function load_languages() {
             languageModel.clear()
+            var language_id_correct = false
             var languages = language_interface.getAllLanguages()
+            var language_id_index  = 0
             for(var i = 0; i < languages.length; ++i) {
                 languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+                if(languages[i] === page.language_id) {
+                    language_id_correct = true
+                    language_id_index = i + 1
+                }
             }
+
+            if(!language_id_correct) {
+                page.language_id = -1
+            }
+
+            language_menu_timer.target_index = language_id_index
+            language_menu_timer.start()
         }
     }
 
     Component.onCompleted: {
+        page.language_id = simple_interface.getLanguageId(page.word_id) // This has to be set before load_languages() as it is needed to determine the correct index
         functions.load_languages()
         word.text = simple_interface.getWord(page.word_id)
         translation.text = simple_interface.getTranslationOfWord(page.word_id)
         priority.value = simple_interface.getPriorityOfWord(page.word_id)
-        page.language_id = simple_interface.getLanguageId(page.word_id)
     }
 
     ListModel {
         id: languageModel
     }
 
+    Timer {
+        property int target_index: 0
+        id: language_menu_timer
+        repeat: false
+        interval: 20
+        onTriggered: languageComboBox.currentIndex = target_index
+    }   // Could't find a better solution as everything else updated the index too soon.
+
     SilicaFlickable {
+        id: silicaFlickable
         anchors.fill: parent
 
         VerticalScrollDecorator {}
@@ -94,17 +116,57 @@ Page {
                     margins: Theme.horizontalPageMargin
                 }
 
+                enabled: word.text.trim() != "" && translation.text.trim() != "" && (page.language_id !== -1 || new_language_input.text !== "")
                 width: parent.width
                 text: qsTr("Save change")
                 onClicked: functions.save_change()
+            }
+
+            ComboBox {
+                id: languageComboBox
+                label: "Language"
+
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("Add new language")
+                        onClicked: {
+                            new_language_input.focus = true
+                            page.language_id = -1
+                        }
+                    }
+
+                    Repeater {
+                        id: languageRepeater
+                        model: languageModel
+
+                        delegate: MenuItem {
+                            text: language
+                            truncationMode: TruncationMode.Fade
+                            onClicked: {
+                                new_language_input.text = ""
+                                page.language_id = lid
+                            }
+                        }
+                    }
+                }
+            }
+
+            TextArea {
+                id: new_language_input
+                visible: languageComboBox.currentIndex === 0
+                width: page.width
+                EnterKey.onClicked: { text = text.replace("\n", ""); word.focus = true }
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                placeholderText: qsTr("Input new language")
+                label: qsTr("New language")
             }
 
             TextArea {
                 id: word
                 width: parent.width
                 height: implicitHeight
-                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
-                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                EnterKey.onClicked: { text = text.replace("\n", ""); translation.focus = true }
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 placeholderText: qsTr("Input word or phrase here")
                 label: qsTr("Word / phrase")
             }
@@ -113,7 +175,7 @@ Page {
                 id: translation
                 width: parent.width
                 height: implicitHeight
-                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
+                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true; silicaFlickable.scrollToTop() }
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 placeholderText: qsTr("Input translation here")
                 label: qsTr("Translation")
@@ -127,54 +189,6 @@ Page {
                 maximumValue: 100
                 label: qsTr("Priority")
                 valueText: "" + value
-            }
-
-            Label {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    margins: Theme.horizontalPageMargin
-                }
-
-                text: qsTr("Languages:")
-            }
-
-            Repeater {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    margins: Theme.horizontalPageMargin
-                }
-
-                model: languageModel
-
-                delegate: ListItem {
-                    width: parent.width
-                    Label {
-                        anchors.centerIn: parent
-                        width: parent.width - 2*Theme.horizontalPageMargin
-                        text: language
-                        color: page.language_id === lid ? Theme.primaryColor : Theme.secondaryColor
-                        font.bold: page.language_id === lid
-                        horizontalAlignment: Text.AlignHCenter
-                        truncationMode: TruncationMode.Fade
-                    }
-
-                    onClicked: {
-                        new_language_input.text = ""
-                        page.language_id = lid
-                    }
-                }
-            }
-
-            TextArea {
-                id: new_language_input
-                width: parent.width
-                EnterKey.onClicked: { text = text.replace("\n", ""); parent.focus = true }
-                EnterKey.iconSource: "image://theme/icon-m-enter-close"
-                placeholderText: qsTr("Input new language")
-                label: qsTr("New language")
-                onTextChanged: page.language_id = -1
             }
         }
     }

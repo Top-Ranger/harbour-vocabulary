@@ -137,7 +137,6 @@ Page {
         }
     }
 
-
     Timer {
         property int target_index: 0
         id: language_menu_timer
