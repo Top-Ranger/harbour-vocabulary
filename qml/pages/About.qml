@@ -62,6 +62,24 @@ Page {
                 text: "Vocabulary is a vocabulary trainer for SailfishOS designed to be used independent of the language you want to learn."
             }
 
+            PageHeader {
+                title: qsTr("Main authors")
+            }
+
+            Text {
+
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+
+                focus: true
+                color: Theme.primaryColor
+                font.pixelSize: Theme.fontSizeExtraSmall
+                wrapMode: Text.Wrap
+
+                text: "Marcus Soll"
+            }
 
             PageHeader {
                 title: qsTr("Contributors")
