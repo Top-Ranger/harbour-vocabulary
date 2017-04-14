@@ -23,7 +23,6 @@ Page {
     allowedOrientations: Orientation.All
 
     property int language_id: -1
-    property int language_id_index
 
     Component.onCompleted: {
         page.language_id = settings_proxy.addVocabularyLanguage
@@ -88,17 +87,21 @@ Page {
             languageModel.clear()
             var language_id_correct = false
             var languages = language_interface.getAllLanguages()
+            var language_id_index  = 0
             for(var i = 0; i < languages.length; ++i) {
                 languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
                 if(languages[i] === page.language_id) {
                     language_id_correct = true
-                    page.language_id_index = i
+                    language_id_index = i + 1
                 }
             }
 
             if(!language_id_correct) {
                 page.language_id = -1
             }
+
+            language_menu_timer.target_index = language_id_index
+            language_menu_timer.start()
         }
     }
 
@@ -134,12 +137,13 @@ Page {
         }
     }
 
+
     Timer {
+        property int target_index: 0
         id: language_menu_timer
-        running: true
         repeat: false
-        interval: 20         // Enough long to process the languages to combobox everytime.
-        onTriggered: languageComboBox.currentIndex = page.language_id_index + 1
+        interval: 20
+        onTriggered: languageComboBox.currentIndex = target_index
     }   // Could't find a better solution as everything else updated the index too soon.
 
     SilicaFlickable {
@@ -190,15 +194,15 @@ Page {
 
                 menu: ContextMenu {
                     MenuItem {
-                        text: "Add new language"
+                        text: qsTr("Add new language")
                         onClicked: {
-                            new_language_input.visible = true
                             new_language_input.focus = true
                             page.language_id = -1
                             search_timer.stop()
                             functions.filter_list(word.text.trim())
                         }
                     }
+
                     Repeater {
                         id: languageRepeater
                         model: languageModel
@@ -211,9 +215,6 @@ Page {
                                 page.language_id = lid
                                 search_timer.stop()
                                 functions.filter_list(word.text.trim())
-                                if (new_language_input.visible) {
-                                    new_language_input.visible = false
-                                }
                             }
                         }
                     }
@@ -222,7 +223,7 @@ Page {
 
             TextArea {
                 id: new_language_input
-                visible: false
+                visible: languageComboBox.currentIndex === 0
                 width: page.width
                 EnterKey.onClicked: { text = text.replace("\n", ""); word.focus = true }
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
