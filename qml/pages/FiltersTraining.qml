@@ -296,7 +296,7 @@ Page {
             ComboBox {
                 id: languageComboBox
                 label: qsTr("Language")
-
+                visible: languageModel.count > 1
                 menu: ContextMenu {
                     MenuItem {
                         text: qsTr("All languages")
