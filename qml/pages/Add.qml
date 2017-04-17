@@ -189,7 +189,7 @@ Page {
 
             ComboBox {
                 id: languageComboBox
-                label: "Language"
+                label: qsTr("Language")
 
                 menu: ContextMenu {
                     MenuItem {

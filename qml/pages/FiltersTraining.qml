@@ -87,20 +87,23 @@ Page {
 
         function load_languages() {
             languageModel.clear()
-            var languages = language_interface.getAllLanguages()
             var language_id_correct = false
-            languageModel.append({"lid": -1, "language": qsTr("All languages")})
+            var languages = language_interface.getAllLanguages()
+            var language_id_index  = 0
             for(var i = 0; i < languages.length; ++i) {
+                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
                 if(languages[i] === page.language_id) {
                     language_id_correct = true
+                    language_id_index = i + 1
                 }
-
-                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
             }
 
             if(!language_id_correct) {
                 page.language_id = -1
             }
+
+            language_menu_timer.target_index = language_id_index
+            language_menu_timer.start()
         }
 
         function update_filters() {
@@ -109,7 +112,7 @@ Page {
 
             // Language
 
-            if(language_id !== -1) {
+            if(page.language_id !== -1) {
                 filter_type.push(Trainer.LANGUAGE)
                 filter_argv.push(page.language_id)
             }
@@ -183,6 +186,14 @@ Page {
     ListModel {
         id: languageModel
     }
+
+    Timer {
+        property int target_index: 0
+        id: language_menu_timer
+        repeat: false
+        interval: 20
+        onTriggered: languageComboBox.currentIndex = target_index
+    }   // Could't find a better solution as everything else updated the index too soon.
 
     SilicaFlickable {
         anchors.fill: parent
@@ -282,40 +293,31 @@ Page {
                 }
             }
 
-            Label {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    margins: Theme.paddingLarge
-                }
+            ComboBox {
+                id: languageComboBox
+                label: qsTr("Language")
 
-                text: qsTr("Language:")
-            }
-
-            Repeater {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    margins: Theme.horizontalPageMargin
-                }
-
-                model: languageModel
-
-                delegate: ListItem {
-                    width: parent.width
-                    Label {
-                        anchors.centerIn: parent
-                        width: parent.width - 2*Theme.horizontalPageMargin
-                        text: language
-                        color: page.language_id === lid ? Theme.primaryColor : Theme.secondaryColor
-                        font.bold: page.language_id === lid
-                        horizontalAlignment: Text.AlignHCenter
-                        truncationMode: TruncationMode.Fade
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("All languages")
+                        onClicked: {
+                            page.language_id = -1
+                            functions.update_filters()
+                        }
                     }
 
-                    onClicked: {
-                        page.language_id = lid
-                        functions.update_filters()
+                    Repeater {
+                        id: languageRepeater
+                        model: languageModel
+
+                        delegate: MenuItem {
+                            text: language
+                            truncationMode: TruncationMode.Fade
+                            onClicked: {
+                                page.language_id = lid
+                                functions.update_filters()
+                            }
+                        }
                     }
                 }
             }
