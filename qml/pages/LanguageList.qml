@@ -173,6 +173,19 @@ Page {
         delegate: ListItem {
             id: listitem
             width: parent.width
+            
+            Rectangle {
+                anchors {
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+
+                height: parent.height * 0.2
+                width: parent.width * simple_interface.getPriorityOfWord(page.word_id) / 100
+
+                color: Theme.secondaryHighlightColor
+                opacity: .5
+            }            
 
             Row {
                 width: parent.width - 2*Theme.paddingLarge
