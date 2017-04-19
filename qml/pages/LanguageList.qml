@@ -181,11 +181,12 @@ Page {
                 }
 
                 height: parent.height * 0.2
-                width: parent.width * simple_interface.getPriorityOfWord(page.word_id) / 100
+                width: parent.width * simple_interface.getPriorityOfWord(id) / 100
 
                 color: Theme.secondaryHighlightColor
+                visible: (simple_interface.getPriorityOfWord(id) > 1)
                 opacity: .5
-            }            
+            }         
 
             Row {
                 width: parent.width - 2*Theme.paddingLarge
