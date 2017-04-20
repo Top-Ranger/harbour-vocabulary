@@ -16,10 +16,15 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.vocabulary.SettingsProxy 1.0
 
 ListItem {
 	id: vocabularyListItem
 	width: parent.width
+	
+	SettingsProxy {
+        	id: settings
+	}
 	
 	Rectangle {
 		anchors {
@@ -31,7 +36,7 @@ ListItem {
 		width: parent.width * priority / 100
 
 		color: Theme.secondaryHighlightColor
-		visible: priority > 1
+		visible: (priority > 1) && settings.adaptiveTrainingEnabled
 		opacity: .5
 	}
 
