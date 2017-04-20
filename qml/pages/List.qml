@@ -30,11 +30,12 @@ Page {
         if(word_changed === true) {
             var word = simple_interface.getWord(page.word_id)
             var translation = simple_interface.getTranslationOfWord(page.word_id)
+            var priority = simple_interface.getPriorityOfWord(page.word_id)
 
             for(var i = 0; i < listModel.count; ++i) {
                 if(listModel.get(i).id === page.word_id) {
                     listModel.remove(i)
-                    listModel.insert(i, {"id": page.word_id, "word": word, "translation": translation})
+                    listModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority})
                     break
                 }
             }
@@ -42,7 +43,7 @@ Page {
             for(i = 0; i < originModel.count; ++i) {
                 if(originModel.get(i).id === page.word_id) {
                     originModel.remove(i)
-                    originModel.insert(i, {"id": page.word_id, "word": word, "translation": translation})
+                    originModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority})
                     break
                 }
             }
@@ -86,8 +87,9 @@ Page {
             for(var i = 0; i < wordlist.length; ++i) {
                 var word = simple_interface.getWord(wordlist[i])
                 var translation = simple_interface.getTranslationOfWord(wordlist[i])
-                originModel.append({"id": wordlist[i], "word": word, "translation": translation})
-                listModel.append({"id": wordlist[i], "word": word, "translation": translation})
+                var priority = simple_interface.getPriorityOfWord(wordlist[i])
+                originModel.append({"id": wordlist[i], "word": word, "translation": translation, "priority": priority})
+                listModel.append({"id": wordlist[i], "word": word, "translation": translation, "priority": priority})
             }
         }
 
@@ -176,12 +178,12 @@ Page {
                 }
 
                 height: parent.height * 0.2
-                width: parent.width * simple_interface.getPriorityOfWord(id) / 100
+                width: parent.width * priority / 100
 
                 color: Theme.secondaryHighlightColor
-                visible: (simple_interface.getPriorityOfWord(id) > 1)
+                visible: priority > 1
                 opacity: .5
-            }             
+            }
 
             Row {
                 width: parent.width - 2*Theme.paddingLarge
