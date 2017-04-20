@@ -33,6 +33,7 @@ For every priority point the vocabulary gets an additional chance of getting dra
 
 ## Contributors
  * Ingvix
+ * sfbg
 
 # License
 

@@ -97,7 +97,8 @@ Page {
                 font.pixelSize: Theme.fontSizeExtraSmall
                 wrapMode: Text.Wrap
 
-                text: "Ingvix"
+                text: "Ingvix
+sfbg"
             }
 
             PageHeader {
