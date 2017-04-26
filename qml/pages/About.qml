@@ -56,10 +56,10 @@ Page {
 
                 focus: true
                 color: Theme.primaryColor
-                font.pixelSize: Theme.fontSizeExtraSmall
+                font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.Wrap
 
-                text: "Vocabulary is a vocabulary trainer for SailfishOS designed to be used independent of the language you want to learn."
+                text: qsTr("Vocabulary is a vocabulary trainer for SailfishOS designed to be used independent of the language you want to learn.")
             }
 
             PageHeader {
@@ -75,7 +75,6 @@ Page {
 
                 focus: true
                 color: Theme.primaryColor
-                font.pixelSize: Theme.fontSizeExtraSmall
                 wrapMode: Text.Wrap
 
                 text: "Marcus Soll"
@@ -94,7 +93,6 @@ Page {
 
                 focus: true
                 color: Theme.primaryColor
-                font.pixelSize: Theme.fontSizeExtraSmall
                 wrapMode: Text.Wrap
 
                 text: "Ingvix
