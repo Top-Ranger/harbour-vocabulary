@@ -44,7 +44,7 @@ Page {
 
             Label {
                 font.bold: true
-                text: "Vocabulary 1.5"
+                text: "Vocabulary 1.6"
             }
 
             Text {
