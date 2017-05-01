@@ -16,6 +16,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.vocabulary.SettingsProxy 1.0
 
 Page {
     id: page
@@ -29,6 +30,10 @@ Page {
 
     property string search_text: ""
 
+    SettingsProxy {
+        id: settings
+    }
+
     Component.onCompleted: {
         page.language_name = language_interface.getLanguageName(page.language_id)
     }
@@ -39,12 +44,13 @@ Page {
             var translation = simple_interface.getTranslationOfWord(page.word_id)
             var priority = simple_interface.getPriorityOfWord(page.word_id)
             var new_language_id = simple_interface.getLanguageId(page.word_id)
+            var priority_visible = settings.adaptiveTrainingEnabled
 
             for(var i = 0; i < listModel.count; ++i) {
                 if(listModel.get(i).id === page.word_id) {
                     listModel.remove(i)
                     if(new_language_id === page.language_id) {
-                        listModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority})
+                        listModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority, "priority_visible": priority_visible})
                     }
                     break
                 }
@@ -54,7 +60,7 @@ Page {
                 if(originModel.get(i).id === page.word_id) {
                     originModel.remove(i)
                     if(new_language_id === page.language_id) {
-                        originModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority})
+                        originModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority, "priority_visible": priority_visible})
                     }
                     break
                 }
@@ -97,12 +103,13 @@ Page {
             listModel.clear()
             originModel.clear()
             var wordlist = language_interface.getVocabularyByLanguage(page.language_id)
+            var words = simple_interface.getBatchWord(wordlist)
+            var translations = simple_interface.getBatchTranslationOfWord(wordlist)
+            var priorities = simple_interface.getBatchPriorityOfWord(wordlist)
+            var priority_visible = settings.adaptiveTrainingEnabled
             for(var i = 0; i < wordlist.length; ++i) {
-                var word = simple_interface.getWord(wordlist[i])
-                var translation = simple_interface.getTranslationOfWord(wordlist[i])
-                var priority = simple_interface.getPriorityOfWord(wordlist[i])
-                originModel.append({"id": wordlist[i], "word": word, "translation": translation, "priority": priority})
-                listModel.append({"id": wordlist[i], "word": word, "translation": translation, "priority": priority})
+                originModel.append({"id": wordlist[i], "word": words[i], "translation": translations[i], "priority": priorities[i], "priority_visible": priority_visible})
+                listModel.append({"id": wordlist[i], "word": words[i], "translation": translations[i], "priority": priorities[i], "priority_visible": priority_visible})
             }
         }
 

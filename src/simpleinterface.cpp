@@ -188,8 +188,7 @@ bool SimpleInterface::setPriority(int id, int priority)
 
     return true;
 }
-
-QVariantList SimpleInterface::getAllWords()
+QList<int> SimpleInterface::getAllWords()
 {
     QString s = "SELECT rowid FROM vocabulary ORDER BY word ASC";
     QSqlQuery q(database);
@@ -201,17 +200,17 @@ QVariantList SimpleInterface::getAllWords()
         QString error = s;
         error.append(": ").append(q.lastError().text());
         WARNING(error);
-        return QVariantList();
+        return QList<int>();
     }
     if(!q.isSelect())
     {
         QString error = s;
         error.append(": No select");
         WARNING(error);
-        return QVariantList();
+        return QList<int>();
     }
 
-    QVariantList vl;
+    QList<int> vl;
     while(q.next())
     {
         vl.append(q.value(0).toInt());
@@ -412,22 +411,17 @@ int SimpleInterface::getLanguageId(int id)
     return q.value(0).toInt();
 }
 
-bool SimpleInterface::removeBatchVocabulary(QVariantList ids)
+bool SimpleInterface::removeBatchVocabulary(QList<int> ids)
 {
     QString s = "DELETE FROM vocabulary WHERE rowid=:id";
     QSqlQuery q(database);
 
     database.transaction();
 
-    for(QVariantList::const_iterator i = ids.constBegin(); i != ids.constEnd(); ++i)
+    for(QList<int>::const_iterator i = ids.constBegin(); i != ids.constEnd(); ++i)
     {
-        if(!(*i).canConvert<int>())
-        {
-            WARNING(QString("Can not convert %1 to int").arg((*i).typeName()));
-            continue;
-        }
         q.prepare(s);
-        q.bindValue(":id", (*i).toInt());
+        q.bindValue(":id", *i);
         if(!q.exec())
         {
             QString error = s;
@@ -441,3 +435,41 @@ bool SimpleInterface::removeBatchVocabulary(QVariantList ids)
     database.commit();
     return true;
 }
+
+QList<QString> SimpleInterface::getBatchWord(QList<int> ids)
+{
+    QList<QString> result;
+
+    database.transaction();
+    for(QList<int>::const_iterator i = ids.constBegin(); i != ids.constEnd(); ++i)
+    {
+        result.push_back(getWord(*i));
+    }
+    database.commit();
+    return result;
+}
+
+QList<QString> SimpleInterface::getBatchTranslationOfWord(QList<int> ids)
+{
+    QList<QString> result;
+    database.transaction();
+    for(QList<int>::const_iterator i = ids.constBegin(); i != ids.constEnd(); ++i)
+    {
+        result.push_back(getTranslationOfWord(*i));
+    }
+    database.commit();
+    return result;
+}
+
+QList<int> SimpleInterface::getBatchPriorityOfWord(QList<int> ids)
+{
+    QList<int> result;
+    database.transaction();
+    for(QList<int>::const_iterator i = ids.constBegin(); i != ids.constEnd(); ++i)
+    {
+        result.push_back(getPriorityOfWord(*i));
+    }
+    database.commit();
+    return result;
+}
+

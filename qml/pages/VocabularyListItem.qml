@@ -16,14 +16,12 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import harbour.vocabulary.SettingsProxy 1.0
 
 ListItem {
     id: vocabularyListItem
-    width: parent.width
-
-    SettingsProxy {
-        id: settings
+    anchors {
+        right: parent.right
+        left: parent.left
     }
 
     Rectangle {
@@ -36,18 +34,17 @@ ListItem {
         width: parent.width * priority / 100
 
         color: Theme.secondaryHighlightColor
-        visible: (priority > 1) && settings.adaptiveTrainingEnabled
+        visible: priority_visible && (priority > 1)
         opacity: .5
     }
 
     Row {
-        width: parent.width - 2*Theme.paddingLarge
-        anchors.centerIn: parent
-
         anchors {
             left: parent.left
             right: parent.right
             margins: Theme.paddingLarge
+            top: parent.top
+            bottom: parent.bottom
         }
 
         Label {

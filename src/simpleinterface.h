@@ -40,20 +40,21 @@ public slots:
     bool removeVocabulary(int id);
     bool editVocabulary(int id, QString new_word, QString translation, int priority, int language);
     bool setPriority(int id, int priority);
-    QVariantList getAllWords();
+    QList<int> getAllWords();
     QString getWord(int id);
     QString getTranslationOfWord(int id);
     int getPriorityOfWord(int id);
     QDate getCreationDate(int id);
     QDate getModificationDate(int id);
     int getLanguageId(int id);
-    bool removeBatchVocabulary(QVariantList ids);
+    bool removeBatchVocabulary(QList<int> ids);
+    QList<QString> getBatchWord(QList<int> ids);
+    QList<QString> getBatchTranslationOfWord(QList<int> ids);
+    QList<int> getBatchPriorityOfWord(QList<int> ids);
     void recount();
 
 private:
     int _count;
-
 };
 
 #endif // SIMPLEINTERFACE_H
-
