@@ -26,7 +26,7 @@ Page {
     property bool word_changed: false
     property int word_id: 0
 
-    property int sort_criterium: SimpleInterface.ALPHABETICAL
+    property int sort_criterium: SimpleInterface.ALPHABETICAL_WORD
     property string search_text: ""
 
     SettingsProxy {
@@ -167,9 +167,19 @@ Page {
 
                 menu: ContextMenu {
                     MenuItem {
-                        text: qsTr("alphabetically")
+                        text: qsTr("alphabetically (word)")
                         onClicked: {
-                            page.sort_criterium = SimpleInterface.ALPHABETICAL
+                            page.sort_criterium = SimpleInterface.ALPHABETICAL_WORD
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("alphabetically (translation)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.ALPHABETICAL_TRANSLATION
                             search_timer.stop()
                             functions.load_list()
                             functions.filter_list(page.search_text)

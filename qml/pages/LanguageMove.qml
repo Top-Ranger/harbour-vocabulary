@@ -16,6 +16,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.vocabulary.SimpleInterface 1.0
 
 Page {
     id: page
@@ -24,6 +25,7 @@ Page {
     property int language_id: -1
     property string language_name: "ERROR"
 
+    property int sort_criterium: SimpleInterface.ALPHABETICAL_WORD
     property string search_text: ""
 
     Item {
@@ -47,7 +49,8 @@ Page {
 
         function load_list() {
             listModel.clear()
-            var wordlist = simple_interface.getAllWords()
+            originModel.clear()
+            var wordlist = simple_interface.getAllWords(page.sort_criterium)
             for(var i = 0; i < wordlist.length; ++i) {
                 var word = simple_interface.getWord(wordlist[i])
                 var translation = simple_interface.getTranslationOfWord(wordlist[i])
@@ -136,6 +139,93 @@ Page {
                     }
                     else {
                         panel.show()
+                    }
+                }
+            }
+
+            ComboBox {
+                width: parent.width
+                label: qsTr("Sort")
+
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("alphabetically (word)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.ALPHABETICAL_WORD
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("alphabetically (translation)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.ALPHABETICAL_TRANSLATION
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("by priority (highest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.PRIORITY_HIGHEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("by priority (lowest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.PRIORITY_LOWEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("creation date (newest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.CREATION_NEWEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("creation date (oldest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.CREATION_OLDEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("modification date (newest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.MODIFICATION_NEWEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("modification date (oldest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.MODIFICATION_OLDEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
                     }
                 }
             }

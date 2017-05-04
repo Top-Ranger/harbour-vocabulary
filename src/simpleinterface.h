@@ -31,7 +31,8 @@ public:
     enum sortcriterium
     {
         NO_SORT,
-        ALPHABETICAL,
+        ALPHABETICAL_WORD,
+        ALPHABETICAL_TRANSLATION,
         PRIORITY_HIGHEST,
         PRIORITY_LOWEST,
         CREATION_NEWEST,

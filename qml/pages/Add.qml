@@ -17,6 +17,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.vocabulary.SettingsProxy 1.0
+import harbour.vocabulary.SimpleInterface 1.0
 
 Page {
     id: page
@@ -62,7 +63,7 @@ Page {
 
         function load_list() {
             listModel.clear()
-            var wordlist = simple_interface.getAllWords()
+            var wordlist = simple_interface.getAllWords(SimpleInterface.NO_SORT)
             for(var i = 0; i < wordlist.length; ++i) {
                 var word = simple_interface.getWord(wordlist[i])
                 var language = simple_interface.getLanguageId(wordlist[i])

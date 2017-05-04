@@ -481,8 +481,11 @@ void SimpleInterface::append_sorting_criterium(QString &q, const sortcriterium &
     {
         case NO_SORT:
             break;
-        case ALPHABETICAL:
+        case ALPHABETICAL_WORD:
             q.append(" ORDER BY word ASC");
+            break;
+        case ALPHABETICAL_TRANSLATION:
+            q.append(" ORDER BY translation ASC");
             break;
         case PRIORITY_HIGHEST:
             q.append(" ORDER BY priority DESC");
