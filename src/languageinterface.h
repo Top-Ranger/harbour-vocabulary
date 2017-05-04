@@ -27,6 +27,19 @@ class LanguageInterface : public QObject
     Q_OBJECT
 
 public:
+    enum sortcriterium
+    {
+        NO_SORT,
+        ALPHABETICAL,
+        PRIORITY_HIGHEST,
+        PRIORITY_LOWEST,
+        CREATION_NEWEST,
+        CREATION_OLDEST,
+        MODIFICATION_NEWEST,
+        MODIFICATION_OLDEST
+    };
+    Q_ENUMS(sortcriterium)
+
     LanguageInterface(QObject *parent = 0);
 
 public slots:
@@ -35,11 +48,12 @@ public slots:
     bool removeLanguage(int id);
     QString getLanguageName(int id);
     bool renameLanguage(int id, QString name);
-    QVariantList getVocabularyByLanguage(int id);
+    QVariantList getVocabularyByLanguage(int id, sortcriterium c);
     int countVocabularyWithLanguage(int id);
     bool moveToLanguage(int lid, QVariantList v_list);
 
 private:
+    void append_sorting_criterium(QString &q, const sortcriterium &c);
 };
 
 #endif // LANGUAGEINTERFACE_H

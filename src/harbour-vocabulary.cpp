@@ -43,6 +43,9 @@ int main(int argc, char *argv[])
     qmlRegisterType<Trainer>("harbour.vocabulary.Trainer", 1, 0, "Trainer");
     qmlRegisterType<SettingsProxy>("harbour.vocabulary.SettingsProxy", 1, 0, "SettingsProxy");
     qmlRegisterType<CSVHandle>("harbour.vocabulary.CSVHandle", 1, 0, "CSVHandle");
+    // Needed for enum access
+    qmlRegisterType<SimpleInterface>("harbour.vocabulary.SimpleInterface", 1, 0, "SimpleInterface");
+    qmlRegisterType<LanguageInterface>("harbour.vocabulary.LanguageInterface", 1, 0, "LanguageInterface");
 
     // Connect to DB
     QString path = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation));

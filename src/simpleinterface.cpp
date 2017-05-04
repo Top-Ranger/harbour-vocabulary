@@ -188,10 +188,12 @@ bool SimpleInterface::setPriority(int id, int priority)
 
     return true;
 }
-QList<int> SimpleInterface::getAllWords()
+QList<int> SimpleInterface::getAllWords(sortcriterium c)
 {
-    QString s = "SELECT rowid FROM vocabulary ORDER BY word ASC";
+    QString s = "SELECT rowid FROM vocabulary";
     QSqlQuery q(database);
+
+    append_sorting_criterium(s, c);
 
     q.prepare(s);
 
@@ -473,3 +475,35 @@ QList<int> SimpleInterface::getBatchPriorityOfWord(QList<int> ids)
     return result;
 }
 
+void SimpleInterface::append_sorting_criterium(QString &q, const sortcriterium &c)
+{
+    switch(c)
+    {
+        case NO_SORT:
+            break;
+        case ALPHABETICAL:
+            q.append(" ORDER BY word ASC");
+            break;
+        case PRIORITY_HIGHEST:
+            q.append(" ORDER BY priority DESC");
+            break;
+        case PRIORITY_LOWEST:
+            q.append(" ORDER BY priority ASC");
+            break;
+        case CREATION_NEWEST:
+            q.append(" ORDER BY creation DESC");
+            break;
+        case CREATION_OLDEST:
+            q.append(" ORDER BY creation ASC");
+            break;
+        case MODIFICATION_NEWEST:
+            q.append(" ORDER BY modification DESC");
+            break;
+        case MODIFICATION_OLDEST:
+            q.append(" ORDER BY modification ASC");
+            break;
+        default:
+            WARNING("Unknown sort criterium" << c);
+            break;
+    }
+}

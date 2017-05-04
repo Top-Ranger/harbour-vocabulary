@@ -186,10 +186,12 @@ bool LanguageInterface::renameLanguage(int id, QString name)
     return true;
 }
 
-QVariantList LanguageInterface::getVocabularyByLanguage(int id)
+QVariantList LanguageInterface::getVocabularyByLanguage(int id, sortcriterium c)
 {
-    QString s = "SELECT rowid FROM vocabulary WHERE language=:language ORDER BY word ASC";
+    QString s = "SELECT rowid FROM vocabulary WHERE language=:language";
     QSqlQuery q(database);
+
+    append_sorting_criterium(s, c);
 
     q.prepare(s);
     q.bindValue(":language", id);
@@ -280,4 +282,37 @@ bool LanguageInterface::moveToLanguage(int lid, QVariantList v_list)
 
     database.commit();
     return true;
+}
+
+void LanguageInterface::append_sorting_criterium(QString &q, const sortcriterium &c)
+{
+    switch(c)
+    {
+        case NO_SORT:
+            break;
+        case ALPHABETICAL:
+            q.append(" ORDER BY word ASC");
+            break;
+        case PRIORITY_HIGHEST:
+            q.append(" ORDER BY priority DESC");
+            break;
+        case PRIORITY_LOWEST:
+            q.append(" ORDER BY priority ASC");
+            break;
+        case CREATION_NEWEST:
+            q.append(" ORDER BY creation DESC");
+            break;
+        case CREATION_OLDEST:
+            q.append(" ORDER BY creation ASC");
+            break;
+        case MODIFICATION_NEWEST:
+            q.append(" ORDER BY modification DESC");
+            break;
+        case MODIFICATION_OLDEST:
+            q.append(" ORDER BY modification ASC");
+            break;
+        default:
+            WARNING("Unknown sort criterium" << c);
+            break;
+    }
 }

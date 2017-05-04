@@ -28,6 +28,19 @@ class SimpleInterface : public QObject
     Q_PROPERTY(int count READ count NOTIFY countChanged)
 
 public:
+    enum sortcriterium
+    {
+        NO_SORT,
+        ALPHABETICAL,
+        PRIORITY_HIGHEST,
+        PRIORITY_LOWEST,
+        CREATION_NEWEST,
+        CREATION_OLDEST,
+        MODIFICATION_NEWEST,
+        MODIFICATION_OLDEST
+    };
+    Q_ENUMS(sortcriterium)
+
     explicit SimpleInterface(QObject *parent = 0);
     int count();
     Q_INVOKABLE bool clearAllVocabulary();
@@ -40,7 +53,7 @@ public slots:
     bool removeVocabulary(int id);
     bool editVocabulary(int id, QString new_word, QString translation, int priority, int language);
     bool setPriority(int id, int priority);
-    QList<int> getAllWords();
+    QList<int> getAllWords(sortcriterium c);
     QString getWord(int id);
     QString getTranslationOfWord(int id);
     int getPriorityOfWord(int id);
@@ -54,6 +67,8 @@ public slots:
     void recount();
 
 private:
+    void append_sorting_criterium(QString &q, const sortcriterium &c);
+
     int _count;
 };
 

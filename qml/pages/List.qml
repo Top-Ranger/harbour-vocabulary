@@ -17,6 +17,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.vocabulary.SettingsProxy 1.0
+import harbour.vocabulary.SimpleInterface 1.0
 
 Page {
     id: page
@@ -25,6 +26,7 @@ Page {
     property bool word_changed: false
     property int word_id: 0
 
+    property int sort_criterium: SimpleInterface.ALPHABETICAL
     property string search_text: ""
 
     SettingsProxy {
@@ -89,7 +91,8 @@ Page {
 
         function load_list() {
             listModel.clear()
-            var wordlist = simple_interface.getAllWords()
+            originModel.clear()
+            var wordlist = simple_interface.getAllWords(page.sort_criterium)
             var words = simple_interface.getBatchWord(wordlist)
             var translations = simple_interface.getBatchTranslationOfWord(wordlist)
             var priorities = simple_interface.getBatchPriorityOfWord(wordlist)
@@ -156,6 +159,83 @@ Page {
             PageHeader {
                 width: parent.width
                 title: qsTr("Vocabulary list") + " (" + listModel.count + ")"
+            }
+
+            ComboBox {
+                width: parent.width
+                label: qsTr("Sort")
+
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("alphabetically")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.ALPHABETICAL
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("by priority (highest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.PRIORITY_HIGHEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("by priority (lowest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.PRIORITY_LOWEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("creation date (newest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.CREATION_NEWEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("creation date (oldest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.CREATION_OLDEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("modification date (newest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.MODIFICATION_NEWEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+
+                    MenuItem {
+                        text: qsTr("modification date (oldest)")
+                        onClicked: {
+                            page.sort_criterium = SimpleInterface.MODIFICATION_OLDEST
+                            search_timer.stop()
+                            functions.load_list()
+                            functions.filter_list(page.search_text)
+                        }
+                    }
+                }
             }
 
             SearchField {
