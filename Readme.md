@@ -19,6 +19,7 @@ For every priority point the vocabulary gets an additional chance of getting dra
    - Creation date
    - Modification date
  * List all known vocabularies
+   - Many sorting options
  * Search for vocabulary
  * Support for multiple languages
  * Adaptive training mode
