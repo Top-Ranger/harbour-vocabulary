@@ -32,6 +32,12 @@ Page {
     property int sort_criterium: LanguageInterface.ALPHABETICAL_WORD
     property string search_text: ""
 
+    onSort_criteriumChanged: {
+        search_timer.stop()
+        functions.load_list()
+        functions.filter_list(page.search_text)
+    }
+
     SettingsProxy {
         id: settings
     }
@@ -176,6 +182,16 @@ Page {
                     remorse_popup.execute(qsTr("Remove all vocabulary"), function() { functions.remove_all_in_this_language() }, 10000)
                 }
             }
+
+            MenuItem {
+                text: qsTr("Select sort criterium")
+                onClicked: {
+                    pageStack.push(Qt.resolvedUrl("SortSelection.qml"), {
+                                       names: [ qsTr("Alphabetically (word)"), qsTr("Alphabetically (translation)"), qsTr("Priority (highest)"), qsTr("Priority (lowest)"), qsTr("Creation date (newest)"), qsTr("Creation date (oldest)"), qsTr("Modification date (newest)"), qsTr("Modification date (oldest)"), ],
+                                       values: [ LanguageInterface.ALPHABETICAL_WORD, LanguageInterface.ALPHABETICAL_TRANSLATION, LanguageInterface.PRIORITY_HIGHEST, LanguageInterface.PRIORITY_LOWEST, LanguageInterface.CREATION_NEWEST, LanguageInterface.CREATION_OLDEST, LanguageInterface.MODIFICATION_NEWEST, LanguageInterface.MODIFICATION_OLDEST, ]
+                                   })
+                }
+            }
         }
 
         header: Column {
@@ -185,93 +201,6 @@ Page {
             PageHeader {
                 width: parent.width
                 title: page.language_name + " (" + listModel.count + ")"
-            }
-
-            ComboBox {
-                width: parent.width
-                label: qsTr("Sort")
-
-                menu: ContextMenu {
-                    MenuItem {
-                        text: qsTr("alphabetically (word)")
-                        onClicked: {
-                            page.sort_criterium = LanguageInterface.ALPHABETICAL_WORD
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("alphabetically (translation)")
-                        onClicked: {
-                            page.sort_criterium = LanguageInterface.ALPHABETICAL_TRANSLATION
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("by priority (highest)")
-                        onClicked: {
-                            page.sort_criterium = LanguageInterface.PRIORITY_HIGHEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("by priority (lowest)")
-                        onClicked: {
-                            page.sort_criterium = LanguageInterface.PRIORITY_LOWEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("creation date (newest)")
-                        onClicked: {
-                            page.sort_criterium = LanguageInterface.CREATION_NEWEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("creation date (oldest)")
-                        onClicked: {
-                            page.sort_criterium = LanguageInterface.CREATION_OLDEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("modification date (newest)")
-                        onClicked: {
-                            page.sort_criterium = LanguageInterface.MODIFICATION_NEWEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("modification date (oldest)")
-                        onClicked: {
-                            page.sort_criterium = LanguageInterface.MODIFICATION_OLDEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-                }
             }
 
             SearchField {

@@ -29,6 +29,12 @@ Page {
     property int sort_criterium: SimpleInterface.ALPHABETICAL_WORD
     property string search_text: ""
 
+    onSort_criteriumChanged: {
+        search_timer.stop()
+        functions.load_list()
+        functions.filter_list(page.search_text)
+    }
+
     SettingsProxy {
         id: settings
     }
@@ -150,6 +156,16 @@ Page {
                     remorse_popup.execute(qsTr("Remove all vocabulary"), function() {if(!simple_interface.clearAllVocabulary()) { panel.show() } else { listModel.clear(); originModel.clear() } }, 10000)
                 }
             }
+
+            MenuItem {
+                text: qsTr("Select sort criterium")
+                onClicked: {
+                    pageStack.push(Qt.resolvedUrl("SortSelection.qml"), {
+                                       names: [ qsTr("Alphabetically (word)"), qsTr("Alphabetically (translation)"), qsTr("Priority (highest)"), qsTr("Priority (lowest)"), qsTr("Creation date (newest)"), qsTr("Creation date (oldest)"), qsTr("Modification date (newest)"), qsTr("Modification date (oldest)"), ],
+                                       values: [ SimpleInterface.ALPHABETICAL_WORD, SimpleInterface.ALPHABETICAL_TRANSLATION, SimpleInterface.PRIORITY_HIGHEST, SimpleInterface.PRIORITY_LOWEST, SimpleInterface.CREATION_NEWEST, SimpleInterface.CREATION_OLDEST, SimpleInterface.MODIFICATION_NEWEST, SimpleInterface.MODIFICATION_OLDEST, ]
+                                   })
+                }
+            }
         }
 
         header: Column {
@@ -159,93 +175,6 @@ Page {
             PageHeader {
                 width: parent.width
                 title: qsTr("Vocabulary list") + " (" + listModel.count + ")"
-            }
-
-            ComboBox {
-                width: parent.width
-                label: qsTr("Sort")
-
-                menu: ContextMenu {
-                    MenuItem {
-                        text: qsTr("alphabetically (word)")
-                        onClicked: {
-                            page.sort_criterium = SimpleInterface.ALPHABETICAL_WORD
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("alphabetically (translation)")
-                        onClicked: {
-                            page.sort_criterium = SimpleInterface.ALPHABETICAL_TRANSLATION
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("by priority (highest)")
-                        onClicked: {
-                            page.sort_criterium = SimpleInterface.PRIORITY_HIGHEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("by priority (lowest)")
-                        onClicked: {
-                            page.sort_criterium = SimpleInterface.PRIORITY_LOWEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("creation date (newest)")
-                        onClicked: {
-                            page.sort_criterium = SimpleInterface.CREATION_NEWEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("creation date (oldest)")
-                        onClicked: {
-                            page.sort_criterium = SimpleInterface.CREATION_OLDEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("modification date (newest)")
-                        onClicked: {
-                            page.sort_criterium = SimpleInterface.MODIFICATION_NEWEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-
-                    MenuItem {
-                        text: qsTr("modification date (oldest)")
-                        onClicked: {
-                            page.sort_criterium = SimpleInterface.MODIFICATION_OLDEST
-                            search_timer.stop()
-                            functions.load_list()
-                            functions.filter_list(page.search_text)
-                        }
-                    }
-                }
             }
 
             SearchField {
