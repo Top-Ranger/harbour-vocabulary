@@ -29,9 +29,11 @@ class SettingsProxy : public QObject
     Q_PROPERTY(int trainingFilterPriority READ trainingFilterPriority WRITE setTrainingFilterPriority NOTIFY trainingFilterPriorityChanged)
 
     Q_PROPERTY(int addVocabularyLanguage READ addVocabularyLanguage WRITE setAddVocabularyLanguage NOTIFY addVocabularyLanguageChanged)
-    
+
     Q_PROPERTY(bool trainingDirectStart READ trainingDirectStart WRITE setTrainingDirectStart NOTIFY trainingDirectStartChanged)
 
+    Q_PROPERTY(int listSortCriterium READ listSortCriterium WRITE setListSortCriterium NOTIFY listSortCriteriumChanged)
+    Q_PROPERTY(int languageListSortCriterium READ languageListSortCriterium WRITE setLanguageListSortCriterium NOTIFY languageListSortCriteriumChanged)
 
 public:
     explicit SettingsProxy(QObject *parent = 0);
@@ -55,8 +57,11 @@ public:
     int trainingFilterPriority();
 
     int addVocabularyLanguage();
-    
+
     bool trainingDirectStart();
+
+    int listSortCriterium();
+    int languageListSortCriterium();
 
 signals:
     void adaptiveTrainingCorrectPointsChanged(int points);
@@ -78,8 +83,11 @@ signals:
     void trainingFilterPriorityChanged(int priority);
 
     void addVocabularyLanguageChanged(int language);
-    
+
     void trainingDirectStartChanged(bool direct);
+
+    void listSortCriteriumChanged(int c);
+    void languageListSortCriteriumChanged(int c);
 
 public slots:
     void setAdaptiveTrainingCorrectPoints(int points);
@@ -101,8 +109,11 @@ public slots:
     void setTrainingFilterPriority(int priority);
 
     void setAddVocabularyLanguage(int language);
-    
+
     void setTrainingDirectStart(bool direct);
+
+    void setListSortCriterium(int c);
+    void setLanguageListSortCriterium(int c);
 
 private:
     QSettings _settings;

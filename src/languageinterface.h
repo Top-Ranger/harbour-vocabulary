@@ -29,8 +29,8 @@ class LanguageInterface : public QObject
 public:
     enum sortcriterium
     {
-        NO_SORT,
-        ALPHABETICAL_WORD,
+        NO_SORT = 0,
+        ALPHABETICAL_WORD  = 1, // Give word sorting as default from settings
         ALPHABETICAL_TRANSLATION,
         PRIORITY_HIGHEST,
         PRIORITY_LOWEST,

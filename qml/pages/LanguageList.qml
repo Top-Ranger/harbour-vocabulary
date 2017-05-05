@@ -33,6 +33,7 @@ Page {
     property string search_text: ""
 
     onSort_criteriumChanged: {
+        settings.languageListSortCriterium = page.sort_criterium
         search_timer.stop()
         functions.load_list()
         functions.filter_list(page.search_text)
@@ -216,7 +217,10 @@ Page {
         }
 
         Component.onCompleted: {
-            functions.load_list()
+            page.sort_criterium = settings.languageListSortCriterium
+            if(listModel.count === 0) {
+                functions.load_list()
+            }
         }
 
         delegate: VocabularyListItem {}
