@@ -32,7 +32,9 @@ bool DatabaseTools::create_new_db()
     operations.append("CREATE INDEX index_vocabulary_language ON vocabulary(language)");
     operations.append("CREATE INDEX index_vocabulary_creation ON vocabulary(creation)");
     operations.append("CREATE INDEX index_vocabulary_modification ON vocabulary(modification)");
-    operations.append("INSERT INTO meta (key, value) VALUES ('version', '4')");
+    operations.append("CREATE INDEX index_vocabulary_word_nocase ON vocabulary(word COLLATE NOCASE)");
+    operations.append("CREATE INDEX index_vocabulary_translation_nocase ON vocabulary(translation COLLATE NOCASE)");
+    operations.append("INSERT INTO meta (key, value) VALUES ('version', '5')");
 
     foreach(QString s, operations)
     {
@@ -461,7 +463,37 @@ bool DatabaseTools::test_and_update_db()
         DEBUG("Upgrade complete");
 
     case 4:
-        DEBUG("Database version: 4");
+        DEBUG("Database upgrade: 4 -> 5");
+        s = "CREATE INDEX index_vocabulary_word_nocase ON vocabulary(word COLLATE NOCASE)";
+        if(!query.exec(s))
+        {
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
+            WARNING(error);
+            return false;
+        }
+
+        s = "CREATE INDEX index_vocabulary_translation_nocase ON vocabulary(translation COLLATE NOCASE)";
+        if(!query.exec(s))
+        {
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
+            WARNING(error);
+            return false;
+        }
+
+        s = "UPDATE meta SET value='5' WHERE key='version'";
+        if(!query.exec(s))
+        {
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
+            WARNING(error);
+            return false;
+        }
+        DEBUG("Upgrade complete");
+
+    case 5:
+        DEBUG("Database version: 5");
         return true;
         break;
 
