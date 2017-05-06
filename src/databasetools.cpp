@@ -34,6 +34,8 @@ bool DatabaseTools::create_new_db()
     operations.append("CREATE INDEX index_vocabulary_modification ON vocabulary(modification)");
     operations.append("CREATE INDEX index_vocabulary_word_nocase ON vocabulary(word COLLATE NOCASE)");
     operations.append("CREATE INDEX index_vocabulary_translation_nocase ON vocabulary(translation COLLATE NOCASE)");
+    operations.append("CREATE INDEX index_vocabulary_number_asked ON vocabulary(number_asked)");
+    operations.append("CREATE INDEX index_vocabulary_number_correct ON vocabulary(number_correct)");
     operations.append("INSERT INTO meta (key, value) VALUES ('version', '5')");
 
     foreach(QString s, operations)
@@ -510,6 +512,24 @@ bool DatabaseTools::test_and_update_db()
         }
 
         s = "UPDATE vocabulary SET number_correct=0";
+        if(!query.exec(s))
+        {
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
+            WARNING(error);
+            return false;
+        }
+
+        s = "CREATE INDEX index_vocabulary_number_asked ON vocabulary(number_asked)";
+        if(!query.exec(s))
+        {
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
+            WARNING(error);
+            return false;
+        }
+
+        s = "CREATE INDEX index_vocabulary_number_correct ON vocabulary(number_correct)";
         if(!query.exec(s))
         {
             QString error = s;
