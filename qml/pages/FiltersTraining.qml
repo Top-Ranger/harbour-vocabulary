@@ -146,6 +146,13 @@ Page {
                 filter_argv.push(minimum_priority.value)
             }
 
+            // Maximum percentage correct
+
+            if(maximum_percentage_correct.value !== 100) {
+                filter_type.push(Trainer.PERCENTAGE_CORRECT)
+                filter_argv.push(maximum_percentage_correct.value)
+            }
+
             // Update
 
             page.number_vocabulary = trainer.count_vocabulary(filter_type, filter_argv)
@@ -177,6 +184,7 @@ Page {
         modification_until.date = settings_proxy.trainingFilterModificationUntilDate
 
         minimum_priority.value = settings_proxy.trainingFilterPriority
+        maximum_percentage_correct.value = settings_proxy.trainingFilterPercentageCorrect
 
         // Call initialising functions
         functions.load_languages()
@@ -219,6 +227,7 @@ Page {
                     modification_until.date = new Date()
 
                     minimum_priority.value = 0
+                    maximum_percentage_correct.value = 100
 
                     functions.update_filters()
                 }
@@ -277,6 +286,7 @@ Page {
                     settings_proxy.trainingFilterModificationUntilDate = modification_until.date
 
                     settings_proxy.trainingFilterPriority = minimum_priority.value
+                    settings_proxy.trainingFilterPercentageCorrect = maximum_percentage_correct.value
 
 
                     pageStack.replace(Qt.resolvedUrl("Training.qml"), { filter_type: page.filter_type, filter_argv: page.filter_argv, selected_modus: page.selected_modus } )
@@ -444,6 +454,26 @@ Page {
                 value: 0
                 label: qsTr("Minimum priority")
                 valueText: "" + value
+
+                onReleased: {
+                    functions.update_filters()
+                }
+            }
+
+            Slider {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                id: maximum_percentage_correct
+                stepSize: 1
+                minimumValue: 0
+                maximumValue: 100
+                value: 100
+                label: qsTr("Maximum percentage correctly answered")
+                valueText: "" + value + "%"
 
                 onReleased: {
                     functions.update_filters()

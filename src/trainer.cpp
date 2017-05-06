@@ -140,6 +140,9 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
         case MINIMUM_PRIORITY:
             s.append("priority >= ?");
             break;
+        case PERCENTAGE_CORRECT:
+            s.append("1.0*number_correct/number_asked <= ?");
+            break;
         case filters_after_enum:
             WARNING("filters_after_enum received");
             return false;
@@ -183,6 +186,9 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
             break;
         case MINIMUM_PRIORITY:
             q.addBindValue(filter_argv[i].toInt());
+            break;
+        case PERCENTAGE_CORRECT:
+            q.addBindValue(filter_argv[i].toDouble() / 100.0);
             break;
         case filters_after_enum:
             WARNING("filters_after_enum received");
@@ -290,6 +296,9 @@ int Trainer::count_vocabulary(QVariantList filter_type, QVariantList filter_argv
         case MINIMUM_PRIORITY:
             s.append("priority >= ?");
             break;
+        case PERCENTAGE_CORRECT:
+            s.append("1.0*number_correct/number_asked <= ?");
+            break;
         case filters_after_enum:
             WARNING("filters_after_enum received");
             return 0;
@@ -333,6 +342,9 @@ int Trainer::count_vocabulary(QVariantList filter_type, QVariantList filter_argv
             break;
         case MINIMUM_PRIORITY:
             q.addBindValue(filter_argv[i].toInt());
+            break;
+        case PERCENTAGE_CORRECT:
+            q.addBindValue(filter_argv[i].toDouble() / 100.0);
             break;
         case filters_after_enum:
             WARNING("filters_after_enum received");

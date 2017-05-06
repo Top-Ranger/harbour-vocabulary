@@ -51,7 +51,8 @@ public:
         CREATION_SINCE = 4,
         CREATION_UNTIL = 5,
         MINIMUM_PRIORITY = 6,
-        filters_after_enum = 7
+        PERCENTAGE_CORRECT = 7, // Range: 100-0
+        filters_after_enum = 8
     };
     Q_ENUMS(trainings_modus)
     Q_ENUMS(filters)

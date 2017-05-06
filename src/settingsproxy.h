@@ -27,6 +27,7 @@ class SettingsProxy : public QObject
     Q_PROPERTY(QDate trainingFilterModificationUntilDate READ trainingFilterModificationUntilDate WRITE setTrainingFilterModificationUntilDate NOTIFY trainingFilterModificationUntilDateChanged)
 
     Q_PROPERTY(int trainingFilterPriority READ trainingFilterPriority WRITE setTrainingFilterPriority NOTIFY trainingFilterPriorityChanged)
+    Q_PROPERTY(int trainingFilterPercentageCorrect READ trainingFilterPercentageCorrect WRITE setTrainingFilterPercentageCorrect NOTIFY trainingFilterPercentageCorrectChanged)
 
     Q_PROPERTY(int addVocabularyLanguage READ addVocabularyLanguage WRITE setAddVocabularyLanguage NOTIFY addVocabularyLanguageChanged)
 
@@ -55,6 +56,7 @@ public:
     QDate trainingFilterModificationUntilDate();
 
     int trainingFilterPriority();
+    int trainingFilterPercentageCorrect();
 
     int addVocabularyLanguage();
 
@@ -81,6 +83,7 @@ signals:
     void trainingFilterModificationUntilDateChanged(QDate date);
 
     void trainingFilterPriorityChanged(int priority);
+    void trainingFilterPercentageCorrectChanged(int percentage);
 
     void addVocabularyLanguageChanged(int language);
 
@@ -107,6 +110,7 @@ public slots:
     void setTrainingFilterModificationUntilDate(QDate date);
 
     void setTrainingFilterPriority(int priority);
+    void setTrainingFilterPercentageCorrect(int percentage);
 
     void setAddVocabularyLanguage(int language);
 

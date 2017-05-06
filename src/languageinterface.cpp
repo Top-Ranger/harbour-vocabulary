@@ -327,10 +327,10 @@ void LanguageInterface::append_sorting_criterium(QString &q, const sortcriterium
         q.append(" ORDER BY number_correct ASC");
         break;
     case PERCENT_CORRECT_HIGHEST:
-        q.append(" ORDER BY number_correct/number_asked DESC");
+        q.append(" ORDER BY 1.0*number_correct/number_asked DESC");
         break;
     case PERCENT_CORRECT_LOWEST:
-        q.append(" ORDER BY number_correct/number_asked ASC");
+        q.append(" ORDER BY 1.0*number_correct/number_asked ASC");
         break;
     default:
         WARNING("Unknown sort criterium" << c);
