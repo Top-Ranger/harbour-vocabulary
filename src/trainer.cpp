@@ -62,6 +62,25 @@ int Trainer::language()
     return _vocabulary[_index].language;
 }
 
+int Trainer::numberAsked()
+{
+    if(_vocabulary.size() == 0)
+    {
+        return -1;
+    }
+    return _vocabulary[_index].number_asked;
+}
+
+int Trainer::numberCorrect()
+{
+    if(_vocabulary.size() == 0)
+    {
+        return -1;
+    }
+    return _vocabulary[_index].number_correct;
+}
+
+
 bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv, trainings_modus selected_modus)
 {
     if(filter_type.size() != filter_argv.size())
@@ -74,7 +93,7 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
 
     // Init vocabulary list
     bool first_where = true;
-    QString s = "SELECT rowid,word,translation,priority,language FROM vocabulary";
+    QString s = "SELECT rowid,word,translation,priority,language,number_asked,number_correct FROM vocabulary";
     QSqlQuery q(database);
 
     for(int i = 0; i < filter_type.size(); ++i)
@@ -203,6 +222,8 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
                 v.translation = q.value(2).toString();
                 v.priority = q.value(3).toInt();
                 v.language = q.value(4).toInt();
+                v.number_asked = q.value(5).toInt();
+                v.number_correct = q.value(6).toInt();
                 _sum += v.priority;
                 _vocabulary.append(v);
             }
@@ -397,7 +418,7 @@ void Trainer::next()
         break;
     default:
         WARNING("UNKNOWN test_modus, USING FALLBACK");
-        // Use TEST_BOTH as fallback
+    // Use TEST_BOTH as fallback
     case TEST_BOTH:
         if(distribution(_rnd) == 0)
         {
@@ -414,6 +435,8 @@ void Trainer::next()
     emit translationChanged(_vocabulary[_index].translation);
     emit modusChanged(_modus);
     emit languageChanged(_vocabulary[_index].language);
+    emit numberAskedChanged(_vocabulary[_index].number_asked);
+    emit numberCorrectChanged(_vocabulary[_index].number_correct);
 }
 
 void Trainer::correct()
@@ -437,6 +460,23 @@ void Trainer::correct()
             WARNING(error);
         }
     }
+    _vocabulary[_index].number_asked += 1;
+    _vocabulary[_index].number_correct += 1;
+    QString s = "UPDATE vocabulary SET number_asked=:na, number_correct=:nc WHERE rowid=:id";
+    QSqlQuery q(database);
+    q.prepare(s);
+    q.bindValue(":na", _vocabulary[_index].number_asked);
+    q.bindValue(":nc", _vocabulary[_index].number_correct);
+    q.bindValue(":id", _vocabulary[_index].id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+    }
+    emit numberAskedChanged(_vocabulary[_index].number_asked);
+    emit numberCorrectChanged(_vocabulary[_index].number_correct);
 }
 
 void Trainer::wrong()
@@ -460,4 +500,18 @@ void Trainer::wrong()
             WARNING(error);
         }
     }
+    _vocabulary[_index].number_asked += 1;
+    QString s = "UPDATE vocabulary SET number_asked=:na WHERE rowid=:id";
+    QSqlQuery q(database);
+    q.prepare(s);
+    q.bindValue(":na", _vocabulary[_index].number_asked);
+    q.bindValue(":id", _vocabulary[_index].id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+    }
+    emit numberAskedChanged(_vocabulary[_index].number_asked);
 }

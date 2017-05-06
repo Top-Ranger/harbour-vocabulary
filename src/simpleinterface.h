@@ -61,10 +61,14 @@ public slots:
     QDate getCreationDate(int id);
     QDate getModificationDate(int id);
     int getLanguageId(int id);
+    int getNumberAsked(int id);
+    int getNumberCorrect(int id);
     bool removeBatchVocabulary(QList<int> ids);
     QList<QString> getBatchWord(QList<int> ids);
     QList<QString> getBatchTranslationOfWord(QList<int> ids);
     QList<int> getBatchPriorityOfWord(QList<int> ids);
+    bool resetTestCountsAll();
+    bool resetTestCounts(int id);
     void recount();
 
 private:

@@ -32,6 +32,8 @@ class Trainer : public QObject
     Q_PROPERTY(QString translation READ translation NOTIFY translationChanged)
     Q_PROPERTY(trainings_modus modus READ modus NOTIFY modusChanged)
     Q_PROPERTY(int language READ language NOTIFY languageChanged)
+    Q_PROPERTY(int numberAsked READ numberAsked NOTIFY numberAskedChanged)
+    Q_PROPERTY(int numberCorrect READ numberCorrect NOTIFY numberCorrectChanged)
 
 public:
     enum trainings_modus
@@ -59,12 +61,16 @@ public:
     QString translation();
     trainings_modus modus();
     int language();
+    int numberAsked();
+    int numberCorrect();
 
 signals:
     void wordChanged(QString word);
     void translationChanged(QString translation);
     void modusChanged(trainings_modus modus);
     void languageChanged(int language);
+    void numberAskedChanged(int asked);
+    void numberCorrectChanged(int correct);
 
 public slots:
     bool load_vocabulary(QVariantList filter_type, QVariantList filter_argv, trainings_modus selected_modus);
@@ -81,6 +87,8 @@ private:
         QString translation;
         int priority;
         int language;
+        int number_asked;
+        int number_correct;
     };
     trainings_modus _modus;
     int _index;

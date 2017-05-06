@@ -53,7 +53,7 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
     QSqlQuery q(database);
     QString s;
 
-    s = "INSERT INTO vocabulary (word, translation, priority, creation, modification, language) VALUES (:word, :translation, 100, :creation, :modification, :language)";
+    s = "INSERT INTO vocabulary (word, translation, priority, creation, modification, language, number_asked, number_correct) VALUES (:word, :translation, 100, :creation, :modification, :language, 0, 0)";
 
 
     int need_num_columns = qMax(column_word, column_translation);
@@ -62,7 +62,7 @@ QStringList CSVHandle::loadCSV(QString path, CSVHandle::seperator sep, bool has_
     if(import_priority)
     {
         need_num_columns = qMax(need_num_columns, column_priority);
-        s = "INSERT INTO vocabulary (word, translation, priority, creation, modification, language) VALUES (:word, :translation, :priority, :creation, :modification, :language)";
+        s = "INSERT INTO vocabulary (word, translation, priority, creation, modification, language, number_asked, number_correct) VALUES (:word, :translation, :priority, :creation, :modification, :language, 0, 0)";
     }
 
     if(has_header)

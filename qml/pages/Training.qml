@@ -173,6 +173,27 @@ Page {
                 }
             }
 
+            Row {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                Label {
+                    id: correct_label
+                    text: qsTr("Correct: ")
+                    color: Theme.primaryColor
+                }
+
+                Label {
+                    width: parent.width - correct_label.width
+                    text: trainer.numberAsked === 0 ? "0%" : "" + Math.round(100.0*trainer.numberCorrect / trainer.numberAsked) + "%"
+                    color: Theme.secondaryColor
+                    wrapMode: Text.Wrap
+                }
+            }
+
             Button {
                 anchors {
                     left: parent.left

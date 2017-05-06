@@ -33,6 +33,8 @@ Page {
             creation_text.text = simple_interface.getCreationDate(page.word_id).toLocaleDateString()
             modification_text.text = simple_interface.getModificationDate(page.word_id).toLocaleDateString()
             language_text.text = language_interface.getLanguageName(simple_interface.getLanguageId(page.word_id))
+            number_asked_text.text = "" + simple_interface.getNumberAsked(page.word_id)
+            number_correct_text.text = "" + simple_interface.getNumberCorrect(page.word_id)
 
             var last_page = pageStack.previousPage(page)
             last_page.word_changed = true
@@ -42,6 +44,15 @@ Page {
         }
     }
 
+    RemorsePopup {
+        id: remorse_popup
+    }
+
+    UpperPanel {
+        id: panel
+        text: qsTr("Can not reset question count")
+    }
+
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height
@@ -49,6 +60,11 @@ Page {
         VerticalScrollDecorator {}
 
         PullDownMenu {
+            MenuItem {
+                text: qsTr("Reset question count")
+                onClicked: remorse_popup.execute(qsTr("Reset question count"), function() {if(!simple_interface.resetTestCounts(page.word_id)) { panel.show() } else {number_asked_text.text = "0"; number_correct_text.text = "0"} })
+            }
+
             MenuItem {
                 text: qsTr("Edit")
                 onClicked: {
@@ -185,6 +201,38 @@ Page {
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
                     text: language_interface.getLanguageName(simple_interface.getLanguageId(page.word_id))
+                }
+            }
+
+            Row {
+                Label {
+                    id: number_correct
+                    text: qsTr("Number correct: ")
+                    color: Theme.highlightColor
+                }
+
+                Text {
+                    id: number_correct_text
+                    width: column.width - number_correct.width
+                    color: Theme.primaryColor
+                    wrapMode: Text.Wrap
+                    text: "" + simple_interface.getNumberCorrect(page.word_id)
+                }
+            }
+
+            Row {
+                Label {
+                    id: number_asked
+                    text: qsTr("Number asked: ")
+                    color: Theme.highlightColor
+                }
+
+                Text {
+                    id: number_asked_text
+                    width: column.width - number_asked.width
+                    color: Theme.primaryColor
+                    wrapMode: Text.Wrap
+                    text: "" + simple_interface.getNumberAsked(page.word_id)
                 }
             }
         }

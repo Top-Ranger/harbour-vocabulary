@@ -1,18 +1,18 @@
 /*
- * Copyright 2017 Marcus Soll
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2017 Marcus Soll
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 #include "databasetools.h"
 
@@ -28,7 +28,7 @@ bool DatabaseTools::create_new_db()
     operations.append("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT)");
     operations.append("CREATE TABLE language (rowid INTEGER PRIMARY KEY, language TEXT)");
     operations.append("INSERT INTO language (rowid, language) VALUES (1, 'Default')");
-    operations.append("CREATE TABLE vocabulary (rowid INTEGER PRIMARY KEY, word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, FOREIGN KEY(language) REFERENCES language(rowid))");
+    operations.append("CREATE TABLE vocabulary (rowid INTEGER PRIMARY KEY, word TEXT, translation TEXT, priority INT, creation INT, modification INT, language INT, number_asked INT, number_correct INT, FOREIGN KEY(language) REFERENCES language(rowid))");
     operations.append("CREATE INDEX index_vocabulary_language ON vocabulary(language)");
     operations.append("CREATE INDEX index_vocabulary_creation ON vocabulary(creation)");
     operations.append("CREATE INDEX index_vocabulary_modification ON vocabulary(modification)");
@@ -81,9 +81,9 @@ bool DatabaseTools::test_and_update_db()
     case 1:
         DEBUG("Database upgrade: 1 -> 2");
         /*
-         * This database update simplifies all words contained in the database.
-         * It is needed because the old CSV import did not simplify.
-         */
+        * This database update simplifies all words contained in the database.
+        * It is needed because the old CSV import did not simplify.
+        */
         {
             QStringList to_update;
 
@@ -148,8 +148,8 @@ bool DatabaseTools::test_and_update_db()
 
     case 2:
         /*
-         * Move to new database format
-         */
+        * Move to new database format
+        */
         DEBUG("Database upgrade: 2 -> 3");
         {
 
@@ -261,11 +261,11 @@ bool DatabaseTools::test_and_update_db()
 
     case 3:
         /*
-         * Added indices
-         *
-         * Use explicit rowid
-         * https://sqlite.org/foreignkeys.html
-         */
+        * Added indices
+        *
+        * Use explicit rowid
+        * https://sqlite.org/foreignkeys.html
+        */
         DEBUG("Database upgrade: 3 -> 4");
         {
             std::vector<QString> v_words;
@@ -482,6 +482,42 @@ bool DatabaseTools::test_and_update_db()
             return false;
         }
 
+        s = "ALTER TABLE vocabulary ADD COLUMN number_asked INT";
+        if(!query.exec(s))
+        {
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
+            WARNING(error);
+            return false;
+        }
+
+        s = "UPDATE vocabulary SET number_asked=0";
+        if(!query.exec(s))
+        {
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
+            WARNING(error);
+            return false;
+        }
+
+        s = "ALTER TABLE vocabulary ADD COLUMN number_correct INT";
+        if(!query.exec(s))
+        {
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
+            WARNING(error);
+            return false;
+        }
+
+        s = "UPDATE vocabulary SET number_correct=0";
+        if(!query.exec(s))
+        {
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
+            WARNING(error);
+            return false;
+        }
+
         s = "UPDATE meta SET value='5' WHERE key='version'";
         if(!query.exec(s))
         {
@@ -499,7 +535,7 @@ bool DatabaseTools::test_and_update_db()
 
     default:
         /* Safeguard - if we reach this point something went REALLY wrong
-         */
+        */
         WARNING("Unknown database version");
         return false;
         break;

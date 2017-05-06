@@ -40,6 +40,15 @@ Dialog {
         id: settings
     }
 
+    RemorsePopup {
+        id: remorse_popup
+    }
+
+    UpperPanel {
+        id: panel
+        text: qsTr("Can not reset question count")
+    }
+
     SilicaFlickable {
 
         VerticalScrollDecorator {}
@@ -115,6 +124,18 @@ Each vocabulary gets a priority between 1 and 100 which starts at 100. Every tim
                 width: parent.width
                 text: qsTr("Directly go to training")
                 description: qsTr("If this is enabled, training will start directly with all vocabulary instead of showing the trainings options.")
+            }
+
+            Button {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                width: parent.width
+                text: qsTr("Reset question count")
+                onClicked: remorse_popup.execute(qsTr("Reset question count"), function() {if(!simple_interface.resetTestCountsAll()) { panel.show() } })
             }
         }
     }

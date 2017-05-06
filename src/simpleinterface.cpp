@@ -87,7 +87,7 @@ bool SimpleInterface::addVocabulary(QString word, QString translation, int langu
 {
     database.transaction();
     qint64 date = QDate::currentDate().toJulianDay();
-    QString s = "INSERT INTO vocabulary (word, translation, priority, creation, modification, language) VALUES (:word, :translation, 100, :creation, :modification, :language)";
+    QString s = "INSERT INTO vocabulary (word, translation, priority, creation, modification, language, number_asked, number_correct) VALUES (:word, :translation, 100, :creation, :modification, :language, 0, 0)";
     QSqlQuery q(database);
 
     q.prepare(s);
@@ -413,6 +413,71 @@ int SimpleInterface::getLanguageId(int id)
     return q.value(0).toInt();
 }
 
+int SimpleInterface::getNumberAsked(int id)
+{
+    QString s = "SELECT number_asked FROM vocabulary WHERE rowid=:id";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.bindValue(":id", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return 0;
+    }
+    if(!q.isSelect())
+    {
+        QString error = s;
+        error.append(": No select");
+        WARNING(error);
+        return 0;
+    }
+    if(!q.next())
+    {
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
+        WARNING(error);
+        return 0;
+    }
+    return q.value(0).toInt();
+}
+
+int SimpleInterface::getNumberCorrect(int id)
+{
+    QString s = "SELECT number_correct FROM vocabulary WHERE rowid=:id";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.bindValue(":id", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return 0;
+    }
+    if(!q.isSelect())
+    {
+        QString error = s;
+        error.append(": No select");
+        WARNING(error);
+        return 0;
+    }
+    if(!q.next())
+    {
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
+        WARNING(error);
+        return 0;
+    }
+    return q.value(0).toInt();
+}
+
+
 bool SimpleInterface::removeBatchVocabulary(QList<int> ids)
 {
     QString s = "DELETE FROM vocabulary WHERE rowid=:id";
@@ -475,38 +540,75 @@ QList<int> SimpleInterface::getBatchPriorityOfWord(QList<int> ids)
     return result;
 }
 
+bool SimpleInterface::resetTestCountsAll()
+{
+    QString s = "UPDATE vocabulary SET number_asked=0, number_correct=0";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return false;
+    }
+
+    return true;
+}
+
+bool SimpleInterface::resetTestCounts(int id)
+{
+    QString s = "UPDATE vocabulary SET number_asked=0, number_correct=0 WHERE rowid=:id";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.bindValue(":id", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return false;
+    }
+
+    return true;
+}
+
 void SimpleInterface::append_sorting_criterium(QString &q, const sortcriterium &c)
 {
     switch(c)
     {
-        case NO_SORT:
-            break;
-        case ALPHABETICAL_WORD:
-            q.append(" ORDER BY word COLLATE NOCASE ASC");
-            break;
-        case ALPHABETICAL_TRANSLATION:
-            q.append(" ORDER BY translation COLLATE NOCASE ASC");
-            break;
-        case PRIORITY_HIGHEST:
-            q.append(" ORDER BY priority DESC");
-            break;
-        case PRIORITY_LOWEST:
-            q.append(" ORDER BY priority ASC");
-            break;
-        case CREATION_NEWEST:
-            q.append(" ORDER BY creation DESC");
-            break;
-        case CREATION_OLDEST:
-            q.append(" ORDER BY creation ASC");
-            break;
-        case MODIFICATION_NEWEST:
-            q.append(" ORDER BY modification DESC");
-            break;
-        case MODIFICATION_OLDEST:
-            q.append(" ORDER BY modification ASC");
-            break;
-        default:
-            WARNING("Unknown sort criterium" << c);
-            break;
+    case NO_SORT:
+        break;
+    case ALPHABETICAL_WORD:
+        q.append(" ORDER BY word COLLATE NOCASE ASC");
+        break;
+    case ALPHABETICAL_TRANSLATION:
+        q.append(" ORDER BY translation COLLATE NOCASE ASC");
+        break;
+    case PRIORITY_HIGHEST:
+        q.append(" ORDER BY priority DESC");
+        break;
+    case PRIORITY_LOWEST:
+        q.append(" ORDER BY priority ASC");
+        break;
+    case CREATION_NEWEST:
+        q.append(" ORDER BY creation DESC");
+        break;
+    case CREATION_OLDEST:
+        q.append(" ORDER BY creation ASC");
+        break;
+    case MODIFICATION_NEWEST:
+        q.append(" ORDER BY modification DESC");
+        break;
+    case MODIFICATION_OLDEST:
+        q.append(" ORDER BY modification ASC");
+        break;
+    default:
+        WARNING("Unknown sort criterium" << c);
+        break;
     }
 }
