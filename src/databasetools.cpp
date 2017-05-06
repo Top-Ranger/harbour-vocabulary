@@ -36,6 +36,7 @@ bool DatabaseTools::create_new_db()
     operations.append("CREATE INDEX index_vocabulary_translation_nocase ON vocabulary(translation COLLATE NOCASE)");
     operations.append("CREATE INDEX index_vocabulary_number_asked ON vocabulary(number_asked)");
     operations.append("CREATE INDEX index_vocabulary_number_correct ON vocabulary(number_correct)");
+    operations.append("CREATE INDEX index_vocabulary_percentage_correct ON vocabulary(number_correct/number_asked)");
     operations.append("INSERT INTO meta (key, value) VALUES ('version', '5')");
 
     foreach(QString s, operations)
@@ -538,6 +539,15 @@ bool DatabaseTools::test_and_update_db()
             return false;
         }
 
+        s = "CREATE INDEX index_vocabulary_percentage_correct ON vocabulary(number_correct/number_asked)";
+        if(!query.exec(s))
+        {
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
+            WARNING(error);
+            return false;
+        }
+
         s = "UPDATE meta SET value='5' WHERE key='version'";
         if(!query.exec(s))
         {
@@ -545,6 +555,15 @@ bool DatabaseTools::test_and_update_db()
             error.append(": ").append(query.lastError().text());
             WARNING(error);
             return false;
+        }
+
+        // Clean database - no hard failure!
+        s = "VACUUM";
+        if(!query.exec(s))
+        {
+            QString error = s;
+            error.append(": ").append(query.lastError().text());
+            WARNING(error);
         }
         DEBUG("Upgrade complete");
 
