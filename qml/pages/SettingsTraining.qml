@@ -46,7 +46,7 @@ Dialog {
 
     UpperPanel {
         id: panel
-        text: qsTr("Can not reset question count")
+        text: qsTr("Can not reset test count")
     }
 
     SilicaFlickable {
@@ -134,8 +134,8 @@ Each vocabulary gets a priority between 1 and 100 which starts at 100. Every tim
                 }
 
                 width: parent.width
-                text: qsTr("Reset question count")
-                onClicked: remorse_popup.execute(qsTr("Reset question count"), function() {if(!simple_interface.resetTestCountsAll()) { panel.show() } })
+                text: qsTr("Reset test count")
+                onClicked: remorse_popup.execute(qsTr("Reset test count"), function() {if(!simple_interface.resetTestCountsAll()) { panel.show() } })
             }
         }
     }

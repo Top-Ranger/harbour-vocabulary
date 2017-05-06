@@ -50,7 +50,7 @@ Page {
 
     UpperPanel {
         id: panel
-        text: qsTr("Can not reset question count")
+        text: qsTr("Can not reset test count")
     }
 
     SilicaFlickable {
@@ -61,8 +61,8 @@ Page {
 
         PullDownMenu {
             MenuItem {
-                text: qsTr("Reset question count")
-                onClicked: remorse_popup.execute(qsTr("Reset question count"), function() {if(!simple_interface.resetTestCounts(page.word_id)) { panel.show() } else {number_asked_text.text = "0"; number_correct_text.text = "0"} })
+                text: qsTr("Reset test count")
+                onClicked: remorse_popup.execute(qsTr("Reset test count"), function() {if(!simple_interface.resetTestCounts(page.word_id)) { panel.show() } else {number_asked_text.text = "0"; number_correct_text.text = "0"} })
             }
 
             MenuItem {
