@@ -607,6 +607,24 @@ void SimpleInterface::append_sorting_criterium(QString &q, const sortcriterium &
     case MODIFICATION_OLDEST:
         q.append(" ORDER BY modification ASC");
         break;
+    case NUMBER_ASKED_HIGHEST:
+        q.append(" ORDER BY number_asked DESC");
+        break;
+    case NUMBER_ASKED_LOWEST:
+        q.append(" ORDER BY number_asked ASC");
+        break;
+    case NUMBER_CORRECT_HIGHEST:
+        q.append(" ORDER BY number_correct DESC");
+        break;
+    case NUMBER_CORRECT_LOWEST:
+        q.append(" ORDER BY number_correct ASC");
+        break;
+    case PERCENT_CORRECT_HIGHEST:
+        q.append(" ORDER BY number_correct/number_asked DESC");
+        break;
+    case PERCENT_CORRECT_LOWEST:
+        q.append(" ORDER BY number_correct/number_asked ASC");
+        break;
     default:
         WARNING("Unknown sort criterium" << c);
         break;

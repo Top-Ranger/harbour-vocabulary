@@ -288,34 +288,52 @@ void LanguageInterface::append_sorting_criterium(QString &q, const sortcriterium
 {
     switch(c)
     {
-        case NO_SORT:
-            break;
-        case ALPHABETICAL_WORD:
-            q.append(" ORDER BY word ASC");
-            break;
-        case ALPHABETICAL_TRANSLATION:
-            q.append(" ORDER BY translation ASC");
-            break;
-        case PRIORITY_HIGHEST:
-            q.append(" ORDER BY priority DESC");
-            break;
-        case PRIORITY_LOWEST:
-            q.append(" ORDER BY priority ASC");
-            break;
-        case CREATION_NEWEST:
-            q.append(" ORDER BY creation DESC");
-            break;
-        case CREATION_OLDEST:
-            q.append(" ORDER BY creation ASC");
-            break;
-        case MODIFICATION_NEWEST:
-            q.append(" ORDER BY modification DESC");
-            break;
-        case MODIFICATION_OLDEST:
-            q.append(" ORDER BY modification ASC");
-            break;
-        default:
-            WARNING("Unknown sort criterium" << c);
-            break;
+    case NO_SORT:
+        break;
+    case ALPHABETICAL_WORD:
+        q.append(" ORDER BY word COLLATE NOCASE ASC");
+        break;
+    case ALPHABETICAL_TRANSLATION:
+        q.append(" ORDER BY translation COLLATE NOCASE ASC");
+        break;
+    case PRIORITY_HIGHEST:
+        q.append(" ORDER BY priority DESC");
+        break;
+    case PRIORITY_LOWEST:
+        q.append(" ORDER BY priority ASC");
+        break;
+    case CREATION_NEWEST:
+        q.append(" ORDER BY creation DESC");
+        break;
+    case CREATION_OLDEST:
+        q.append(" ORDER BY creation ASC");
+        break;
+    case MODIFICATION_NEWEST:
+        q.append(" ORDER BY modification DESC");
+        break;
+    case MODIFICATION_OLDEST:
+        q.append(" ORDER BY modification ASC");
+        break;
+    case NUMBER_ASKED_HIGHEST:
+        q.append(" ORDER BY number_asked DESC");
+        break;
+    case NUMBER_ASKED_LOWEST:
+        q.append(" ORDER BY number_asked ASC");
+        break;
+    case NUMBER_CORRECT_HIGHEST:
+        q.append(" ORDER BY number_correct DESC");
+        break;
+    case NUMBER_CORRECT_LOWEST:
+        q.append(" ORDER BY number_correct ASC");
+        break;
+    case PERCENT_CORRECT_HIGHEST:
+        q.append(" ORDER BY number_correct/number_asked DESC");
+        break;
+    case PERCENT_CORRECT_LOWEST:
+        q.append(" ORDER BY number_correct/number_asked ASC");
+        break;
+    default:
+        WARNING("Unknown sort criterium" << c);
+        break;
     }
 }

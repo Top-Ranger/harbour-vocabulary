@@ -188,8 +188,8 @@ Page {
                 text: qsTr("Select sort criterium")
                 onClicked: {
                     pageStack.push(Qt.resolvedUrl("SortSelection.qml"), {
-                                       names: [ qsTr("Alphabetically (word)"), qsTr("Alphabetically (translation)"), qsTr("Priority (highest)"), qsTr("Priority (lowest)"), qsTr("Creation date (newest)"), qsTr("Creation date (oldest)"), qsTr("Modification date (newest)"), qsTr("Modification date (oldest)"), ],
-                                       values: [ LanguageInterface.ALPHABETICAL_WORD, LanguageInterface.ALPHABETICAL_TRANSLATION, LanguageInterface.PRIORITY_HIGHEST, LanguageInterface.PRIORITY_LOWEST, LanguageInterface.CREATION_NEWEST, LanguageInterface.CREATION_OLDEST, LanguageInterface.MODIFICATION_NEWEST, LanguageInterface.MODIFICATION_OLDEST, ]
+                                       names: [ qsTr("Alphabetically (word)"), qsTr("Alphabetically (translation)"), qsTr("Priority (highest)"), qsTr("Priority (lowest)"), qsTr("Creation date (newest)"), qsTr("Creation date (oldest)"), qsTr("Modification date (newest)"), qsTr("Modification date (oldest)"), qsTr("Number asked (highest)"), qsTr("Number asked (lowest)"), qsTr("Number correct (highest)"), qsTr("Number correct (lowest)"), qsTr("Percentage correct (highest)"), qsTr("Percentage correct (lowest)"), ],
+                                       values: [ LanguageInterface.ALPHABETICAL_WORD, LanguageInterface.ALPHABETICAL_TRANSLATION, LanguageInterface.PRIORITY_HIGHEST, LanguageInterface.PRIORITY_LOWEST, LanguageInterface.CREATION_NEWEST, LanguageInterface.CREATION_OLDEST, LanguageInterface.MODIFICATION_NEWEST, LanguageInterface.MODIFICATION_OLDEST, LanguageInterface.NUMBER_ASKED_HIGHEST, LanguageInterface.NUMBER_ASKED_LOWEST, LanguageInterface.NUMBER_CORRECT_HIGHEST, LanguageInterface.NUMBER_CORRECT_LOWEST, LanguageInterface.PERCENT_CORRECT_HIGHEST, LanguageInterface.PERCENT_CORRECT_LOWEST, ]
                                    })
                 }
             }
