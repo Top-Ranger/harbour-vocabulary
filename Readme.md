@@ -18,6 +18,7 @@ For every priority point the vocabulary gets an additional chance of getting dra
  * Details about vocabularies
    - Creation date
    - Modification date
+   - Training statistics
  * List all known vocabularies
    - Many sorting options
  * Search for vocabulary
