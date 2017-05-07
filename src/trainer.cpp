@@ -141,7 +141,7 @@ bool Trainer::load_vocabulary(QVariantList filter_type, QVariantList filter_argv
             s.append("priority >= ?");
             break;
         case PERCENTAGE_CORRECT:
-            s.append("1.0*number_correct/number_asked <= ?");
+            s.append("CAST(number_correct AS REAL)/CAST(number_asked AS REAL) <= ?");
             break;
         case filters_after_enum:
             WARNING("filters_after_enum received");
@@ -297,7 +297,7 @@ int Trainer::count_vocabulary(QVariantList filter_type, QVariantList filter_argv
             s.append("priority >= ?");
             break;
         case PERCENTAGE_CORRECT:
-            s.append("1.0*number_correct/number_asked <= ?");
+            s.append("CAST(number_correct AS REAL)/CAST(number_asked AS REAL) <= ?");
             break;
         case filters_after_enum:
             WARNING("filters_after_enum received");
