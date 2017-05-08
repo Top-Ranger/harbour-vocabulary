@@ -577,6 +577,266 @@ bool SimpleInterface::resetTestCounts(int id)
     return true;
 }
 
+QVariantList SimpleInterface::getAllLanguages()
+{
+    QString s = "SELECT rowid FROM language ORDER BY language ASC";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return QVariantList();
+    }
+    if(!q.isSelect())
+    {
+        QString error = s;
+        error.append(": No select");
+        WARNING(error);
+        return QVariantList();
+    }
+
+    QVariantList vl;
+    while(q.next())
+    {
+        vl.append(q.value(0).toInt());
+    }
+    return vl;
+}
+
+int SimpleInterface::addLanguage(QString language)
+{
+    database.transaction();
+    QString s = "INSERT INTO language (language) VALUES (:language)";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.bindValue(":language", language);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        database.rollback();
+        return -1;
+    }
+    database.commit();
+
+    s = "SELECT last_insert_rowid()";
+
+    if(!q.exec(s))
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return -1;
+    }
+    if(!q.isSelect())
+    {
+        QString error = s;
+        error.append(": No select");
+        WARNING(error);
+        return -1;
+    }
+    if(!q.next())
+    {
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
+        WARNING(error);
+        return -1;
+    }
+    return q.value(0).toInt();
+}
+
+bool SimpleInterface::removeLanguage(int id)
+{
+    if(countVocabularyWithLanguage(id) != 0)
+    {
+        WARNING("Can not remove a language with vocabulary in it");
+        return false;
+    }
+
+    database.transaction();
+
+    QString s = "DELETE FROM language WHERE rowid=:id";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.bindValue(":id", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        database.rollback();
+        return false;
+    }
+
+    database.commit();
+    return true;
+}
+
+QString SimpleInterface::getLanguageName(int id)
+{
+    QString s = "SELECT language FROM language WHERE rowid=:id";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.bindValue(":id", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return "";
+    }
+    if(!q.isSelect())
+    {
+        QString error = s;
+        error.append(": No select");
+        WARNING(error);
+        return "";
+    }
+    if(!q.next())
+    {
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
+        WARNING(error);
+        return "";
+    }
+    return q.value(0).toString();
+}
+
+bool SimpleInterface::renameLanguage(int id, QString name)
+{
+    name = name.simplified();
+
+    // Update entry
+    database.transaction();
+
+    QSqlQuery q(database);
+    QString s = "UPDATE language SET language=:l WHERE rowid=:id";
+    q.prepare(s);
+    q.bindValue(":l", name);
+    q.bindValue(":id", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        database.rollback();
+        return false;
+    }
+
+    database.commit();
+    return true;
+}
+
+QVariantList SimpleInterface::getVocabularyByLanguage(int id, sortcriterium c)
+{
+    QString s = "SELECT rowid FROM vocabulary WHERE language=:language";
+    QSqlQuery q(database);
+
+    append_sorting_criterium(s, c);
+
+    q.prepare(s);
+    q.bindValue(":language", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return QVariantList();
+    }
+    if(!q.isSelect())
+    {
+        QString error = s;
+        error.append(": No select");
+        WARNING(error);
+        return QVariantList();
+    }
+
+    QVariantList vl;
+    while(q.next())
+    {
+        vl.append(q.value(0).toInt());
+    }
+    return vl;
+}
+
+int SimpleInterface::countVocabularyWithLanguage(int id)
+{
+    QString s = "SELECT count(*) FROM vocabulary WHERE language=:language";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+    q.bindValue(":language", id);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return -1;
+    }
+    if(!q.isSelect())
+    {
+        QString error = s;
+        error.append(": No select");
+        WARNING(error);
+        return -1;
+    }
+    if(!q.next())
+    {
+        QString error = s;
+        error.append(" - No entry found: ").append(q.lastError().text());
+        WARNING(error);
+        return -1;
+    }
+    return q.value(0).toInt();
+}
+
+bool SimpleInterface::moveToLanguage(int lid, QVariantList v_list)
+{
+    QString s = "UPDATE vocabulary SET language=:language, modification=:modification WHERE rowid=:id";
+    qint64 date = QDate::currentDate().toJulianDay();
+    QSqlQuery q(database);
+
+    database.transaction();
+
+    for(QVariantList::const_iterator i = v_list.constBegin(); i != v_list.constEnd(); ++i)
+    {
+        if(!(*i).canConvert<int>())
+        {
+            WARNING(QString("Can not convert %1 to int").arg((*i).typeName()));
+            continue;
+        }
+        q.prepare(s);
+        q.bindValue(":language", lid);
+        q.bindValue(":modification", date);
+        q.bindValue(":id", (*i).toInt());
+        if(!q.exec())
+        {
+            QString error = s;
+            error.append(": ").append(q.lastError().text());
+            WARNING(error);
+            database.rollback();
+            return false;
+        }
+    }
+
+    database.commit();
+    return true;
+}
+
 void SimpleInterface::append_sorting_criterium(QString &q, const sortcriterium &c)
 {
     switch(c)

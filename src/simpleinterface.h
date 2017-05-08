@@ -56,6 +56,7 @@ signals:
     void countChanged(int);
 
 public slots:
+    // Vocabulary based methods
     bool addVocabulary(QString word, QString translation, int language);
     bool removeVocabulary(int id);
     bool editVocabulary(int id, QString new_word, QString translation, int priority, int language);
@@ -76,6 +77,17 @@ public slots:
     bool resetTestCountsAll();
     bool resetTestCounts(int id);
     void recount();
+
+    // Language based methods
+
+    QVariantList getAllLanguages();
+    int addLanguage(QString language);
+    bool removeLanguage(int id);
+    QString getLanguageName(int id);
+    bool renameLanguage(int id, QString name);
+    QVariantList getVocabularyByLanguage(int id, sortcriterium c);
+    int countVocabularyWithLanguage(int id);
+    bool moveToLanguage(int lid, QVariantList v_list);
 
 private:
     void append_sorting_criterium(QString &q, const sortcriterium &c);

@@ -24,7 +24,6 @@
 #include "settingsproxy.h"
 #include "fileutils.h"
 #include "csvhandle.h"
-#include "languageinterface.h"
 
 #include <QtQuick>
 #include <sailfishapp.h>
@@ -45,7 +44,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<CSVHandle>("harbour.vocabulary.CSVHandle", 1, 0, "CSVHandle");
     // Needed for enum access
     qmlRegisterType<SimpleInterface>("harbour.vocabulary.SimpleInterface", 1, 0, "SimpleInterface");
-    qmlRegisterType<LanguageInterface>("harbour.vocabulary.LanguageInterface", 1, 0, "LanguageInterface");
 
     // Connect to DB
     QString path = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
@@ -109,12 +107,10 @@ int main(int argc, char *argv[])
     RandomVocabulary random_vocabulary;
     SimpleInterface simple_interface;
     FileUtils file_utils;
-    LanguageInterface language_interface;
 
     view->rootContext()->setContextProperty("random_vocabulary", &random_vocabulary);
     view->rootContext()->setContextProperty("simple_interface", &simple_interface);
     view->rootContext()->setContextProperty("file_utils", &file_utils);
-    view->rootContext()->setContextProperty("language_interface", &language_interface);
 
     // Start application
     view->setSource(SailfishApp::pathTo("qml/harbour-vocabulary.qml"));

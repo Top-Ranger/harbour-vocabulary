@@ -35,9 +35,9 @@ Page {
         function load_languages() {
             languageModel.clear()
             languageModel.append({"lid": -1, "language": qsTr("All languages")})
-            var languages = language_interface.getAllLanguages()
+            var languages = simple_interface.getAllLanguages()
             for(var i = 0; i < languages.length; ++i) {
-                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+                languageModel.append({"lid": languages[i], "language": simple_interface.getLanguageName(languages[i])})
             }
         }
     }

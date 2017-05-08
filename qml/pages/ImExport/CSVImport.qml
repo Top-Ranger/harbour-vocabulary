@@ -34,9 +34,9 @@ Page {
 
         function load_languages() {
             languageModel.clear()
-            var languages = language_interface.getAllLanguages()
+            var languages = simple_interface.getAllLanguages()
             for(var i = 0; i < languages.length; ++i) {
-                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+                languageModel.append({"lid": languages[i], "language": simple_interface.getLanguageName(languages[i])})
             }
         }
     }
@@ -243,7 +243,7 @@ Page {
                     var id = page.language_id
 
                     if(page.language_id === -1) {
-                        id = language_interface.addLanguage(new_language_input.text)
+                        id = simple_interface.addLanguage(new_language_input.text)
                         if(id === -1) {
                             errors.text = qsTr("Can not add new language")
                             return

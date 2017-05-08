@@ -32,14 +32,14 @@ Page {
 
         function load_languages() {
             languageModel.clear()
-            var languages = language_interface.getAllLanguages()
+            var languages = simple_interface.getAllLanguages()
             for(var i = 0; i < languages.length; ++i) {
-                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+                languageModel.append({"lid": languages[i], "language": simple_interface.getLanguageName(languages[i])})
             }
         }
 
         function remove_language(lid, item) {
-            if(language_interface.removeLanguage(lid)) {
+            if(simple_interface.removeLanguage(lid)) {
                 item.animateRemoval()
 
                 for(var i = 0; i < languageModel.count; ++i) {
@@ -112,7 +112,7 @@ Page {
                 }
                 Label {
                     width: parent.width - language_label.width
-                    text: language_interface.countVocabularyWithLanguage(lid)
+                    text: simple_interface.countVocabularyWithLanguage(lid)
                     color: Theme.secondaryColor
                     horizontalAlignment: Text.AlignHCenter
                     truncationMode: TruncationMode.Fade
@@ -120,7 +120,7 @@ Page {
             }
 
             onClicked: {
-                pageStack.push(Qt.resolvedUrl("LanguageList.qml"), { language_id: lid } )
+                pageStack.push(Qt.resolvedUrl("List.qml"), { language_id: lid } )
             }
 
             menu: ContextMenu {
@@ -134,7 +134,7 @@ Page {
 
                 MenuItem {
                     text: "<img src=\"image://theme/icon-m-delete\" width=\"" + Theme.iconSizeSmall + "\" height=\"" + Theme.iconSizeSmall + "\" align=\"middle\" >" + qsTr("Remove language")
-                    enabled: language_interface.countVocabularyWithLanguage(lid) === 0
+                    enabled: simple_interface.countVocabularyWithLanguage(lid) === 0
                     textFormat: Text.StyledText
                     onClicked: {
                         listitem.remorseAction(qsTr("Remove language"), function() { functions.remove_language(lid, listitem) })
@@ -171,7 +171,7 @@ Page {
                 icon.source: "image://theme/icon-m-add"
                 enabled: new_language_input.text !== ""
                 onClicked: {
-                    if(language_interface.addLanguage(new_language_input.text) === -1) {
+                    if(simple_interface.addLanguage(new_language_input.text) === -1) {
                         add_panel.show()
                     }
                     else {

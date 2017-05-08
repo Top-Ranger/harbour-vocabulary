@@ -49,8 +49,7 @@ SOURCES += src/harbour-vocabulary.cpp \
     src/settingsproxy.cpp \
     src/fileutils.cpp \
     src/csvhandle.cpp \
-    src/databasetools.cpp \
-    src/languageinterface.cpp
+    src/databasetools.cpp
 
 OTHER_FILES += qml/harbour-vocabulary.qml \
     qml/cover/CoverPage.qml \
@@ -72,7 +71,6 @@ DISTFILES += \
     qml/pages/ImExport/CSVImport.qml \
     qml/pages/ImExport/CSVExport.qml \
     qml/pages/Languages.qml \
-    qml/pages/LanguageList.qml \
     qml/pages/LanguageMove.qml \
     qml/pages/LanguageEdit.qml \
     qml/pages/FiltersTraining.qml \
@@ -87,5 +85,4 @@ HEADERS += \
     src/settingsproxy.h \
     src/fileutils.h \
     src/csvhandle.h \
-    src/databasetools.h \
-    src/languageinterface.h
+    src/databasetools.h

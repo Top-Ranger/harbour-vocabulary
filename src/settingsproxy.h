@@ -34,7 +34,6 @@ class SettingsProxy : public QObject
     Q_PROPERTY(bool trainingDirectStart READ trainingDirectStart WRITE setTrainingDirectStart NOTIFY trainingDirectStartChanged)
 
     Q_PROPERTY(int listSortCriterium READ listSortCriterium WRITE setListSortCriterium NOTIFY listSortCriteriumChanged)
-    Q_PROPERTY(int languageListSortCriterium READ languageListSortCriterium WRITE setLanguageListSortCriterium NOTIFY languageListSortCriteriumChanged)
 
 public:
     explicit SettingsProxy(QObject *parent = 0);
@@ -63,7 +62,6 @@ public:
     bool trainingDirectStart();
 
     int listSortCriterium();
-    int languageListSortCriterium();
 
 signals:
     void adaptiveTrainingCorrectPointsChanged(int points);
@@ -90,7 +88,6 @@ signals:
     void trainingDirectStartChanged(bool direct);
 
     void listSortCriteriumChanged(int c);
-    void languageListSortCriteriumChanged(int c);
 
 public slots:
     void setAdaptiveTrainingCorrectPoints(int points);
@@ -117,7 +114,6 @@ public slots:
     void setTrainingDirectStart(bool direct);
 
     void setListSortCriterium(int c);
-    void setLanguageListSortCriterium(int c);
 
 private:
     QSettings _settings;

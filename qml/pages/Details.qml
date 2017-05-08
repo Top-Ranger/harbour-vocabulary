@@ -32,7 +32,7 @@ Page {
             priority.value = simple_interface.getPriorityOfWord(page.word_id)
             creation_text.text = simple_interface.getCreationDate(page.word_id).toLocaleDateString()
             modification_text.text = simple_interface.getModificationDate(page.word_id).toLocaleDateString()
-            language_text.text = language_interface.getLanguageName(simple_interface.getLanguageId(page.word_id))
+            language_text.text = simple_interface.getLanguageName(simple_interface.getLanguageId(page.word_id))
             number_asked_text.text = "" + simple_interface.getNumberAsked(page.word_id)
             number_correct_text.text = "" + simple_interface.getNumberCorrect(page.word_id)
 
@@ -200,7 +200,7 @@ Page {
                     width: column.width - modification.width
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
-                    text: language_interface.getLanguageName(simple_interface.getLanguageId(page.word_id))
+                    text: simple_interface.getLanguageName(simple_interface.getLanguageId(page.word_id))
                 }
             }
 

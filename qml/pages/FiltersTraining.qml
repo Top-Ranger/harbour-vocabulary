@@ -88,10 +88,10 @@ Page {
         function load_languages() {
             languageModel.clear()
             var language_id_correct = false
-            var languages = language_interface.getAllLanguages()
+            var languages = simple_interface.getAllLanguages()
             var language_id_index  = 0
             for(var i = 0; i < languages.length; ++i) {
-                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+                languageModel.append({"lid": languages[i], "language": simple_interface.getLanguageName(languages[i])})
                 if(languages[i] === page.language_id) {
                     language_id_correct = true
                     language_id_index = i + 1

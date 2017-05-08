@@ -43,7 +43,7 @@ Page {
         function save_word() {
             var new_id = -1
             if(language_id === -1) {
-                new_id = language_interface.addLanguage(new_language_input.text)
+                new_id = simple_interface.addLanguage(new_language_input.text)
                 if(new_id === -1) {
                     panel.show()
                     return
@@ -87,10 +87,10 @@ Page {
         function load_languages() {
             languageModel.clear()
             var language_id_correct = false
-            var languages = language_interface.getAllLanguages()
+            var languages = simple_interface.getAllLanguages()
             var language_id_index  = 0
             for(var i = 0; i < languages.length; ++i) {
-                languageModel.append({"lid": languages[i], "language": language_interface.getLanguageName(languages[i])})
+                languageModel.append({"lid": languages[i], "language": simple_interface.getLanguageName(languages[i])})
                 if(languages[i] === page.language_id) {
                     language_id_correct = true
                     language_id_index = i + 1

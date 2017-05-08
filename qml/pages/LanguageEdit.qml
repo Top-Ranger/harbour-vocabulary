@@ -24,14 +24,14 @@ Page {
     property int language_id: -1
 
     Component.onCompleted: {
-        language.text = language_interface.getLanguageName(page.language_id)
+        language.text = simple_interface.getLanguageName(page.language_id)
     }
 
     Item {
         id: functions
 
         function save_change() {
-            if(language_interface.renameLanguage(page.language_id, language.text)) {
+            if(simple_interface.renameLanguage(page.language_id, language.text)) {
                 pageStack.pop()
             }
             else {
@@ -53,7 +53,7 @@ Page {
             spacing: Theme.paddingMedium
 
             PageHeader {
-                title: qsTr("Edit language") + " " + language_interface.getLanguageName(page.language_id)
+                title: qsTr("Edit language") + " " + simple_interface.getLanguageName(page.language_id)
             }
 
             Button {

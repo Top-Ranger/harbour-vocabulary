@@ -23,6 +23,9 @@ Page {
     id: page
     allowedOrientations: Orientation.All
 
+    property int language_id: -1 // If this is -1 no language will be filtered, else this list will be specifically for that language
+    property string language_name: "ERROR"
+
     property bool word_changed: false
     property int word_id: 0
 
@@ -40,17 +43,26 @@ Page {
         id: settings
     }
 
+    Component.onCompleted: {
+        if(page.language_id !== -1) {
+            page.language_name = simple_interface.getLanguageName(page.language_id)
+        }
+    }
+
     onStatusChanged: {
         if(word_changed === true) {
             var word = simple_interface.getWord(page.word_id)
             var translation = simple_interface.getTranslationOfWord(page.word_id)
             var priority = simple_interface.getPriorityOfWord(page.word_id)
+            var new_language_id = simple_interface.getLanguageId(page.word_id)
             var priority_visible = settings.adaptiveTrainingEnabled
 
             for(var i = 0; i < listModel.count; ++i) {
                 if(listModel.get(i).id === page.word_id) {
                     listModel.remove(i)
-                    listModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority, "priority_visible": priority_visible})
+                    if(page.language_id === -1 || new_language_id === page.language_id) {
+                        listModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority, "priority_visible": priority_visible})
+                    }
                     break
                 }
             }
@@ -58,7 +70,9 @@ Page {
             for(i = 0; i < originModel.count; ++i) {
                 if(originModel.get(i).id === page.word_id) {
                     originModel.remove(i)
-                    originModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority, "priority_visible": priority_visible})
+                    if(page.language_id === -1 || new_language_id === page.language_id) {
+                        originModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority, "priority_visible": priority_visible})
+                    }
                     break
                 }
             }
@@ -99,7 +113,14 @@ Page {
         function load_list() {
             listModel.clear()
             originModel.clear()
-            var wordlist = simple_interface.getAllWords(page.sort_criterium)
+            var wordlist = []
+            if(page.language_id === -1) {
+                wordlist = simple_interface.getAllWords(page.sort_criterium)
+            }
+            else {
+                wordlist = simple_interface.getVocabularyByLanguage(page.language_id, page.sort_criterium)
+            }
+
             var words = simple_interface.getBatchWord(wordlist)
             var translations = simple_interface.getBatchTranslationOfWord(wordlist)
             var priorities = simple_interface.getBatchPriorityOfWord(wordlist)
@@ -118,6 +139,20 @@ Page {
                 if(item.word.toLowerCase().indexOf(filter) !== -1 || item.translation.toLowerCase().indexOf(filter) !== -1) {
                     listModel.append(item)
                 }
+            }
+        }
+
+        function remove_all_in_this_language() {
+            var array = []
+            for(var i = 0; i < originModel.count; ++i) {
+                array.push(originModel.get(i).id)
+            }
+            if(simple_interface.removeBatchVocabulary(array)) {
+                originModel.clear()
+                listModel.clear()
+            }
+            else {
+                panel.show()
             }
         }
     }
@@ -153,8 +188,17 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: qsTr("Remove all vocabulary")
+                visible: page.language_id === -1
                 onClicked: {
                     remorse_popup.execute(qsTr("Remove all vocabulary"), function() {if(!simple_interface.clearAllVocabulary()) { panel.show() } else { listModel.clear(); originModel.clear() } }, 10000)
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Remove all vocabulary in language")
+                visible: page.language_id !== -1
+                onClicked: {
+                    remorse_popup.execute(qsTr("Remove all vocabulary"), function() { functions.remove_all_in_this_language() }, 10000)
                 }
             }
 
@@ -175,7 +219,7 @@ Page {
 
             PageHeader {
                 width: parent.width
-                title: qsTr("Vocabulary list") + " (" + listModel.count + ")"
+                title: page.language_id === -1 ? qsTr("Vocabulary list") + " (" + listModel.count + ")" : page.language_name + " (" + listModel.count + ")"
             }
 
             SearchField {

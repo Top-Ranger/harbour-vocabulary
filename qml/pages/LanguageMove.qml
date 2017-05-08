@@ -79,12 +79,12 @@ Page {
                 }
             }
 
-            return language_interface.moveToLanguage(page.language_id, array)
+            return simple_interface.moveToLanguage(page.language_id, array)
         }
     }
 
     Component.onCompleted: {
-        page.language_name = language_interface.getLanguageName(page.language_id)
+        page.language_name = simple_interface.getLanguageName(page.language_id)
         functions.load_list()
     }
 

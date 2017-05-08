@@ -167,7 +167,7 @@ Page {
 
                 Label {
                     width: parent.width - language_label.width
-                    text: trainer.language !== -1 ? language_interface.getLanguageName(trainer.language) : ""
+                    text: trainer.language !== -1 ? simple_interface.getLanguageName(trainer.language) : ""
                     color: Theme.secondaryColor
                     wrapMode: Text.Wrap
                 }
