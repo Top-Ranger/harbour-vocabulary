@@ -74,7 +74,6 @@ DISTFILES += \
     qml/pages/LanguageMove.qml \
     qml/pages/LanguageEdit.qml \
     qml/pages/FiltersTraining.qml \
-    qml/pages/VocabularyListItem.qml \
     qml/pages/SortSelection.qml
 
 HEADERS += \

@@ -32,6 +32,8 @@ Page {
     property int sort_criterium: SimpleInterface.ALPHABETICAL_WORD
     property string search_text: ""
 
+    property bool priority_visible: settings.adaptiveTrainingEnabled
+
     onSort_criteriumChanged: {
         settings.listSortCriterium = page.sort_criterium
         search_timer.stop()
@@ -55,13 +57,12 @@ Page {
             var translation = simple_interface.getTranslationOfWord(page.word_id)
             var priority = simple_interface.getPriorityOfWord(page.word_id)
             var new_language_id = simple_interface.getLanguageId(page.word_id)
-            var priority_visible = settings.adaptiveTrainingEnabled
 
             for(var i = 0; i < listModel.count; ++i) {
                 if(listModel.get(i).id === page.word_id) {
                     listModel.remove(i)
                     if(page.language_id === -1 || new_language_id === page.language_id) {
-                        listModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority, "priority_visible": priority_visible})
+                        listModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority })
                     }
                     break
                 }
@@ -71,7 +72,7 @@ Page {
                 if(originModel.get(i).id === page.word_id) {
                     originModel.remove(i)
                     if(page.language_id === -1 || new_language_id === page.language_id) {
-                        originModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority, "priority_visible": priority_visible})
+                        originModel.insert(i, {"id": page.word_id, "word": word, "translation": translation, "priority": priority })
                     }
                     break
                 }
@@ -124,10 +125,9 @@ Page {
             var words = simple_interface.getBatchWord(wordlist)
             var translations = simple_interface.getBatchTranslationOfWord(wordlist)
             var priorities = simple_interface.getBatchPriorityOfWord(wordlist)
-            var priority_visible = settings.adaptiveTrainingEnabled
             for(var i = 0; i < wordlist.length; ++i) {
-                originModel.append({"id": wordlist[i], "word": words[i], "translation": translations[i], "priority": priorities[i], "priority_visible": priority_visible})
-                listModel.append({"id": wordlist[i], "word": words[i], "translation": translations[i], "priority": priorities[i], "priority_visible": priority_visible})
+                originModel.append({"id": wordlist[i], "word": words[i], "translation": translations[i], "priority": priorities[i] })
+                listModel.append({"id": wordlist[i], "word": words[i], "translation": translations[i], "priority": priorities[i] })
             }
         }
 
@@ -241,7 +241,92 @@ Page {
             }
         }
 
-        delegate: VocabularyListItem {}
+        delegate: ListItem {
+            id: vocabularyListItem
+            anchors {
+                right: parent.right
+                left: parent.left
+            }
+
+            Rectangle {
+                anchors {
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+
+                height: parent.height * 0.2
+                width: parent.width * priority / 100
+
+                color: Theme.secondaryHighlightColor
+                visible: page.priority_visible && (priority > 1)
+                opacity: .5
+            }
+
+            Row {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.paddingLarge
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+
+                Label {
+                    id: word_label
+                    text: word
+                    color: Theme.primaryColor
+                }
+                Label {
+                    text: " "
+                    color: Theme.primaryColor
+                }
+                Label {
+                    width: parent.width - word_label.width
+                    text: translation
+                    color: Theme.secondaryColor
+                    horizontalAlignment: Text.AlignLeft
+                    truncationMode: TruncationMode.Elide
+                }
+            }
+
+            menu: ContextMenu {
+                MenuItem {
+                    text: "<img src=\"image://theme/icon-s-edit\" align=\"middle\" /> " + qsTr("Edit vocabulary")
+                    textFormat: Text.StyledText
+                    onClicked: {
+                        pageStack.push(Qt.resolvedUrl("Edit.qml"), { word_id: id } )
+                    }
+                }
+
+                MenuItem {
+                    text: "<img src=\"image://theme/icon-m-delete\" width=\"" + Theme.iconSizeSmall + "\" height=\"" + Theme.iconSizeSmall + "\" align=\"middle\" >" + qsTr("Remove vocabulary")
+                    textFormat: Text.StyledText
+                    onClicked: {
+                        vocabularyListItem.remorseAction(qsTr("Remove vocabulary"), function() { functions.remove_word(id, vocabularyListItem) })
+                    }
+                }
+
+                MenuItem {
+                    text: "<img src=\"image://theme/icon-s-clipboard\" align=\"middle\" /> "+ qsTr("Copy word to clipboard")
+                    textFormat: Text.StyledText
+                    onClicked: {
+                        Clipboard.text = word
+                    }
+                }
+
+                MenuItem {
+                    text: "<img src=\"image://theme/icon-s-clipboard\" align=\"middle\" /> " + qsTr("Copy translation to clipboard")
+                    textFormat: Text.StyledText
+                    onClicked: {
+                        Clipboard.text = translation
+                    }
+                }
+            }
+
+            onClicked: {
+                pageStack.push(Qt.resolvedUrl("Details.qml"), { word_id: id })
+            }
+        }
 
         VerticalScrollDecorator {}
     }
