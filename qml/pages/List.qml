@@ -33,6 +33,7 @@ Page {
     property string search_text: ""
 
     property bool priority_visible: settings.adaptiveTrainingEnabled
+    property bool translation_visible: settings.listShowTranslation
 
     onSort_criteriumChanged: {
         settings.listSortCriterium = page.sort_criterium
@@ -203,6 +204,13 @@ Page {
             }
 
             MenuItem {
+                text: page.translation_visible ? qsTr("Hide translation") : qsTr("Show translation")
+                onClicked: {
+                    settings.listShowTranslation = !page.translation_visible
+                }
+            }
+
+            MenuItem {
                 text: qsTr("Select sort criterium")
                 onClicked: {
                     pageStack.push(Qt.resolvedUrl("SortSelection.qml"), {
@@ -284,6 +292,7 @@ Page {
                     width: parent.width - word_label.width
                     text: translation
                     color: Theme.secondaryColor
+                    visible: page.translation_visible
                     horizontalAlignment: Text.AlignLeft
                     truncationMode: TruncationMode.Elide
                 }

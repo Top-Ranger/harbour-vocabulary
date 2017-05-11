@@ -88,7 +88,12 @@ bool SettingsProxy::trainingDirectStart()
 
 int SettingsProxy::listSortCriterium()
 {
-    return _settings.value("sorting/list", 1).toInt();
+    return _settings.value("list/sorting", 1).toInt();
+}
+
+bool SettingsProxy::listShowTranslation()
+{
+    return _settings.value("list/show_translation", true).toBool();
 }
 
 void SettingsProxy::setAdaptiveTrainingCorrectPoints(int points)
@@ -189,6 +194,12 @@ void SettingsProxy::setTrainingDirectStart(bool direct)
 
 void SettingsProxy::setListSortCriterium(int c)
 {
-    _settings.setValue("sorting/list", c);
+    _settings.setValue("list/sorting", c);
     emit listSortCriteriumChanged(c);
+}
+
+void SettingsProxy::setListShowTranslation(bool show)
+{
+    _settings.setValue("list/show_translation", show);
+    emit listShowTranslationChanged(show);
 }
