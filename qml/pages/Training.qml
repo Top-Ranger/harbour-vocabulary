@@ -27,6 +27,8 @@ Page {
     property bool loading_success: false
     property int selected_modus: Trainer.TEST_BOTH
 
+    property int end_after: 0
+
     Component.onCompleted: {
         if(trainer.load_vocabulary(filter_type, filter_argv, selected_modus)) {
             loading_success = true
@@ -47,8 +49,17 @@ Page {
             property int status_reveal_answer: 1
             property int current_status: status_ask_question
             property int trainings_mode: trainer.modus
+            property int questions_asked: 0
+            property int questions_correct: 0
 
             function new_question() {
+                questions_asked += 1
+
+                if(page.end_after !== 0 && questions_asked > page.end_after) {
+                    pageStack.replace(Qt.resolvedUrl("TrainingResult.qml"), { correct_this_time: questions_correct / (questions_asked-1) } )
+                    return
+                }
+
                 translation.text = ""
                 word.text = ""
                 trainer.next()
@@ -223,6 +234,7 @@ Page {
                     text: qsTr("Correct")
                     onClicked: {
                         trainer.correct()
+                        master.questions_correct += 1
                         master.new_question()
                     }
                 }

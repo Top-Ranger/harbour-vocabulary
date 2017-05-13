@@ -173,6 +173,8 @@ Page {
         // Load settings
         page.language_id = settings_proxy.trainingFilterLanguage
 
+        end_after.value = settings_proxy.trainingEndAfter
+
         switch_creation_since.checked = settings_proxy.trainingFilterCreationSinceEnabled
         switch_creation_until.checked = settings_proxy.trainingFilterCreationUntilEnabled
         switch_modification_since.checked = settings_proxy.trainingFilterModificationSinceEnabled
@@ -215,6 +217,8 @@ Page {
                 text: qsTr("Reset to default")
                 onClicked: {
                     page.language_id = -1
+
+                    end_after.value = 0
 
                     switch_creation_since.checked = false
                     switch_creation_until.checked = false
@@ -275,6 +279,8 @@ Page {
                 onClicked: {
                     settings_proxy.trainingFilterLanguage = page.language_id
 
+                    settings_proxy.trainingEndAfter = end_after.value
+
                     settings_proxy.trainingFilterCreationSinceEnabled = switch_creation_since.checked
                     settings_proxy.trainingFilterCreationUntilEnabled = switch_creation_until.checked
                     settings_proxy.trainingFilterModificationSinceEnabled = switch_modification_since.checked
@@ -288,8 +294,7 @@ Page {
                     settings_proxy.trainingFilterPriority = minimum_priority.value
                     settings_proxy.trainingFilterPercentageCorrect = maximum_percentage_correct.value
 
-
-                    pageStack.replace(Qt.resolvedUrl("Training.qml"), { filter_type: page.filter_type, filter_argv: page.filter_argv, selected_modus: page.selected_modus } )
+                    pageStack.replace(Qt.resolvedUrl("Training.qml"), { filter_type: page.filter_type, filter_argv: page.filter_argv, selected_modus: page.selected_modus, end_after: end_after.value } )
                 }
             }
 
@@ -301,6 +306,22 @@ Page {
                     MenuItem { text: qsTr("Guess translation"); onClicked: page.selected_modus = Trainer.GUESS_TRANSLATION }
                     MenuItem { text: qsTr("Guess word"); onClicked: page.selected_modus = Trainer.GUESS_WORD }
                 }
+            }
+
+            Slider {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.horizontalPageMargin
+                }
+
+                id: end_after
+                stepSize: 1
+                minimumValue: 0
+                maximumValue: 100
+                value: 0
+                label: qsTr("End after number of vocabulary asked")
+                valueText: value === 0 ? qsTr("Do not end") : "" + value
             }
 
             ComboBox {

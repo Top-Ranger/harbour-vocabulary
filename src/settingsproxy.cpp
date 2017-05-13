@@ -76,6 +76,11 @@ int SettingsProxy::trainingFilterPercentageCorrect()
     return _settings.value("training_filter/percentage_correct", 100).toInt();
 }
 
+int SettingsProxy::trainingEndAfter()
+{
+    return _settings.value("training/end_after", 0).toInt();
+}
+
 int SettingsProxy::addVocabularyLanguage()
 {
     return _settings.value("add_vocabulary/language", -1).toInt();
@@ -178,6 +183,12 @@ void SettingsProxy::setTrainingFilterPercentageCorrect(int percentage)
 {
     _settings.setValue("training_filter/percentage_correct", percentage);
     emit trainingFilterPercentageCorrectChanged(percentage);
+}
+
+void SettingsProxy::setTrainingEndAfter(int end)
+{
+    _settings.setValue("training/end_after", end);
+    emit trainingFilterPercentageCorrectChanged(end);
 }
 
 void SettingsProxy::setAddVocabularyLanguage(int language)

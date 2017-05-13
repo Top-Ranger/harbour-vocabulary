@@ -76,6 +76,7 @@ public slots:
     QList<int> getBatchPriorityOfWord(QList<int> ids);
     bool resetTestCountsAll();
     bool resetTestCounts(int id);
+    float getOverallPercentageCorrect();
     void recount();
 
     // Language based methods

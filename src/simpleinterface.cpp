@@ -577,6 +577,31 @@ bool SimpleInterface::resetTestCounts(int id)
     return true;
 }
 
+float SimpleInterface::getOverallPercentageCorrect()
+{
+    QString s = "SELECT AVG(CAST(number_correct AS REAL)/CAST(number_asked AS REAL)) FROM vocabulary";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return 0.0f;
+    }
+        if(!q.next())
+    {
+        QString error = s;
+        error.append(" - no average found: ").append(q.lastError().text());
+        WARNING(error);
+        return 0.0f;
+    }
+
+    return q.value(0).toFloat();
+}
+
 QVariantList SimpleInterface::getAllLanguages()
 {
     QString s = "SELECT rowid FROM language ORDER BY language ASC";

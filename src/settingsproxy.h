@@ -29,6 +29,8 @@ class SettingsProxy : public QObject
     Q_PROPERTY(int trainingFilterPriority READ trainingFilterPriority WRITE setTrainingFilterPriority NOTIFY trainingFilterPriorityChanged)
     Q_PROPERTY(int trainingFilterPercentageCorrect READ trainingFilterPercentageCorrect WRITE setTrainingFilterPercentageCorrect NOTIFY trainingFilterPercentageCorrectChanged)
 
+    Q_PROPERTY(int trainingEndAfter READ trainingEndAfter WRITE setTrainingEndAfter NOTIFY trainingEndAfterChanged)
+
     Q_PROPERTY(int addVocabularyLanguage READ addVocabularyLanguage WRITE setAddVocabularyLanguage NOTIFY addVocabularyLanguageChanged)
 
     Q_PROPERTY(bool trainingDirectStart READ trainingDirectStart WRITE setTrainingDirectStart NOTIFY trainingDirectStartChanged)
@@ -58,6 +60,8 @@ public:
     int trainingFilterPriority();
     int trainingFilterPercentageCorrect();
 
+    int trainingEndAfter();
+
     int addVocabularyLanguage();
 
     bool trainingDirectStart();
@@ -85,6 +89,8 @@ signals:
     void trainingFilterPriorityChanged(int priority);
     void trainingFilterPercentageCorrectChanged(int percentage);
 
+    void trainingEndAfterChanged(int end);
+
     void addVocabularyLanguageChanged(int language);
 
     void trainingDirectStartChanged(bool direct);
@@ -111,6 +117,8 @@ public slots:
 
     void setTrainingFilterPriority(int priority);
     void setTrainingFilterPercentageCorrect(int percentage);
+
+    void setTrainingEndAfter(int end);
 
     void setAddVocabularyLanguage(int language);
 
