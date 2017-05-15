@@ -199,7 +199,7 @@ Page {
 
                 Label {
                     width: parent.width - correct_label.width
-                    text: trainer.numberAsked === 0 ? "0%" : "" + Math.round(100.0*trainer.numberCorrect / trainer.numberAsked) + "%"
+                    text: trainer.numberAsked === 0 ? "" : "" + Math.round(100.0*trainer.numberCorrect / trainer.numberAsked) + "%"
                     color: Theme.secondaryColor
                     wrapMode: Text.Wrap
                 }

@@ -216,7 +216,7 @@ Page {
                     width: column.width - percentage_correct.width
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
-                    text:parseInt(number_asked_text.text) !== 0 ? "" + Math.round(100.0 * parseInt(number_correct_text.text) / parseInt(number_asked_text.text)) + "%" : "0%"
+                    text:parseInt(number_asked_text.text) !== 0 ? "" + Math.round(100.0 * parseInt(number_correct_text.text) / parseInt(number_asked_text.text)) + "%" : ""
                 }
             }
 
