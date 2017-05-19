@@ -215,7 +215,8 @@ Page {
                 onClicked: {
                     pageStack.push(Qt.resolvedUrl("SortSelection.qml"), {
                                        names: [ qsTr("Alphabetically (word)"), qsTr("Alphabetically (translation)"), qsTr("Priority (highest)"), qsTr("Priority (lowest)"), qsTr("Creation date (newest)"), qsTr("Creation date (oldest)"), qsTr("Modification date (newest)"), qsTr("Modification date (oldest)"), qsTr("Number asked (highest)"), qsTr("Number asked (lowest)"), qsTr("Number correct (highest)"), qsTr("Number correct (lowest)"), qsTr("Percentage correct (highest)"), qsTr("Percentage correct (lowest)"), ],
-                                       values: [ SimpleInterface.ALPHABETICAL_WORD, SimpleInterface.ALPHABETICAL_TRANSLATION, SimpleInterface.PRIORITY_HIGHEST, SimpleInterface.PRIORITY_LOWEST, SimpleInterface.CREATION_NEWEST, SimpleInterface.CREATION_OLDEST, SimpleInterface.MODIFICATION_NEWEST, SimpleInterface.MODIFICATION_OLDEST, SimpleInterface.NUMBER_ASKED_HIGHEST, SimpleInterface.NUMBER_ASKED_LOWEST, SimpleInterface.NUMBER_CORRECT_HIGHEST, SimpleInterface.NUMBER_CORRECT_LOWEST, SimpleInterface.PERCENT_CORRECT_HIGHEST, SimpleInterface.PERCENT_CORRECT_LOWEST, ]
+                                       values: [ SimpleInterface.ALPHABETICAL_WORD, SimpleInterface.ALPHABETICAL_TRANSLATION, SimpleInterface.PRIORITY_HIGHEST, SimpleInterface.PRIORITY_LOWEST, SimpleInterface.CREATION_NEWEST, SimpleInterface.CREATION_OLDEST, SimpleInterface.MODIFICATION_NEWEST, SimpleInterface.MODIFICATION_OLDEST, SimpleInterface.NUMBER_ASKED_HIGHEST, SimpleInterface.NUMBER_ASKED_LOWEST, SimpleInterface.NUMBER_CORRECT_HIGHEST, SimpleInterface.NUMBER_CORRECT_LOWEST, SimpleInterface.PERCENT_CORRECT_HIGHEST, SimpleInterface.PERCENT_CORRECT_LOWEST, ],
+                                       current_sorting: page.sort_criterium
                                    })
                 }
             }

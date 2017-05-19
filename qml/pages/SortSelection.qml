@@ -23,6 +23,7 @@ Page {
 
     property var names: []
     property var values: []
+    property int current_sorting: -1
 
     Item {
         id: functions
@@ -83,6 +84,9 @@ Page {
 
         Component.onCompleted: {
             functions.load_list()
+            if(page.current_sorting === -1) {
+                console.warn("SortSelection.qml - No current sort criterium set")
+            }
         }
 
         delegate: ListItem {
@@ -100,6 +104,7 @@ Page {
                 }
 
                 text: name
+                font.bold: value === page.current_sorting
                 horizontalAlignment: Text.AlignLeft
                 truncationMode: TruncationMode.Elide
             }
