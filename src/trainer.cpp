@@ -48,6 +48,15 @@ QString Trainer::translation()
     return _vocabulary[_index].translation;
 }
 
+int Trainer::id()
+{
+    if(_vocabulary.size() == 0)
+    {
+        return -1;
+    }
+    return _vocabulary[_index].id;
+}
+
 Trainer::trainings_modus Trainer::modus()
 {
     return _modus;
@@ -445,6 +454,7 @@ void Trainer::next()
 
     emit wordChanged(_vocabulary[_index].word);
     emit translationChanged(_vocabulary[_index].translation);
+    emit idChanged(_vocabulary[_index].id);
     emit modusChanged(_modus);
     emit languageChanged(_vocabulary[_index].language);
     emit numberAskedChanged(_vocabulary[_index].number_asked);

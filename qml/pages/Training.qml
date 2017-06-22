@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016,2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,12 +51,46 @@ Page {
             property int trainings_mode: trainer.modus
             property int questions_asked: 0
             property int questions_correct: 0
+            
+            property var keys_question_wrong: []
+            property var values_question_wrong: []
+            
+            function add_wrong_id(id) {
+                if(end_after === 0){
+                    return
+                }
+                
+                // Search for key
+                for(var i = 0; i < keys_question_wrong.length; ++i) {
+                    if(keys_question_wrong[i] === id) {
+                        values_question_wrong[i] = values_question_wrong[i] + 1
+                        return
+                    }
+                }
+                
+                // Key not known - add it
+                keys_question_wrong.push(id)
+                values_question_wrong.push(1)
+            }
 
             function new_question() {
                 questions_asked += 1
 
                 if(page.end_after !== 0 && questions_asked > page.end_after) {
-                    pageStack.replace(Qt.resolvedUrl("TrainingResult.qml"), { correct_this_time: questions_correct / (questions_asked-1) } )
+                    // Find most wrong vocabulary
+                    var most_wrong_id = -1
+                    var most_wrong_count = 0
+                    
+                    for(var i = 0; i < keys_question_wrong.length; ++i) {
+                        if(values_question_wrong[i] > most_wrong_count) {
+                            console.log(keys_question_wrong[i])
+                            most_wrong_count = values_question_wrong[i]
+                            most_wrong_id = keys_question_wrong[i]
+                        }
+                    }
+                    
+                    // Show result page
+                    pageStack.replace(Qt.resolvedUrl("TrainingResult.qml"), { correct_this_time: questions_correct / (questions_asked-1), most_wrong: most_wrong_id } )
                     return
                 }
 
@@ -245,6 +279,7 @@ Page {
                     text: qsTr("False")
                     onClicked: {
                         trainer.wrong()
+                        master.add_wrong_id(trainer.id)
                         master.new_question()
                     }
                 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016.2017 Marcus Soll
+ * Copyright 2016,2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ class Trainer : public QObject
     Q_OBJECT
     Q_PROPERTY(QString word READ word NOTIFY wordChanged)
     Q_PROPERTY(QString translation READ translation NOTIFY translationChanged)
+    Q_PROPERTY(int id READ id NOTIFY idChanged)
     Q_PROPERTY(trainings_modus modus READ modus NOTIFY modusChanged)
     Q_PROPERTY(int language READ language NOTIFY languageChanged)
     Q_PROPERTY(int numberAsked READ numberAsked NOTIFY numberAskedChanged)
@@ -60,6 +61,7 @@ public:
     explicit Trainer(QObject *parent = 0);
     QString word();
     QString translation();
+    int id();
     trainings_modus modus();
     int language();
     int numberAsked();
@@ -68,6 +70,7 @@ public:
 signals:
     void wordChanged(QString word);
     void translationChanged(QString translation);
+    void idChanged(int id);
     void modusChanged(trainings_modus modus);
     void languageChanged(int language);
     void numberAskedChanged(int asked);

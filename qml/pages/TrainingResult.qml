@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016,2017 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ Page {
 
     property real correct_this_time: 0
     property real correct_overall: simple_interface.getOverallPercentageCorrect();
+    property int most_wrong: -1
 
     SilicaFlickable {
         anchors.fill: parent
@@ -74,6 +75,63 @@ Page {
                     color: Theme.primaryColor
                     wrapMode: Text.Wrap
                     text: "" + Math.round(100 * page.correct_overall) + "%"
+                }
+            }
+            
+            Text {
+                visible: most_wrong !== -1
+                width: parent.width
+                text: qsTr("Vocabulary with the most wrong answers:")
+                font.underline: true
+                font.bold: true
+                color: Theme.highlightColor
+                wrapMode: Text.Wrap
+            }
+            
+            Row {
+                visible: most_wrong !== -1
+                Label {
+                    id: most_wrong_word
+                    text: qsTr("Vocabulary: ")
+                    color: Theme.highlightColor
+                }
+
+                Text {
+                    id: most_wrong_word_label
+                    width: column.width - most_wrong_word.width
+                    color: Theme.primaryColor
+                    wrapMode: Text.Wrap
+                    text: most_wrong !== -1 ? simple_interface.getWord(most_wrong) : ""
+                }
+            }
+            
+            Row {
+                visible: most_wrong !== -1
+                Label {
+                    id: most_wrong_translation
+                    text: qsTr("Translation: ")
+                    color: Theme.highlightColor
+                }
+
+                Text {
+                    id: most_wrong_translation_label
+                    width: column.width - most_wrong_translation.width
+                    color: Theme.primaryColor
+                    wrapMode: Text.Wrap
+                    text: most_wrong !== -1 ? simple_interface.getTranslationOfWord(most_wrong) : ""
+                }
+            }
+            
+            Button {
+                visible: most_wrong !== -1
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+                text: qsTr("Show on cover")
+                onClicked: {
+                    random_vocabulary.word = most_wrong_word_label.text
+                    random_vocabulary.translation = most_wrong_translation_label.text
                 }
             }
         }
