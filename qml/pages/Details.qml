@@ -111,7 +111,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: word_text
                     width: column.width - word.width - word_icon.width
                     color: Theme.primaryColor
@@ -135,7 +135,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: translation_text
                     width: column.width - translation.width - translation_icon.width
                     color: Theme.primaryColor
@@ -163,7 +163,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: creation_text
                     width: column.width - creation.width
                     color: Theme.primaryColor
@@ -179,7 +179,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: modification_text
                     width: column.width - modification.width
                     color: Theme.primaryColor
@@ -195,7 +195,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: language_text
                     width: column.width - modification.width
                     color: Theme.primaryColor
@@ -211,7 +211,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: percentage_correct_text
                     width: column.width - percentage_correct.width
                     color: Theme.primaryColor
@@ -227,7 +227,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: number_correct_text
                     width: column.width - number_correct.width
                     color: Theme.primaryColor
@@ -243,7 +243,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: number_asked_text
                     width: column.width - number_asked.width
                     color: Theme.primaryColor

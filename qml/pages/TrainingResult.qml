@@ -53,7 +53,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: this_time_label
                     width: column.width - this_time.width
                     color: Theme.primaryColor
@@ -69,7 +69,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: overall_label
                     width: column.width - overall.width
                     color: Theme.primaryColor
@@ -78,7 +78,7 @@ Page {
                 }
             }
             
-            Text {
+            Label {
                 visible: most_wrong !== -1
                 width: parent.width
                 text: qsTr("Vocabulary with the most wrong answers:")
@@ -96,7 +96,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: most_wrong_word_label
                     width: column.width - most_wrong_word.width
                     color: Theme.primaryColor
@@ -113,7 +113,7 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Text {
+                Label {
                     id: most_wrong_translation_label
                     width: column.width - most_wrong_translation.width
                     color: Theme.primaryColor

@@ -73,7 +73,7 @@ Dialog {
                 cancelText: qsTr("Abort")
             }
 
-            Text {
+            Label {
 
                 anchors {
                     left: parent.left

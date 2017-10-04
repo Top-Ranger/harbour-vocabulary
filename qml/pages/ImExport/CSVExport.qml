@@ -177,7 +177,7 @@ Page {
                 }
             }
 
-            Text {
+            Label {
                 anchors {
                     left: parent.left
                     right: parent.right

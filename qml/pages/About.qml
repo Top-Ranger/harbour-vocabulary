@@ -47,7 +47,7 @@ Page {
                 text: "Vocabulary 1.8"
             }
 
-            Text {
+            Label {
 
                 anchors {
                     left: parent.left
@@ -66,7 +66,7 @@ Page {
                 title: qsTr("Main authors")
             }
 
-            Text {
+            Label {
 
                 anchors {
                     left: parent.left
@@ -84,7 +84,7 @@ Page {
                 title: qsTr("Contributors")
             }
 
-            Text {
+            Label {
 
                 anchors {
                     left: parent.left
@@ -103,7 +103,7 @@ sfbg"
                 title: qsTr("License")
             }
 
-            Text {
+            Label {
 
                 anchors {
                     left: parent.left
