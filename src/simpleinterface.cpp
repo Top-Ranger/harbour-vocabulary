@@ -577,6 +577,24 @@ bool SimpleInterface::resetTestCounts(int id)
     return true;
 }
 
+bool SimpleInterface::resetPriorityAll()
+{
+    QString s = "UPDATE vocabulary SET priority=100";
+    QSqlQuery q(database);
+
+    q.prepare(s);
+
+    if(!q.exec())
+    {
+        QString error = s;
+        error.append(": ").append(q.lastError().text());
+        WARNING(error);
+        return false;
+    }
+
+    return true;
+}
+
 float SimpleInterface::getOverallPercentageCorrect()
 {
     QString s = "SELECT AVG(CAST(number_correct AS REAL)/CAST(number_asked AS REAL)) FROM vocabulary";
