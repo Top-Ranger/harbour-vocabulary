@@ -1,5 +1,5 @@
 /*
- * Copyright 2016,2017 Marcus Soll
+ * Copyright 2016,2017,2019 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -301,32 +301,28 @@ Page {
 
             menu: ContextMenu {
                 MenuItem {
-                    text: "<img src=\"image://theme/icon-s-edit\" align=\"middle\" /> " + qsTr("Edit vocabulary")
-                    textFormat: Text.StyledText
+                    text: qsTr("Edit vocabulary")
                     onClicked: {
                         pageStack.push(Qt.resolvedUrl("Edit.qml"), { word_id: id } )
                     }
                 }
 
                 MenuItem {
-                    text: "<img src=\"image://theme/icon-m-delete\" width=\"" + Theme.iconSizeSmall + "\" height=\"" + Theme.iconSizeSmall + "\" align=\"middle\" >" + qsTr("Remove vocabulary")
-                    textFormat: Text.StyledText
+                    text: qsTr("Remove vocabulary")
                     onClicked: {
                         vocabularyListItem.remorseAction(qsTr("Remove vocabulary"), function() { functions.remove_word(id, vocabularyListItem) })
                     }
                 }
 
                 MenuItem {
-                    text: "<img src=\"image://theme/icon-s-clipboard\" align=\"middle\" /> "+ qsTr("Copy word to clipboard")
-                    textFormat: Text.StyledText
+                    text: qsTr("Copy word to clipboard")
                     onClicked: {
                         Clipboard.text = word
                     }
                 }
 
                 MenuItem {
-                    text: "<img src=\"image://theme/icon-s-clipboard\" align=\"middle\" /> " + qsTr("Copy translation to clipboard")
-                    textFormat: Text.StyledText
+                    text: qsTr("Copy translation to clipboard")
                     onClicked: {
                         Clipboard.text = translation
                     }
