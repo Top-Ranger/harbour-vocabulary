@@ -157,6 +157,7 @@ Dialog {
                 id: word
                 width: parent.width
                 height: implicitHeight
+                EnterKey.enabled: text.length > 0
                 EnterKey.onClicked: { text = text.replace("\n", ""); translation.focus = true }
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 placeholderText: qsTr("Input word or phrase here")
