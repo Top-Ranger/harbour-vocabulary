@@ -17,12 +17,16 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-Page {
+Dialog {
     id: page
     allowedOrientations: Orientation.All
 
     property int word_id: 0
     property int language_id: -1
+
+    canAccept: word.text.trim() != "" && translation.text.trim() != "" && (page.language_id !== -1 || new_language_input.text !== "")
+    onAccepted: functions.save_change()
+
 
     Item {
         id: functions
@@ -43,7 +47,6 @@ Page {
                 var last_page = pageStack.previousPage()
                 last_page.word_changed = true
                 last_page.word_id = page.word_id
-                pageStack.pop()
             }
             else {
                 panel.show()
@@ -96,31 +99,20 @@ Page {
         id: silicaFlickable
         anchors.fill: parent
 
+        DialogHeader {
+            id: header
+            title: qsTr("Edit vocabulary") + " " + simple_interface.getWord(page.word_id)
+            acceptText: qsTr("Save change")
+        }
+
         VerticalScrollDecorator {}
 
-        contentHeight: column.height
 
         Column {
             id: column
             width: page.width
             spacing: Theme.paddingMedium
-
-            PageHeader {
-                title: qsTr("Edit vocabulary") + " " + simple_interface.getWord(page.word_id)
-            }
-
-            Button {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    margins: Theme.horizontalPageMargin
-                }
-
-                enabled: word.text.trim() != "" && translation.text.trim() != "" && (page.language_id !== -1 || new_language_input.text !== "")
-                width: parent.width
-                text: qsTr("Save change")
-                onClicked: functions.save_change()
-            }
+            anchors.top: header.bottom
 
             ComboBox {
                 id: languageComboBox
