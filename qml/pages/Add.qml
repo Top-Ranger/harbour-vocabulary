@@ -176,7 +176,8 @@ Dialog {
 
         Column {
             id: column
-            width: page.width
+            width: parent.width
+            anchors.top: header.bottom
             spacing: Theme.paddingMedium
 
             ComboBox {
@@ -215,7 +216,7 @@ Dialog {
             TextArea {
                 id: new_language_input
                 visible: languageComboBox.currentIndex === 0
-                width: page.width
+                width: parent.width
                 EnterKey.onClicked: { text = text.replace("\n", ""); word.focus = true }
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 placeholderText: qsTr("Input new language")
@@ -277,6 +278,7 @@ Dialog {
                 id: word
                 width: parent.width
                 height: implicitHeight
+                EnterKey.enabled: text.length > 0
                 EnterKey.onClicked: { text = text.replace("\n", ""); translation.focus = true }
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 placeholderText: qsTr("Input word or phrase here")
