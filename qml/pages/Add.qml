@@ -19,11 +19,13 @@ import Sailfish.Silica 1.0
 import harbour.vocabulary.SettingsProxy 1.0
 import harbour.vocabulary.SimpleInterface 1.0
 
-Page {
+Dialog {
     id: page
     allowedOrientations: Orientation.All
 
     property int language_id: -1
+    canAccept: word.text != "" && translation.text != "" && (page.language_id !== -1 || new_language_input.text !== "")
+    onAccepted: functions.save_word()
 
     Component.onCompleted: {
         page.language_id = settings_proxy.addVocabularyLanguage
@@ -54,7 +56,6 @@ Page {
 
             if(simple_interface.addVocabulary(word.text, translation.text, id)) {
                 settings_proxy.addVocabularyLanguage = id
-                pageStack.pop()
             }
             else {
                 panel.show()
@@ -150,6 +151,13 @@ Page {
         id: silicaFlickable
         anchors.fill: parent
 
+        DialogHeader {
+            id: header
+            //% Save new vocabulary
+            title: qsTr("Add vocabulary")
+            acceptText: qsTr("Save vocabulary")
+        }
+
         VerticalScrollDecorator {}
 
         contentHeight: column.height
@@ -170,23 +178,6 @@ Page {
             id: column
             width: page.width
             spacing: Theme.paddingMedium
-
-            PageHeader {
-                title: qsTr("Add vocabulary")
-            }
-
-            Button {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    margins: Theme.horizontalPageMargin
-                }
-
-                enabled: word.text.trim() != "" && translation.text.trim() != "" && (page.language_id !== -1 || new_language_input.text !== "")
-                width: parent.width
-                text: qsTr("Save vocabulary")
-                onClicked: functions.save_word()
-            }
 
             ComboBox {
                 id: languageComboBox
