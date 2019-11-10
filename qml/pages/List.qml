@@ -220,6 +220,11 @@ Page {
                                    })
                 }
             }
+
+            MenuItem {
+                text: qsTr("Add vocabulary")
+                onClicked: pageStack.push(Qt.resolvedUrl("Add.qml"))
+            }
         }
 
         header: Column {

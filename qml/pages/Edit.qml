@@ -102,7 +102,7 @@ Page {
 
         Column {
             id: column
-            width: page.width
+            width: parent.width
             spacing: Theme.paddingMedium
 
             PageHeader {
