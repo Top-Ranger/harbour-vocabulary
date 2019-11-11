@@ -113,7 +113,7 @@ Dialog {
 
         Column {
             id: column
-            width: page.width
+            width: parent.width
             spacing: Theme.paddingMedium
             anchors.top: header.bottom
 
