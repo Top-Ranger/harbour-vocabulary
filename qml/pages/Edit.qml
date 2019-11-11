@@ -81,6 +81,9 @@ Dialog {
         word.text = simple_interface.getWord(page.word_id)
         translation.text = simple_interface.getTranslationOfWord(page.word_id)
         priority.value = simple_interface.getPriorityOfWord(page.word_id)
+
+        // set focus to entry field for word as soon as page is constructed
+        word.focus = true
     }
 
     ListModel {
@@ -157,7 +160,8 @@ Dialog {
                 id: word
                 width: parent.width
                 height: implicitHeight
-                EnterKey.enabled: text.length > 0
+                cursorPosition: text.length
+                EnterKey.enabled: text.lenght > 0
                 EnterKey.onClicked: { text = text.replace("\n", ""); translation.focus = true }
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 placeholderText: qsTr("Input word or phrase here")

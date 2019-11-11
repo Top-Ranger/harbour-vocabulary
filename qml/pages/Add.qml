@@ -33,6 +33,9 @@ Dialog {
         functions.load_list()
         functions.load_languages()
         functions.filter_list("")
+
+        // set focus to entry field for word as soon as page is constructed
+        word.focus = true
     }
 
     SettingsProxy {
