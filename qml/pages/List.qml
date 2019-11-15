@@ -223,7 +223,11 @@ Page {
 
             MenuItem {
                 text: qsTr("Add vocabulary")
-                onClicked: pageStack.push(Qt.resolvedUrl("Add.qml"))
+                onClicked: {
+                    var addDialog = pageStack.push(Qt.resolvedUrl("Add.qml"))
+                    // connect to 'accepted' signal in order to reload vocabulary list after adding new one
+                    addDialog.accepted.connect(function() {functions.load_list()})
+                }
             }
         }
 
