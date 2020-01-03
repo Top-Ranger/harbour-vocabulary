@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Marcus Soll
+ * Copyright 2016,2020 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import harbour.vocabulary.SettingsProxy 1.0
 Page {
     id: page
     allowedOrientations: Orientation.All
+
+    property bool word_added: false // Added for compatibility with Add.qml
 
     SettingsProxy {
         id: settings_proxy

@@ -54,6 +54,8 @@ Page {
 
             if(simple_interface.addVocabulary(word.text, translation.text, id)) {
                 settings_proxy.addVocabularyLanguage = id
+                var last_page = pageStack.previousPage()
+                last_page.word_added = true
                 pageStack.pop()
             }
             else {

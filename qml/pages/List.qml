@@ -1,5 +1,5 @@
 /*
- * Copyright 2016,2017,2019 Marcus Soll
+ * Copyright 2016,2017,2019,2020 Marcus Soll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ Page {
 
     property bool word_changed: false
     property int word_id: 0
+
+    property bool word_added: false
 
     property int sort_criterium: SimpleInterface.ALPHABETICAL_WORD
     property string search_text: ""
@@ -79,6 +81,8 @@ Page {
                 }
             }
             word_changed = false
+        } else if(word_added === true) {
+            functions.load_list()
         }
     }
 
@@ -200,6 +204,13 @@ Page {
                 visible: page.language_id !== -1
                 onClicked: {
                     remorse_popup.execute(qsTr("Remove all vocabulary"), function() { functions.remove_all_in_this_language() }, 10000)
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Add vocabulary")
+                onClicked: {
+                    pageStack.push(Qt.resolvedUrl("Add.qml"))
                 }
             }
 
